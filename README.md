@@ -5,7 +5,7 @@ colorFrom: blue
 colorTo: gray
 sdk: docker
 app_port: 8000
-base_path: /web
+base_path: /replays
 pinned: false
 license: mit
 short_description: Agents repair broken transactions without double-charging
@@ -269,6 +269,13 @@ Results land in the output directory as `summary.json`, `episodes.jsonl` and ful
 episodes as chat or tool-calling conversations. A local Python policy shares a
 process with the grader, so local scores are self-reported; use OpenEnv or Harbor
 below when that matters. [Agent guide](docs/AGENTS.md).
+
+### Live demo
+
+Try it in the browser on the [Hugging Face Space](https://huggingface.co/spaces/dmaheshwar22/airline-recovery-env):
+watch step-by-step replays of every recorded hard-tier episode, or open the
+playground and repair an incident yourself. Rebuild the replay data after new
+runs with `python scripts/build_replays.py`.
 
 ### OpenEnv
 

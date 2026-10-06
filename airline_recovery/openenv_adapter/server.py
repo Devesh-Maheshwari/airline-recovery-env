@@ -12,6 +12,7 @@ from openenv.core.env_server.types import ConcurrencyConfig
 
 from .environment import AirlineEnvironment
 from .models import AirlineAction, AirlineObservation, AirlineState
+from .replays import register as register_replays
 
 
 class PlaygroundManager:
@@ -43,7 +44,9 @@ def build_playground(web_manager, action_fields, metadata, is_chat_env, title, q
     """Keep the native controls while supplying an executable Airline Recovery Env example."""
     from openenv.core.env_server.gradio_ui import build_gradio_app
 
-    instructions = """### Connect to Airline Recovery Env
+    instructions = """### Watch AI agents try it: [replays of every recorded episode](/replays)
+
+### Connect to Airline Recovery Env
 Use the URL of this server as `base_url` (the local default is shown below).
 
 ```python
@@ -104,6 +107,7 @@ def build_app(max_sessions: int = 4, max_steps: int | None = None):
 
     app.router.lifespan_context = lifespan
     app.state.airline_environments = instances
+    register_replays(app)
     return app
 
 

@@ -144,6 +144,12 @@ gamed. This release closes those findings and removes the legacy simulator.
 - `examples/openai_compatible_agent.py`: the tool-calling loop for any OpenAI-compatible endpoint (Together AI, vLLM, Ollama); `examples/llm_agent.py` for the Anthropic API.
 - Recorded model baselines in `evidence/v0.4.0/`.
 
+### Added (demo)
+
+- `/replays`: a read-only page on the OpenEnv server (and the Hugging Face
+  Space's landing page) with step-by-step replays of every recorded hard-tier
+  episode, built from `evidence/` by `scripts/build_replays.py`.
+
 ### Renamed
 
 - The project was developed under the working name "SWA"; the package is now `airline_recovery` (distribution `airline-recovery-env`, CLI `airline-recovery`), task IDs are `airline-recovery-<split>-<index>`, and the OpenEnv environment is `airline_recovery`.

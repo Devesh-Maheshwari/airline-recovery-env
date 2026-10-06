@@ -38,3 +38,6 @@ airline-recovery-eval = "airline_recovery.live.evaluate:main"
 
 [tool.setuptools.packages.find]
 include = ["airline_recovery*"]
+
+[tool.setuptools.package-data]
+"airline_recovery.openenv_adapter" = ["replays.json"]
