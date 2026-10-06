@@ -3,9 +3,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import FastAPI
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
-
 DATA = Path(__file__).with_name("replays.json")
 
 PAGE = r"""<!doctype html>
@@ -76,8 +73,10 @@ $("detail").innerHTML=h}
 </script></body></html>"""
 
 
-def register(app: FastAPI) -> None:
-    """Add the replay page and its data to an existing app."""
+def register(app) -> None:
+    """Add the replay page and its data to an existing FastAPI app."""
+    from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+
     @app.get("/replays", include_in_schema=False)
     @app.get("/replays/", include_in_schema=False)
     def replay_page() -> HTMLResponse:

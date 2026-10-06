@@ -272,10 +272,12 @@ below when that matters. [Agent guide](docs/AGENTS.md).
 
 ### Live demo
 
-Try it in the browser on the [Hugging Face Space](https://huggingface.co/spaces/dmaheshwar22/airline-recovery-env):
-watch step-by-step replays of every recorded hard-tier episode, or open the
-playground and repair an incident yourself. Rebuild the replay data after new
-runs with `python scripts/build_replays.py`.
+The [Hugging Face Space](https://huggingface.co/spaces/dmaheshwar22/airline-recovery-env)
+shows step-by-step replays of every recorded hard-tier episode in the browser.
+To repair an incident yourself, run the OpenEnv server below and open its
+playground at `/web/`; the same replay page is served at `/replays`. Rebuild the
+replay data after new runs with `python scripts/build_replays.py`, and the static
+Space with `python scripts/build_static_space.py <dir>`.
 
 ### OpenEnv
 
