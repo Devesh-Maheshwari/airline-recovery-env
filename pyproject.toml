@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "airline-recovery-env"
+version = "0.5.0"
+description = "Stateful airline transaction recovery benchmark for tool-using agents"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+dependencies = []
+authors = [{name = "Devesh Maheshwari"}]
+keywords = ["agents", "benchmark", "reinforcement-learning", "tool-use", "openenv", "harbor", "incident-recovery", "transactions"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Operating System :: POSIX",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.urls]
+Homepage = "https://github.com/Devesh-Maheshwari/airline-recovery-env"
+Repository = "https://github.com/Devesh-Maheshwari/airline-recovery-env"
+Changelog = "https://github.com/Devesh-Maheshwari/airline-recovery-env/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+openenv = ["openenv>=0.7.0,<0.8"]
+
+[project.scripts]
+airline-recovery = "airline_recovery.cli:main"
+airline-recovery-eval = "airline_recovery.live.evaluate:main"
+
+[tool.setuptools.packages.find]
+include = ["airline_recovery*"]

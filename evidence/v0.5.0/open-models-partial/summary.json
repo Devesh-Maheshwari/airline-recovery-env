@@ -1,0 +1,112 @@
+{
+  "glm-5.3": {
+    "easy": {
+      "attempted": 27,
+      "finished_cleanly": 13,
+      "integrity_violation_episodes": 0,
+      "not_completed": {
+        "credit limit (HTTP 402)": 12,
+        "provider error or network": 2
+      },
+      "solved": 0,
+      "solved_tasks": []
+    },
+    "hard": {
+      "attempted": 16,
+      "finished_cleanly": 12,
+      "integrity_violation_episodes": 0,
+      "not_completed": {
+        "credit limit (HTTP 402)": 1,
+        "provider error or network": 3
+      },
+      "solved": 0,
+      "solved_tasks": []
+    },
+    "model": "zai-org/GLM-5.3"
+  },
+  "gpt-oss-120b": {
+    "easy": {
+      "attempted": 33,
+      "finished_cleanly": 13,
+      "integrity_violation_episodes": 0,
+      "not_completed": {
+        "credit limit (HTTP 402)": 15,
+        "provider error or network": 5
+      },
+      "solved": 1,
+      "solved_tasks": [
+        "train:1"
+      ]
+    },
+    "hard": {
+      "attempted": 24,
+      "finished_cleanly": 11,
+      "integrity_violation_episodes": 0,
+      "not_completed": {
+        "credit limit (HTTP 402)": 11,
+        "provider error or network": 2
+      },
+      "solved": 1,
+      "solved_tasks": [
+        "hard:train:1"
+      ]
+    },
+    "model": "openai/gpt-oss-120b"
+  },
+  "kimi-k3": {
+    "easy": {
+      "attempted": 18,
+      "finished_cleanly": 6,
+      "integrity_violation_episodes": 0,
+      "not_completed": {
+        "credit limit (HTTP 402)": 10,
+        "provider error or network": 2
+      },
+      "solved": 3,
+      "solved_tasks": [
+        "train:1",
+        "train:2"
+      ]
+    },
+    "hard": {
+      "attempted": 24,
+      "finished_cleanly": 6,
+      "integrity_violation_episodes": 2,
+      "not_completed": {
+        "credit limit (HTTP 402)": 15,
+        "provider error or network": 3
+      },
+      "solved": 2,
+      "solved_tasks": [
+        "hard:train:1"
+      ]
+    },
+    "model": "moonshotai/Kimi-K3"
+  },
+  "llama-3.3-70b": {
+    "easy": {
+      "attempted": 33,
+      "finished_cleanly": 6,
+      "integrity_violation_episodes": 0,
+      "not_completed": {
+        "credit limit (HTTP 402)": 26,
+        "provider error or network": 1
+      },
+      "solved": 0,
+      "solved_tasks": []
+    },
+    "hard": {
+      "attempted": 24,
+      "finished_cleanly": 7,
+      "integrity_violation_episodes": 0,
+      "not_completed": {
+        "credit limit (HTTP 402)": 17
+      },
+      "solved": 2,
+      "solved_tasks": [
+        "hard:train:1"
+      ]
+    },
+    "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo"
+  }
+}

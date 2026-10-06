@@ -1,0 +1,85 @@
+name: live-benchmark
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    # The full suite runs about 9 minutes on a fast Linux machine and longer on a hosted runner;
+    # test_hard_controls and test_hard_oracle take most of it.
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -e .
+      - run: python -m unittest discover -s tests -v
+      - run: python -m airline_recovery.live.evaluate --policy reference --split all --seeds 7 --output runs/ci-reference
+      - name: Require all reference episodes to solve
+        run: python -c "import json; episodes=[json.loads(line) for line in open('runs/ci-reference/episodes.jsonl')]; assert episodes and all(e['success'] for e in episodes), episodes"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reference-${{ matrix.python }}
+          path: runs/ci-reference
+  openenv:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-openenv.lock && python -m pip install --no-deps -e .
+      - run: python -m unittest discover -s tests -p test_openenv_live.py -v
+  installed-wheel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip wheel --no-deps --wheel-dir dist .
+      - name: Run installed package outside checkout
+        shell: bash
+        run: |
+          python -m venv "$RUNNER_TEMP/airline_recovery-wheel"
+          "$RUNNER_TEMP/airline_recovery-wheel/bin/pip" install --no-index dist/*.whl
+          mkdir -p "$RUNNER_TEMP/airline_recovery-smoke"
+          cd "$RUNNER_TEMP/airline_recovery-smoke"
+          "$RUNNER_TEMP/airline_recovery-wheel/bin/python" -m airline_recovery list
+          "$RUNNER_TEMP/airline_recovery-wheel/bin/python" -m airline_recovery demo --delay 0
+          "$RUNNER_TEMP/airline_recovery-wheel/bin/python" -m airline_recovery showcase --delay 0 --output showcase
+          "$RUNNER_TEMP/airline_recovery-wheel/bin/python" -m airline_recovery build-harbor
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t airline-recovery-env .
+      - run: docker run --detach --name airline-recovery-env --publish 8000:8000 airline-recovery-env
+      - name: Wait for the server to report healthy
+        shell: bash
+        run: |
+          for attempt in $(seq 1 45); do
+            status="$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8000/health || true)"
+            if [ "$status" = "200" ]; then
+              echo "GET /health returned 200 after $attempt attempts"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "GET /health did not return 200 (last status: $status)"
+          exit 1
+      - name: Show container logs
+        if: failure()
+        run: docker logs airline-recovery-env
+      - name: Stop the container
+        if: always()
+        run: docker stop airline-recovery-env

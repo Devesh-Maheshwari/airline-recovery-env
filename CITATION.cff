@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use Airline Recovery Env, cite the software and include the evaluated version and task/seed grid."
+title: "Airline Recovery Env"
+type: software
+version: 0.5.0
+date-released: 2026-10-06
+license: MIT
+authors:
+  - family-names: Maheshwari
+    given-names: Devesh
+repository-code: "https://github.com/Devesh-Maheshwari/airline-recovery-env"

@@ -1,0 +1,450 @@
+{
+  "available_tools": [
+    {
+      "description": "Inspect measured HTTP results, process availability and queue depth.",
+      "name": "get_metrics",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "service": {
+            "enum": [
+              "inventory",
+              "pricing",
+              "payment",
+              "booking",
+              "checkin"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Read recent executed HTTP request logs and trace IDs.",
+      "name": "get_logs",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "service": {
+            "enum": [
+              "inventory",
+              "pricing",
+              "payment",
+              "booking",
+              "checkin"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Read current deployed settings. No known-good baseline is supplied.",
+      "name": "get_config",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "service": {
+            "enum": [
+              "inventory",
+              "pricing",
+              "payment",
+              "booking",
+              "checkin"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Apply validated operator settings atomically; see configuration_contracts in the reset observation for legal fields, types and bounds. Provider latency is an observed external condition and cannot be patched. Booking payment_timeout_ms must cover provider_latency_ms. Payment idempotency protects retries; turning it off can double-charge. Checkin accepted_schema=2 accepts schema1 and2;1 accepts only1. Settings are not themselves graded.",
+      "name": "patch_config",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "service": {
+            "enum": [
+              "inventory",
+              "pricing",
+              "payment",
+              "booking",
+              "checkin"
+            ],
+            "type": "string"
+          },
+          "values": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "service",
+          "values"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Restart an unavailable process, preserving its database records and deployed settings.",
+      "name": "restart_service",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "service": {
+            "enum": [
+              "inventory",
+              "pricing",
+              "payment",
+              "booking",
+              "checkin"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "service"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Run bounded read-only SQLite SELECT over flights, bookings, holds, charges, outbox, checkins, request_logs, service_config, cache. Inspect table schemas through sqlite_master. Writes/PRAGMA/ATTACH/extensions are prohibited.",
+      "name": "query_sql",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "query": {
+            "maxLength": 4000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Retry pending outbox delivery in order. A failed head event blocks following events; investigate payload before discarding anything.",
+      "name": "replay_events",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Move a malformed event aside, preserving its payload. Discarding valid required events fails integrity verification.",
+      "name": "quarantine_event",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "event_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "event_id"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Evict service cache entries. New quotes then read the current fare version.",
+      "name": "invalidate_cache",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "service": {
+            "enum": [
+              "inventory",
+              "pricing",
+              "payment",
+              "booking",
+              "checkin"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "service"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Resume an existing booking with its accepted fare. Default capture key is booking:<booking_id> for booking.payment_key_version=1, booking-v2:<booking_id> for version 2. Changing versions can duplicate a previously committed charge. Inspect charges (charge_id, booking_id, idempotency_key, amount_cents). Optional idempotency_key retries that exact key; booking and payment idempotency must be enabled and timeout sufficient. Alternatively existing_charge_id adopts the explicitly selected sole matching charge and reserved seat without another capture; mismatches reject without changing business rows. These options are mutually exclusive. Omitting both performs a capture with the current deployed key; it does not discover prior payments.",
+      "name": "reconcile_booking",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "booking_id": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "existing_charge_id": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "idempotency_key": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "booking_id"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Run fresh booking, duplicate-request, sold-out and projection probes. Only healthy probe actions at step 6 or later count. Obtain two counted healthy probes after the last successful mutating tool call; any unhealthy workload or injected failure resets the count.",
+      "name": "probe",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      }
+    },
+    {
+      "description": "Stop and receive the outcome score. Changing configs to defaults or claiming success is insufficient.",
+      "name": "finish",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      }
+    }
+  ],
+  "configuration_contracts": {
+    "booking": {
+      "observed_fields": {
+        "payment_idempotency_enabled": {
+          "readOnly": false,
+          "type": "boolean"
+        },
+        "payment_key_version": {
+          "maximum": 2,
+          "minimum": 1,
+          "readOnly": false,
+          "type": "integer"
+        },
+        "payment_timeout_ms": {
+          "maximum": 10000,
+          "minimum": 1,
+          "readOnly": false,
+          "type": "integer"
+        },
+        "validate_price": {
+          "readOnly": false,
+          "type": "boolean"
+        }
+      },
+      "patch_schema": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "payment_idempotency_enabled": {
+            "readOnly": false,
+            "type": "boolean"
+          },
+          "payment_key_version": {
+            "maximum": 2,
+            "minimum": 1,
+            "readOnly": false,
+            "type": "integer"
+          },
+          "payment_timeout_ms": {
+            "maximum": 10000,
+            "minimum": 1,
+            "readOnly": false,
+            "type": "integer"
+          },
+          "validate_price": {
+            "readOnly": false,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "checkin": {
+      "observed_fields": {
+        "accepted_schema": {
+          "maximum": 2,
+          "minimum": 1,
+          "readOnly": false,
+          "type": "integer"
+        },
+        "batch_size": {
+          "maximum": 50,
+          "minimum": 1,
+          "readOnly": false,
+          "type": "integer"
+        },
+        "consumer_enabled": {
+          "readOnly": false,
+          "type": "boolean"
+        }
+      },
+      "patch_schema": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "accepted_schema": {
+            "maximum": 2,
+            "minimum": 1,
+            "readOnly": false,
+            "type": "integer"
+          },
+          "batch_size": {
+            "maximum": 50,
+            "minimum": 1,
+            "readOnly": false,
+            "type": "integer"
+          },
+          "consumer_enabled": {
+            "readOnly": false,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "inventory": {
+      "observed_fields": {
+        "enforce_capacity": {
+          "readOnly": false,
+          "type": "boolean"
+        }
+      },
+      "patch_schema": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "enforce_capacity": {
+            "readOnly": false,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "payment": {
+      "observed_fields": {
+        "idempotency_enabled": {
+          "readOnly": false,
+          "type": "boolean"
+        },
+        "provider_latency_ms": {
+          "maximum": 10000,
+          "minimum": 0,
+          "readOnly": true,
+          "type": "integer"
+        }
+      },
+      "patch_schema": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "idempotency_enabled": {
+            "readOnly": false,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "pricing": {
+      "observed_fields": {
+        "cache_enabled": {
+          "readOnly": false,
+          "type": "boolean"
+        }
+      },
+      "patch_schema": {
+        "additionalProperties": false,
+        "minProperties": 1,
+        "properties": {
+          "cache_enabled": {
+            "readOnly": false,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      }
+    }
+  },
+  "episode_contract": {
+    "max_actions": 48,
+    "mutating_tools": [
+      "invalidate_cache",
+      "patch_config",
+      "quarantine_event",
+      "reconcile_booking",
+      "replay_events",
+      "restart_service"
+    ],
+    "post_finish_safety_check": "When every other success condition holds, trusted traffic repeats two ordinary hazards against the settings you leave deployed: a booking whose payment acknowledgement is lost and is then retried by the customer, and a booking attempted across a fare change. A duplicate charge, or a booking accepted at a fare other than the current one, is an integrity violation.",
+    "required_healthy_probes": 2,
+    "reward": "Zero until finish or the action budget ends. Terminal reward is 0 after any integrity violation or before the injection horizon completes; otherwise 0.2*availability (last three traffic windows) + 0.6*incident_recovery (share of requests ever left incomplete during the episode that are now complete) + 0.2*verified, capped at 0.95 unless every success condition holds.",
+    "step_numbering": "The first action is step 1; a healthy probe at step 6 counts.",
+    "success_conditions": [
+      "All required booking-to-checkin transactions recovered",
+      "No integrity violation at any point in the episode",
+      "All requests in the last three traffic windows succeeded as expected",
+      "Two counted healthy probes after the last reset of verification",
+      "At least six actions and completion of the incident injection horizon",
+      "The deployed settings survive the post-finish safety check"
+    ],
+    "traffic_rule": "Every action, including reads, rejected actions and finish, advances customer traffic before its observation and score.",
+    "verification_eligible_from_step": 6,
+    "verification_reset_rule": "Every successful mutating tool call, including a no-op, resets the count. A rejected mutation does not itself reset it. Any unhealthy workload or newly injected failure resets it."
+  },
+  "info": {
+    "action_budget": 48,
+    "backend": "live-http-sqlite",
+    "synthetic": true
+  },
+  "mission": "Restore all accepted booking-to-checkin transactions and new request probes. Preserve exact charges, capacity, accepted fares and valid events. Inspect actual HTTP logs and SQL records. Only healthy probes at action step 6 or later count: obtain two counted healthy probe windows after the last successful mutating tool call, then finish. Reads and rejected actions also advance traffic. Faults may arrive during recovery; see episode_contract and configuration_contracts.",
+  "observation_keys": [
+    "alerts",
+    "available_tools",
+    "configuration_contracts",
+    "episode_contract",
+    "episode_id",
+    "mission",
+    "result",
+    "step",
+    "summary"
+  ],
+  "summary_keys": [
+    "booking_count",
+    "checkins",
+    "confirmed_bookings",
+    "outbox_pending",
+    "pending_bookings",
+    "remaining_actions",
+    "required_verification_windows",
+    "verification_eligible_from_step",
+    "verification_windows"
+  ]
+}

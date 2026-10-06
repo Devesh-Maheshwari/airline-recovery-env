@@ -1,0 +1,20 @@
+schema_version = "1.4"
+artifacts = ["/app/episode.json"]
+[task]
+name = "airline-recovery/airline-recovery-hard-eval-001"
+version = "0.5.0"
+description = "Recover live airline transactions without corrupting bookings, charges or seat capacity"
+[metadata]
+difficulty = "hard-2"
+category = "sre"
+tags = ["transactions", "incident-recovery", "stateful", "http", "eval", "hard"]
+[agent]
+timeout_sec = 900.0
+[verifier]
+timeout_sec = 120.0
+environment_mode = "separate"
+[environment]
+build_timeout_sec = 600.0
+cpus = 1
+memory_mb = 512
+network_mode = "public"

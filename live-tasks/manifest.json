@@ -1,0 +1,143 @@
+{
+  "version": "0.5.0",
+  "tasks": [
+    {
+      "path": "train/airline-recovery-train-000",
+      "split": "train",
+      "index": 0,
+      "tier": "easy"
+    },
+    {
+      "path": "train/airline-recovery-train-001",
+      "split": "train",
+      "index": 1,
+      "tier": "easy"
+    },
+    {
+      "path": "train/airline-recovery-train-002",
+      "split": "train",
+      "index": 2,
+      "tier": "easy"
+    },
+    {
+      "path": "train/airline-recovery-train-003",
+      "split": "train",
+      "index": 3,
+      "tier": "easy"
+    },
+    {
+      "path": "train/airline-recovery-train-004",
+      "split": "train",
+      "index": 4,
+      "tier": "easy"
+    },
+    {
+      "path": "eval/airline-recovery-eval-000",
+      "split": "eval",
+      "index": 0,
+      "tier": "easy"
+    },
+    {
+      "path": "eval/airline-recovery-eval-001",
+      "split": "eval",
+      "index": 1,
+      "tier": "easy"
+    },
+    {
+      "path": "eval/airline-recovery-eval-002",
+      "split": "eval",
+      "index": 2,
+      "tier": "easy"
+    },
+    {
+      "path": "test/airline-recovery-test-000",
+      "split": "test",
+      "index": 0,
+      "tier": "easy"
+    },
+    {
+      "path": "test/airline-recovery-test-001",
+      "split": "test",
+      "index": 1,
+      "tier": "easy"
+    },
+    {
+      "path": "test/airline-recovery-test-002",
+      "split": "test",
+      "index": 2,
+      "tier": "easy"
+    },
+    {
+      "path": "hard/train/airline-recovery-hard-train-000",
+      "split": "train",
+      "index": 0,
+      "tier": "hard"
+    },
+    {
+      "path": "hard/train/airline-recovery-hard-train-001",
+      "split": "train",
+      "index": 1,
+      "tier": "hard"
+    },
+    {
+      "path": "hard/train/airline-recovery-hard-train-002",
+      "split": "train",
+      "index": 2,
+      "tier": "hard"
+    },
+    {
+      "path": "hard/train/airline-recovery-hard-train-003",
+      "split": "train",
+      "index": 3,
+      "tier": "hard"
+    },
+    {
+      "path": "hard/train/airline-recovery-hard-train-004",
+      "split": "train",
+      "index": 4,
+      "tier": "hard"
+    },
+    {
+      "path": "hard/train/airline-recovery-hard-train-005",
+      "split": "train",
+      "index": 5,
+      "tier": "hard"
+    },
+    {
+      "path": "hard/eval/airline-recovery-hard-eval-000",
+      "split": "eval",
+      "index": 0,
+      "tier": "hard"
+    },
+    {
+      "path": "hard/eval/airline-recovery-hard-eval-001",
+      "split": "eval",
+      "index": 1,
+      "tier": "hard"
+    },
+    {
+      "path": "hard/eval/airline-recovery-hard-eval-002",
+      "split": "eval",
+      "index": 2,
+      "tier": "hard"
+    },
+    {
+      "path": "hard/test/airline-recovery-hard-test-000",
+      "split": "test",
+      "index": 0,
+      "tier": "hard"
+    },
+    {
+      "path": "hard/test/airline-recovery-hard-test-001",
+      "split": "test",
+      "index": 1,
+      "tier": "hard"
+    },
+    {
+      "path": "hard/test/airline-recovery-hard-test-002",
+      "split": "test",
+      "index": 2,
+      "tier": "hard"
+    }
+  ]
+}

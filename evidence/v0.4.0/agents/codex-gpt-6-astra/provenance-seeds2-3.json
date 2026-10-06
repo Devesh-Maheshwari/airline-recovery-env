@@ -1,0 +1,42 @@
+{
+  "agent": "codex",
+  "command": [
+    "codex",
+    "exec",
+    "--model",
+    "gpt-6-astra",
+    "--sandbox",
+    "workspace-write",
+    "-c",
+    "sandbox_workspace_write.network_access=true",
+    "-c",
+    "approval_policy=\"never\"",
+    "--skip-git-repo-check",
+    "--ephemeral",
+    "--json",
+    "<instruction>"
+  ],
+  "instruction": "Recover a synthetic airline booking-to-checkin system running in separate HTTP worker processes.\nPreserve accepted bookings, exact single charges, seat capacity, accepted fares, and valid events.\nRun `python control.py` for the current observation and full tool schemas.\nRun `python control.py action '{\"tool\":\"get_metrics\",\"arguments\":{}}'` to act.\nInspect logs/config/SQL, repair underlying problems, reconcile accepted transactions and verify two healthy probe windows before finish.\nEvery tool action advances customer traffic; another incident can arrive while you work. Budget: 48 actions.\nThere is one episode and its actions cannot be undone: the world runs in an isolated sidecar and is the only thing graded.\nWhen you call finish (or exhaust the budget) the sidecar issues a signed receipt, which the CLI stores in episode.json. An episode without a receipt scores 0.\nReward measures actual completed requests and integrity; correct configuration names or a written explanation do not earn credit.\nThis benchmark executes local HTTP and SQLite transactions; it does not connect to real airlines, payments or cloud infrastructure.\n",
+  "model": "gpt-6-astra",
+  "seeds": [
+    2,
+    3
+  ],
+  "source_sha256": {
+    "airline_recovery/live/__init__.py": "7076535f17658ee34bc2c77abef936ec3aeed6892ab9743236f7940677257b4f",
+    "airline_recovery/live/bridge.py": "497436f3ef8d0f2ed332226cfc14d98504addf9003b417cfc67a5ee79d304c01",
+    "airline_recovery/live/environment.py": "9c2d7271a8db30a395c0ac1f018e4659a81ccc2af8bc5e5caa97416cd0faaad5",
+    "airline_recovery/live/evaluate.py": "2f72f97d795ac3b279f087ce12aa19394d2373922710bfb43aabad62b67dde99",
+    "airline_recovery/live/external.py": "46b337382c79cf2054ca2722fef8f96e9541f18d3edaa6decdd550758f408833",
+    "airline_recovery/live/harbor.py": "d64ab7822bdc56622ac03cc1915af3d27a8bc3ffbf3daa009c7400a98d41a3e0",
+    "airline_recovery/live/policies.py": "0bdb752f2acc3d1e409c3c690bff9d4230f380cd589a8d7205c1d0f67885b38d",
+    "airline_recovery/live/runtime.py": "e88ab2cfd628baf74009010af5f5bcaadadc0f2088e287c0fd666c84912ff712",
+    "airline_recovery/live/scenarios.py": "da381f22c87ff5d0fddf76f14a6a5f137ba39ff3d2edd16d0b2e63885daa09ab",
+    "airline_recovery/live/showcase.py": "ba2cc1aeb26237c4395aed46c0763463b7c7a792afe744aee99b37bb39ad034b",
+    "airline_recovery/live/store.py": "eaba4c945e2e9695a085e009ee54d1e671a0dbd900871aad2455893731acf966",
+    "airline_recovery/live/verification.py": "91d8563ee72e800db40248846f4878910719d59cd7b4fdd905a9cbc628294bbf",
+    "airline_recovery/live/worker.py": "2f4bbc3cef37c911e5d0a3fc2f9a3d88394cf290036e20d24143ca66ed81a582"
+  },
+  "started_utc": "2026-10-02T22:48:17.415159+00:00",
+  "trust_boundary": "external-process"
+}

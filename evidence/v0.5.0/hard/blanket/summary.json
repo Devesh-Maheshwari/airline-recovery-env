@@ -1,0 +1,593 @@
+{
+  "all": {
+    "by_level": {
+      "1": {
+        "episodes": 12,
+        "pass_rate": 0.25,
+        "successes": 3
+      },
+      "2": {
+        "episodes": 12,
+        "pass_rate": 0.0,
+        "successes": 0
+      },
+      "3": {
+        "episodes": 12,
+        "pass_rate": 0.0,
+        "successes": 0
+      }
+    },
+    "episodes": 36,
+    "errors": 0,
+    "excess_capture_cents": 350000,
+    "integrity_violation_episodes": 30,
+    "mean_cost": 0.1216388888888889,
+    "mean_incident_recovery": 0.2292989417989418,
+    "mean_requests": 83.13888888888889,
+    "mean_reward": 0.09044444444444445,
+    "mean_steps": 14.694444444444445,
+    "mean_tool_calls": 13.694444444444445,
+    "mean_wall_seconds": 6.3466809131625475,
+    "pass_rate": 0.08333333333333333,
+    "pass_rate_95pct_wilson": [
+      0.02874861133599338,
+      0.2182669124927263
+    ],
+    "successes": 3,
+    "tasks": 12,
+    "tasks_solved_on_every_seed": 0,
+    "terminated": 36,
+    "total_wall_seconds": 228.4805128738517,
+    "truncated": 0
+  },
+  "by_split": {
+    "eval": {
+      "by_level": {
+        "1": {
+          "episodes": 3,
+          "pass_rate": 0.0,
+          "successes": 0
+        },
+        "2": {
+          "episodes": 3,
+          "pass_rate": 0.0,
+          "successes": 0
+        },
+        "3": {
+          "episodes": 3,
+          "pass_rate": 0.0,
+          "successes": 0
+        }
+      },
+      "episodes": 9,
+      "errors": 0,
+      "excess_capture_cents": 95000,
+      "integrity_violation_episodes": 8,
+      "mean_cost": 0.12011111111111111,
+      "mean_incident_recovery": 0.1814814814814815,
+      "mean_requests": 84.22222222222223,
+      "mean_reward": 0.019555555555555555,
+      "mean_steps": 14.555555555555555,
+      "mean_tool_calls": 13.555555555555555,
+      "mean_wall_seconds": 6.041486560341178,
+      "pass_rate": 0.0,
+      "pass_rate_95pct_wilson": [
+        0.0,
+        0.2991450484195441
+      ],
+      "successes": 0,
+      "tasks": 3,
+      "tasks_solved_on_every_seed": 0,
+      "terminated": 9,
+      "total_wall_seconds": 54.3733790430706,
+      "truncated": 0
+    },
+    "test": {
+      "by_level": {
+        "1": {
+          "episodes": 3,
+          "pass_rate": 0.0,
+          "successes": 0
+        },
+        "2": {
+          "episodes": 3,
+          "pass_rate": 0.0,
+          "successes": 0
+        },
+        "3": {
+          "episodes": 3,
+          "pass_rate": 0.0,
+          "successes": 0
+        }
+      },
+      "episodes": 9,
+      "errors": 0,
+      "excess_capture_cents": 60000,
+      "integrity_violation_episodes": 8,
+      "mean_cost": 0.12255555555555556,
+      "mean_incident_recovery": 0.17222222222222222,
+      "mean_requests": 75.22222222222223,
+      "mean_reward": 0.021777777777777778,
+      "mean_steps": 14.777777777777779,
+      "mean_tool_calls": 13.777777777777779,
+      "mean_wall_seconds": 5.564008689989957,
+      "pass_rate": 0.0,
+      "pass_rate_95pct_wilson": [
+        0.0,
+        0.2991450484195441
+      ],
+      "successes": 0,
+      "tasks": 3,
+      "tasks_solved_on_every_seed": 0,
+      "terminated": 9,
+      "total_wall_seconds": 50.07607820990961,
+      "truncated": 0
+    },
+    "train": {
+      "by_level": {
+        "1": {
+          "episodes": 6,
+          "pass_rate": 0.5,
+          "successes": 3
+        },
+        "2": {
+          "episodes": 6,
+          "pass_rate": 0.0,
+          "successes": 0
+        },
+        "3": {
+          "episodes": 6,
+          "pass_rate": 0.0,
+          "successes": 0
+        }
+      },
+      "episodes": 18,
+      "errors": 0,
+      "excess_capture_cents": 195000,
+      "integrity_violation_episodes": 14,
+      "mean_cost": 0.12194444444444444,
+      "mean_incident_recovery": 0.28174603174603174,
+      "mean_requests": 86.55555555555556,
+      "mean_reward": 0.16022222222222224,
+      "mean_steps": 14.722222222222221,
+      "mean_tool_calls": 13.722222222222221,
+      "mean_wall_seconds": 6.890614201159527,
+      "pass_rate": 0.16666666666666666,
+      "pass_rate_95pct_wilson": [
+        0.05836576805861446,
+        0.39222038103915724
+      ],
+      "successes": 3,
+      "tasks": 6,
+      "tasks_solved_on_every_seed": 0,
+      "terminated": 18,
+      "total_wall_seconds": 124.03105562087148,
+      "truncated": 0
+    }
+  },
+  "by_task": {
+    "eval:0": {
+      "by_level": {
+        "1": {
+          "episodes": 3,
+          "pass_rate": 0.0,
+          "successes": 0
+        }
+      },
+      "episodes": 3,
+      "errors": 0,
+      "excess_capture_cents": 0,
+      "integrity_violation_episodes": 2,
+      "mean_cost": 0.10300000000000001,
+      "mean_incident_recovery": 0.4777777777777778,
+      "mean_requests": 62,
+      "mean_reward": 0.058666666666666666,
+      "mean_steps": 13,
+      "mean_tool_calls": 12,
+      "mean_wall_seconds": 5.627484986015285,
+      "pass_rate": 0.0,
+      "pass_rate_95pct_wilson": [
+        5.551115123125783e-17,
+        0.5614970317550454
+      ],
+      "successes": 0,
+      "tasks": 1,
+      "tasks_solved_on_every_seed": 0,
+      "terminated": 3,
+      "total_wall_seconds": 16.882454958045855,
+      "truncated": 0
+    },
+    "eval:1": {
+      "by_level": {
+        "2": {
+          "episodes": 3,
+          "pass_rate": 0.0,
+          "successes": 0
+        }
+      },
+      "episodes": 3,
+      "errors": 0,
+      "excess_capture_cents": 70000,
+      "integrity_violation_episodes": 3,
+      "mean_cost": 0.13966666666666666,
+      "mean_incident_recovery": 0.06666666666666667,
+      "mean_requests": 107.66666666666667,
+      "mean_reward": 0.0,
+      "mean_steps": 16.333333333333332,
+      "mean_tool_calls": 15.333333333333334,
+      "mean_wall_seconds": 7.183247750333976,
+      "pass_rate": 0.0,
+      "pass_rate_95pct_wilson": [
+        5.551115123125783e-17,
+        0.5614970317550454
+      ],
+      "successes": 0,
+      "tasks": 1,
+      "tasks_solved_on_every_seed": 0,
+      "terminated": 3,
+      "total_wall_seconds": 21.549743251001928,
+      "truncated": 0
+    },
+    "eval:2": {
+      "by_level": {
+        "3": {
+          "episodes": 3,
+          "pass_rate": 0.0,
+          "successes": 0
+        }
+      },
+      "episodes": 3,
+      "errors": 0,
+      "excess_capture_cents": 25000,
+      "integrity_violation_episodes": 3,
+      "mean_cost": 0.11766666666666667,
+      "mean_incident_recovery": 0.0,
+      "mean_requests": 83,
+      "mean_reward": 0.0,
+      "mean_steps": 14.333333333333334,
+      "mean_tool_calls": 13.333333333333334,
+      "mean_wall_seconds": 5.313726944674272,
+      "pass_rate": 0.0,
+      "pass_rate_95pct_wilson": [
+        5.551115123125783e-17,
+        0.5614970317550454
+      ],
+      "successes": 0,
+      "tasks": 1,
+      "tasks_solved_on_every_seed": 0,
+      "terminated": 3,
+      "total_wall_seconds": 15.941180834022816,
+      "truncated": 0
+    },
+    "test:0": {
+      "by_level": {
+        "1": {
+          "episodes": 3,
+          "pass_rate": 0.0,
+          "successes": 0
+        }
+      },
+      "episodes": 3,
+      "errors": 0,
+      "excess_capture_cents": 0,
+      "integrity_violation_episodes": 2,
+      "mean_cost": 0.09566666666666666,
+      "mean_incident_recovery": 0.5166666666666667,
+      "mean_requests": 59.333333333333336,
+      "mean_reward": 0.06533333333333334,
+      "mean_steps": 12.333333333333334,
+      "mean_tool_calls": 11.333333333333334,
+      "mean_wall_seconds": 4.901423041669962,
+      "pass_rate": 0.0,
+      "pass_rate_95pct_wilson": [
+        5.551115123125783e-17,
+        0.5614970317550454
+      ],
+      "successes": 0,
+      "tasks": 1,
+      "tasks_solved_on_every_seed": 0,
+      "terminated": 3,
+      "total_wall_seconds": 14.704269125009887,
+      "truncated": 0
+    },
+    "test:1": {
+      "by_level": {
+        "2": {
+          "episodes": 3,
+          "pass_rate": 0.0,
+          "successes": 0
+        }
+      },
+      "episodes": 3,
+      "errors": 0,
+      "excess_capture_cents": 20000,
+      "integrity_violation_episodes": 3,
+      "mean_cost": 0.16166666666666665,
+      "mean_incident_recovery": 0.0,
+      "mean_requests": 92.33333333333333,
+      "mean_reward": 0.0,
+      "mean_steps": 18.333333333333332,
+      "mean_tool_calls": 17.333333333333332,
+      "mean_wall_seconds": 6.756819305960865,
+      "pass_rate": 0.0,
+      "pass_rate_95pct_wilson": [
+        5.551115123125783e-17,
+        0.5614970317550454
+      ],
+      "successes": 0,
+      "tasks": 1,
+      "tasks_solved_on_every_seed": 0,
+      "terminated": 3,
+      "total_wall_seconds": 20.270457917882595,
+      "truncated": 0
+    },
+    "test:2": {
+      "by_level": {
+        "3": {
+          "episodes": 3,
+          "pass_rate": 0.0,
+          "successes": 0
+        }
+      },
+      "episodes": 3,
+      "errors": 0,
+      "excess_capture_cents": 40000,
+      "integrity_violation_episodes": 3,
+      "mean_cost": 0.11033333333333334,
+      "mean_incident_recovery": 0.0,
+      "mean_requests": 74,
+      "mean_reward": 0.0,
+      "mean_steps": 13.666666666666666,
+      "mean_tool_calls": 12.666666666666666,
+      "mean_wall_seconds": 5.0337837223390425,
+      "pass_rate": 0.0,
+      "pass_rate_95pct_wilson": [
+        5.551115123125783e-17,
+        0.5614970317550454
+      ],
+      "successes": 0,
+      "tasks": 1,
+      "tasks_solved_on_every_seed": 0,
+      "terminated": 3,
+      "total_wall_seconds": 15.101351167017128,
+      "truncated": 0
+    },
+    "train:0": {
+      "by_level": {
+        "1": {
+          "episodes": 3,
+          "pass_rate": 0.3333333333333333,
+          "successes": 1
+        }
+      },
+      "episodes": 3,
+      "errors": 0,
+      "excess_capture_cents": 40000,
+      "integrity_violation_episodes": 2,
+      "mean_cost": 0.08833333333333333,
+      "mean_incident_recovery": 0.8333333333333334,
+      "mean_requests": 58.333333333333336,
+      "mean_reward": 0.2986666666666667,
+      "mean_steps": 11.666666666666666,
+      "mean_tool_calls": 10.666666666666666,
+      "mean_wall_seconds": 5.239866916342483,
+      "pass_rate": 0.3333333333333333,
+      "pass_rate_95pct_wilson": [
+        0.06149194472039621,
+        0.7923403991979522
+      ],
+      "successes": 1,
+      "tasks": 1,
+      "tasks_solved_on_every_seed": 0,
+      "terminated": 3,
+      "total_wall_seconds": 15.71960074902745,
+      "truncated": 0
+    },
+    "train:1": {
+      "by_level": {
+        "1": {
+          "episodes": 3,
+          "pass_rate": 0.6666666666666666,
+          "successes": 2
+        }
+      },
+      "episodes": 3,
+      "errors": 0,
+      "excess_capture_cents": 0,
+      "integrity_violation_episodes": 0,
+      "mean_cost": 0.059,
+      "mean_incident_recovery": 0.6666666666666666,
+      "mean_requests": 46.333333333333336,
+      "mean_reward": 0.6626666666666667,
+      "mean_steps": 9,
+      "mean_tool_calls": 8,
+      "mean_wall_seconds": 4.06998248565166,
+      "pass_rate": 0.6666666666666666,
+      "pass_rate_95pct_wilson": [
+        0.2076596008020477,
+        0.9385080552796037
+      ],
+      "successes": 2,
+      "tasks": 1,
+      "tasks_solved_on_every_seed": 0,
+      "terminated": 3,
+      "total_wall_seconds": 12.209947456954978,
+      "truncated": 0
+    },
+    "train:2": {
+      "by_level": {
+        "2": {
+          "episodes": 3,
+          "pass_rate": 0.0,
+          "successes": 0
+        }
+      },
+      "episodes": 3,
+      "errors": 0,
+      "excess_capture_cents": 0,
+      "integrity_violation_episodes": 3,
+      "mean_cost": 0.16166666666666668,
+      "mean_incident_recovery": 0.07936507936507936,
+      "mean_requests": 97.66666666666667,
+      "mean_reward": 0.0,
+      "mean_steps": 18.333333333333332,
+      "mean_tool_calls": 17.333333333333332,
+      "mean_wall_seconds": 7.710078874990965,
+      "pass_rate": 0.0,
+      "pass_rate_95pct_wilson": [
+        5.551115123125783e-17,
+        0.5614970317550454
+      ],
+      "successes": 0,
+      "tasks": 1,
+      "tasks_solved_on_every_seed": 0,
+      "terminated": 3,
+      "total_wall_seconds": 23.130236624972895,
+      "truncated": 0
+    },
+    "train:3": {
+      "by_level": {
+        "2": {
+          "episodes": 3,
+          "pass_rate": 0.0,
+          "successes": 0
+        }
+      },
+      "episodes": 3,
+      "errors": 0,
+      "excess_capture_cents": 65000,
+      "integrity_violation_episodes": 3,
+      "mean_cost": 0.147,
+      "mean_incident_recovery": 0.0,
+      "mean_requests": 121.66666666666667,
+      "mean_reward": 0.0,
+      "mean_steps": 17,
+      "mean_tool_calls": 16,
+      "mean_wall_seconds": 8.018345360993408,
+      "pass_rate": 0.0,
+      "pass_rate_95pct_wilson": [
+        5.551115123125783e-17,
+        0.5614970317550454
+      ],
+      "successes": 0,
+      "tasks": 1,
+      "tasks_solved_on_every_seed": 0,
+      "terminated": 3,
+      "total_wall_seconds": 24.055036082980223,
+      "truncated": 0
+    },
+    "train:4": {
+      "by_level": {
+        "3": {
+          "episodes": 3,
+          "pass_rate": 0.0,
+          "successes": 0
+        }
+      },
+      "episodes": 3,
+      "errors": 0,
+      "excess_capture_cents": 25000,
+      "integrity_violation_episodes": 3,
+      "mean_cost": 0.15433333333333332,
+      "mean_incident_recovery": 0.1111111111111111,
+      "mean_requests": 107.66666666666667,
+      "mean_reward": 0.0,
+      "mean_steps": 17.666666666666668,
+      "mean_tool_calls": 16.666666666666668,
+      "mean_wall_seconds": 8.9120114443164,
+      "pass_rate": 0.0,
+      "pass_rate_95pct_wilson": [
+        5.551115123125783e-17,
+        0.5614970317550454
+      ],
+      "successes": 0,
+      "tasks": 1,
+      "tasks_solved_on_every_seed": 0,
+      "terminated": 3,
+      "total_wall_seconds": 26.736034332949203,
+      "truncated": 0
+    },
+    "train:5": {
+      "by_level": {
+        "3": {
+          "episodes": 3,
+          "pass_rate": 0.0,
+          "successes": 0
+        }
+      },
+      "episodes": 3,
+      "errors": 0,
+      "excess_capture_cents": 65000,
+      "integrity_violation_episodes": 3,
+      "mean_cost": 0.12133333333333333,
+      "mean_incident_recovery": 0.0,
+      "mean_requests": 87.66666666666667,
+      "mean_reward": 0.0,
+      "mean_steps": 14.666666666666666,
+      "mean_tool_calls": 13.666666666666666,
+      "mean_wall_seconds": 7.393400124662246,
+      "pass_rate": 0.0,
+      "pass_rate_95pct_wilson": [
+        5.551115123125783e-17,
+        0.5614970317550454
+      ],
+      "successes": 0,
+      "tasks": 1,
+      "tasks_solved_on_every_seed": 0,
+      "terminated": 3,
+      "total_wall_seconds": 22.180200373986736,
+      "truncated": 0
+    }
+  },
+  "interpretation": "Scripted policies are baselines, not training. Wilson intervals describe this run's episode sample; repeated seeds and related tasks are not independent production incidents, so read tasks_solved_on_every_seed alongside pass_rate. The policy ran in the grader's process: these numbers are self-reported.",
+  "matched_episode_keys": [
+    "hard:train:0:1",
+    "hard:train:0:2",
+    "hard:train:0:3",
+    "hard:train:1:1",
+    "hard:train:1:2",
+    "hard:train:1:3",
+    "hard:train:2:1",
+    "hard:train:2:2",
+    "hard:train:2:3",
+    "hard:train:3:1",
+    "hard:train:3:2",
+    "hard:train:3:3",
+    "hard:train:4:1",
+    "hard:train:4:2",
+    "hard:train:4:3",
+    "hard:train:5:1",
+    "hard:train:5:2",
+    "hard:train:5:3",
+    "hard:eval:0:1",
+    "hard:eval:0:2",
+    "hard:eval:0:3",
+    "hard:eval:1:1",
+    "hard:eval:1:2",
+    "hard:eval:1:3",
+    "hard:eval:2:1",
+    "hard:eval:2:2",
+    "hard:eval:2:3",
+    "hard:test:0:1",
+    "hard:test:0:2",
+    "hard:test:0:3",
+    "hard:test:1:1",
+    "hard:test:1:2",
+    "hard:test:1:3",
+    "hard:test:2:1",
+    "hard:test:2:2",
+    "hard:test:2:3"
+  ],
+  "max_steps": null,
+  "policy": "blanket",
+  "schema_version": 2,
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "source_stable_through_completion": true,
+  "tier": "hard",
+  "trust_boundary": "in-process",
+  "wall_seconds": 228.51260508300038
+}

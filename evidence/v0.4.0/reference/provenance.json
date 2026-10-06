@@ -1,0 +1,34 @@
+{
+  "completed_utc": "2026-10-02T21:43:38.278042+00:00",
+  "index": null,
+  "max_steps": 48,
+  "platform": "macOS-26.5-arm64-arm-64bit",
+  "policy": "reference",
+  "policy_source_sha256": "0bdb752f2acc3d1e409c3c690bff9d4230f380cd589a8d7205c1d0f67885b38d",
+  "python": "3.12.12 (main, Oct  9 2025, 11:07:00) [Clang 17.0.0 (clang-1700.6.3.2)]",
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "source_sha256": {
+    "airline_recovery/live/__init__.py": "7076535f17658ee34bc2c77abef936ec3aeed6892ab9743236f7940677257b4f",
+    "airline_recovery/live/bridge.py": "497436f3ef8d0f2ed332226cfc14d98504addf9003b417cfc67a5ee79d304c01",
+    "airline_recovery/live/environment.py": "9c2d7271a8db30a395c0ac1f018e4659a81ccc2af8bc5e5caa97416cd0faaad5",
+    "airline_recovery/live/evaluate.py": "2f72f97d795ac3b279f087ce12aa19394d2373922710bfb43aabad62b67dde99",
+    "airline_recovery/live/harbor.py": "d327279c0565e052aecd87f68c30787764c096ede527829f655ae27497bf1fda",
+    "airline_recovery/live/policies.py": "0bdb752f2acc3d1e409c3c690bff9d4230f380cd589a8d7205c1d0f67885b38d",
+    "airline_recovery/live/runtime.py": "e88ab2cfd628baf74009010af5f5bcaadadc0f2088e287c0fd666c84912ff712",
+    "airline_recovery/live/scenarios.py": "da381f22c87ff5d0fddf76f14a6a5f137ba39ff3d2edd16d0b2e63885daa09ab",
+    "airline_recovery/live/showcase.py": "ba2cc1aeb26237c4395aed46c0763463b7c7a792afe744aee99b37bb39ad034b",
+    "airline_recovery/live/store.py": "eaba4c945e2e9695a085e009ee54d1e671a0dbd900871aad2455893731acf966",
+    "airline_recovery/live/verification.py": "91d8563ee72e800db40248846f4878910719d59cd7b4fdd905a9cbc628294bbf",
+    "airline_recovery/live/worker.py": "2f4bbc3cef37c911e5d0a3fc2f9a3d88394cf290036e20d24143ca66ed81a582"
+  },
+  "source_stable_through_completion": false,
+  "split": "all",
+  "started_utc": "2026-10-02T21:39:31.389980+00:00",
+  "trust_boundary": "in-process"
+}

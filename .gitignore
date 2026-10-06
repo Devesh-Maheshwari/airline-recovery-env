@@ -1,0 +1,19 @@
+__pycache__/
+*.egg-info/
+.venv/
+build/
+dist/
+jobs/
+runtime/
+runs/
+.DS_Store
+*.pyc
+.env
+.env.*
+*.sqlite3-wal
+*.sqlite3-shm
+.idea/
+.vscode/
+# Local tool state lives in top-level dot-directories; .github is the only one published.
+/.*/
+!/.github/

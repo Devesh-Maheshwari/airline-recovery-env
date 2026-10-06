@@ -1,0 +1,14 @@
+services:
+  main:
+    depends_on:
+      world:
+        condition: service_healthy
+  world:
+    build:
+      context: ./world-airline-recovery-hard-eval-002
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8081/health',timeout=2)"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    mem_limit: 512m

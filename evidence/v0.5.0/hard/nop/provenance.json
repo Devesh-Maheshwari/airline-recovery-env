@@ -1,0 +1,37 @@
+{
+  "completed_utc": "2026-10-05T16:32:36.686966+00:00",
+  "index": null,
+  "max_steps": null,
+  "platform": "macOS-26.5-arm64-arm-64bit",
+  "policy": "nop",
+  "policy_source_sha256": "3550da8a61e0edbceb43823928bd4c3339c16c02a9aff2981853a6e69005f11f",
+  "python": "3.12.12 (main, Oct  9 2025, 11:07:00) [Clang 17.0.0 (clang-1700.6.3.2)]",
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "source_sha256": {
+    "airline_recovery/live/__init__.py": "7076535f17658ee34bc2c77abef936ec3aeed6892ab9743236f7940677257b4f",
+    "airline_recovery/live/bridge.py": "7be8064e7013076083aa20a5e3f1f64d00a2862075eb2861369776892fa8ae1d",
+    "airline_recovery/live/environment.py": "1a13f8c3f4566470b66ded1a630070c6c65b18f5019645b306378e92d62b0c32",
+    "airline_recovery/live/evaluate.py": "d809f88fedfd9e3db19f269724ffda3da6ab01a39adb37381a3cebfaa4a64148",
+    "airline_recovery/live/external.py": "88250e9df4e91a1ba7f49a67a4de363ff8c55873eabcc3221bdd503117b31d22",
+    "airline_recovery/live/harbor.py": "3b403d3d01cd155fa5493f132fa9527b9fea9567e646bfe254a070ec70c3c111",
+    "airline_recovery/live/hard_injector.py": "31d30899aaf4a9fe96d6f78ca9c354f121a266dc44c5aa7060de18655a529aa8",
+    "airline_recovery/live/hardcases.py": "bd56fdbbbb03d11ab2ff48dfd9eb38b1f9c8a62a39710e1aa1ccaf25a50f39e1",
+    "airline_recovery/live/oracle.py": "338a79b46ca0b00869f9edd484cd912e2fb81acc0f03cb76d6e1d49355ea25a0",
+    "airline_recovery/live/policies.py": "3550da8a61e0edbceb43823928bd4c3339c16c02a9aff2981853a6e69005f11f",
+    "airline_recovery/live/runtime.py": "c6f404c4070ff350fafb5ff6ef65833799ca94380b84b9286a0427d122669687",
+    "airline_recovery/live/scenarios.py": "178bdba018299be95656c6ae2c10b5e60207b260ef50c9b6cd1b257f0c579dea",
+    "airline_recovery/live/showcase.py": "1e48ae96bfe65c42ec050dc24d8ff2ad1402a8133409187a7a0b8ee90fec0549",
+    "airline_recovery/live/store.py": "8bf4489d08f49385b8f6b2572769e0df47fe65e3a718560d70718748acf691bf",
+    "airline_recovery/live/verification.py": "202a3152722e3e2753641fdae034fd3ea507af53da4095c172a43b53636728c3",
+    "airline_recovery/live/worker.py": "a35c84acfed5fc60aa53f4627ec9566f0e2c739f3ccb18e49ebadd8ec68d35ba"
+  },
+  "source_stable_through_completion": true,
+  "split": "all",
+  "started_utc": "2026-10-05T16:29:50.417377+00:00",
+  "tier": "hard",
+  "trust_boundary": "in-process"
+}

@@ -1,0 +1,139 @@
+{
+  "agent": "claude-code",
+  "all": {
+    "by_level": {},
+    "episodes": 33,
+    "errors": 0,
+    "excess_capture_cents": 0,
+    "integrity_violation_episodes": 0,
+    "mean_cost": null,
+    "mean_incident_recovery": null,
+    "mean_requests": null,
+    "mean_reward": 0.9554778484848485,
+    "mean_steps": 18.09375,
+    "mean_tool_calls": null,
+    "mean_wall_seconds": 91.66258361732771,
+    "pass_rate": 0.9090909090909091,
+    "pass_rate_95pct_wilson": [
+      0.7642739435353026,
+      0.9685960584754184
+    ],
+    "successes": 30,
+    "tasks": 11,
+    "tasks_solved_on_every_seed": 8,
+    "terminated": 32,
+    "total_wall_seconds": 3024.8652593718143,
+    "truncated": 0
+  },
+  "by_split": {
+    "eval": {
+      "by_level": {},
+      "episodes": 9,
+      "errors": 0,
+      "excess_capture_cents": 0,
+      "integrity_violation_episodes": 0,
+      "mean_cost": null,
+      "mean_incident_recovery": null,
+      "mean_requests": null,
+      "mean_reward": 0.8666666666666667,
+      "mean_steps": 16.5,
+      "mean_tool_calls": null,
+      "mean_wall_seconds": 104.68536380545184,
+      "pass_rate": 0.7777777777777778,
+      "pass_rate_95pct_wilson": [
+        0.45258896910698887,
+        0.9367748928821533
+      ],
+      "successes": 7,
+      "tasks": 3,
+      "tasks_solved_on_every_seed": 1,
+      "terminated": 8,
+      "total_wall_seconds": 942.1682742490666,
+      "truncated": 0
+    },
+    "test": {
+      "by_level": {},
+      "episodes": 9,
+      "errors": 0,
+      "excess_capture_cents": 0,
+      "integrity_violation_episodes": 0,
+      "mean_cost": null,
+      "mean_incident_recovery": null,
+      "mean_requests": null,
+      "mean_reward": 0.9700854444444444,
+      "mean_steps": 23,
+      "mean_tool_calls": null,
+      "mean_wall_seconds": 106.14095468975655,
+      "pass_rate": 0.8888888888888888,
+      "pass_rate_95pct_wilson": [
+        0.5650002944233439,
+        0.9801091123614551
+      ],
+      "successes": 8,
+      "tasks": 3,
+      "tasks_solved_on_every_seed": 2,
+      "terminated": 9,
+      "total_wall_seconds": 955.268592207809,
+      "truncated": 0
+    },
+    "train": {
+      "by_level": {},
+      "episodes": 15,
+      "errors": 0,
+      "excess_capture_cents": 0,
+      "integrity_violation_episodes": 0,
+      "mean_cost": null,
+      "mean_incident_recovery": null,
+      "mean_requests": null,
+      "mean_reward": 1.0,
+      "mean_steps": 16,
+      "mean_tool_calls": null,
+      "mean_wall_seconds": 75.16189286099592,
+      "pass_rate": 1.0,
+      "pass_rate_95pct_wilson": [
+        0.7961166989641515,
+        1.0
+      ],
+      "successes": 15,
+      "tasks": 5,
+      "tasks_solved_on_every_seed": 5,
+      "terminated": 15,
+      "total_wall_seconds": 1127.4283929149387,
+      "truncated": 0
+    }
+  },
+  "failures": [
+    {
+      "reward": 0.8,
+      "run_id": "eval:1:1",
+      "steps": 41,
+      "verified": false,
+      "violations": []
+    },
+    {
+      "reward": 0.0,
+      "run_id": "eval:2:3",
+      "steps": null,
+      "verified": null,
+      "violations": null
+    },
+    {
+      "reward": 0.730769,
+      "run_id": "test:2:3",
+      "steps": 37,
+      "verified": false,
+      "violations": []
+    }
+  ],
+  "model": "claude-haiku-4-5",
+  "schema_version": 1,
+  "seeds": [
+    1,
+    2,
+    3
+  ],
+  "tier": "easy",
+  "total_cost_usd": 4.8149314,
+  "trust_boundary": "external-process",
+  "unfinished_episodes": 1
+}
