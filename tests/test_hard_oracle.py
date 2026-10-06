@@ -270,6 +270,7 @@ class DecisionTableTests(unittest.TestCase):
         self.assertEqual(queries.index(SQL_A) + 1, queries.index(oracle.SQL_A_LEGACY))
 
 
+@unittest.skipIf(os.environ.get("AIRLINE_SKIP_HARD_GRIDS") == "1", "executed hard-tier grid runs in its own CI job")
 @unittest.skipUnless(HAVE_HARD_TIER, "hard tier not integrated yet")
 class OracleHardTierTests(unittest.TestCase):
     def test_oracle_solves_every_generated_instance(self):

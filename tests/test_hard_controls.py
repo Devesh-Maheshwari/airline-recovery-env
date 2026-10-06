@@ -100,6 +100,7 @@ class ControlStructureTests(unittest.TestCase):
         self.assertIn(SQL_A, [a["arguments"].get("query") for a in actions[:first]])
 
 
+@unittest.skipIf(os.environ.get("AIRLINE_SKIP_HARD_GRIDS") == "1", "executed hard-tier grid runs in its own CI job")
 @unittest.skipUnless(HAVE_HARD_TIER, "hard tier not integrated yet")
 class ControlOutcomeTests(unittest.TestCase):
     def run_control(self, name):

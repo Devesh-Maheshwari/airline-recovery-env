@@ -5,9 +5,8 @@ permissions:
 jobs:
   core:
     runs-on: ubuntu-latest
-    # The full suite runs about 9 minutes on a fast Linux machine and longer on a hosted runner;
-    # test_hard_controls and test_hard_oracle take most of it.
-    timeout-minutes: 40
+    # The executed hard-tier grids run in the hard-grids job below.
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -19,6 +18,8 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: python -m pip install -e .
       - run: python -m unittest discover -s tests -v
+        env:
+          AIRLINE_SKIP_HARD_GRIDS: '1'
       - run: python -m airline_recovery.live.evaluate --policy reference --split all --seeds 7 --output runs/ci-reference
       - name: Require all reference episodes to solve
         run: python -c "import json; episodes=[json.loads(line) for line in open('runs/ci-reference/episodes.jsonl')]; assert episodes and all(e['success'] for e in episodes), episodes"
@@ -27,6 +28,19 @@ jobs:
         with:
           name: reference-${{ matrix.python }}
           path: runs/ci-reference
+  hard-grids:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -e .
+      - name: Oracle solves every hard slot; scripted controls fail for the designed reason
+        run: python -m unittest discover -s tests -p "test_hard_[oc]*.py" -v
+        env:
+          AIRLINE_HARD_SEEDS: '2'
   openenv:
     runs-on: ubuntu-latest
     timeout-minutes: 15
