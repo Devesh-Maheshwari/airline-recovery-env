@@ -17,6 +17,7 @@ HARD = ROOT / "evidence" / "v0.5.0" / "hard"
 OUT = ROOT / "airline_recovery" / "openenv_adapter" / "replays.json"
 AGENTS = {"oracle": "Reference oracle", "codex-gpt-6-astra": "Codex (gpt-6-astra)",
           "claude-sonnet-5-5": "Claude Code (Sonnet 5.5)", "claude-haiku-4-5": "Claude Code (Haiku 4.5)"}
+SHORT = {"oracle": "Oracle", "codex-gpt-6-astra": "Codex", "claude-sonnet-5-5": "Sonnet 5.5", "claude-haiku-4-5": "Haiku 4.5"}
 LONG = 400
 
 
@@ -59,7 +60,7 @@ def build() -> dict:
             steps = [{"tool": a.get("tool"), "arguments": _short(a.get("arguments") or {})} for a in actions]
             episodes.append(_episode(name, record, steps))
     episodes.sort(key=lambda e: (list(AGENTS).index(e["agent"]), e["split"], e["index"], e["seed"]))
-    return {"version": 1, "agents": AGENTS, "agent_order": list(AGENTS), "episodes": episodes}
+    return {"version": 1, "agents": AGENTS, "agent_short": SHORT, "agent_order": list(AGENTS), "episodes": episodes}
 
 
 if __name__ == "__main__":

@@ -14,13 +14,13 @@ PAGE = r"""<!doctype html>
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
 main{max-width:1180px;margin:0 auto;padding:24px 16px 64px}h1{font-size:24px;margin:0 0 4px}h2{font-size:17px;margin:28px 0 10px}
 p.lead{color:var(--muted);margin:0 0 18px;max-width:760px}a{color:var(--accent)}
-table{border-collapse:collapse;width:100%;background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden}
-th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600}
-td.n{text-align:right;font-variant-numeric:tabular-nums}tr.pick{cursor:pointer}tr.pick:hover td{background:color-mix(in srgb,var(--accent) 7%,transparent)}tr.sel td{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+table{border-collapse:collapse;width:100%;background:var(--card)}.box{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+th,td{padding:8px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}tr:last-child td{border-bottom:0}th{white-space:nowrap}th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}tr.pick{cursor:pointer}tr.pick:hover td{background:color-mix(in srgb,var(--accent) 7%,transparent)}tr.sel td{background:color-mix(in srgb,var(--accent) 12%,transparent)}
 .badge{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:600}.pass{color:var(--pass);background:var(--passbg)}.fail{color:var(--fail);background:var(--failbg)}.warn{color:var(--warn);background:var(--warnbg)}
 .controls{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 12px}select{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
 .layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px;align-items:start}@media (max-width:900px){.layout{grid-template-columns:1fr}}
-.list{max-height:70vh;overflow:auto;border-radius:8px}.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;position:sticky;top:12px}
+.list{max-height:70vh;overflow:auto}.list th{position:sticky;top:0;background:var(--card);z-index:1}.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;position:sticky;top:12px}
 .harm{margin:8px 0 12px;padding:10px 12px;border-radius:8px;background:var(--failbg);color:var(--fail)}.ok{margin:8px 0 12px;padding:10px 12px;border-radius:8px;background:var(--passbg);color:var(--pass)}
 ol.steps{margin:0;padding:0;list-style:none;max-height:56vh;overflow:auto}ol.steps li{display:grid;grid-template-columns:34px 1fr;gap:8px;padding:7px 0;border-bottom:1px solid var(--line)}
 .num{color:var(--muted);font-variant-numeric:tabular-nums;text-align:right}.tool{font-weight:600}.args{font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);word-break:break-all;margin-top:2px}
@@ -32,10 +32,10 @@ ol.steps{margin:0;padding:0;list-style:none;max-height:56vh;overflow:auto}ol.ste
 <p class="lead">A pretend airline runs as five small services: pricing, seats, payments, bookings and check-in. Something breaks, for example a payment goes through but the booking is never told. An AI agent gets tools to look around and repair it, and is graded only on what happened to the customers: nobody charged twice, nobody who cancelled given a ticket, every paying customer checked in.</p>
 <p class="lead">Below is every recorded episode on the hard tier: a reference procedure that always solves it, and three AI coding agents on the same incidents. Pick an episode to see each move and what the grader found.</p>
 <p><a class="cta" href="/web/">Play it yourself</a> <a href="https://github.com/Devesh-Maheshwari/airline-recovery-env" style="margin-left:12px">Source and docs on GitHub</a></p>
-<h2>Results</h2><table id="summary"></table>
+<h2>Results</h2><div class="box"><table id="summary"></table></div>
 <h2>Episodes</h2>
 <div class="controls"><select id="agent"></select><select id="outcome"><option value="">All outcomes</option><option value="pass">Solved</option><option value="harm">Harmed a customer</option><option value="other">Other failure</option></select><select id="level"><option value="">All levels</option><option>1</option><option>2</option><option>3</option></select></div>
-<div class="layout"><div class="list"><table id="episodes"></table></div><div class="panel" id="detail"><div class="empty">Select an episode on the left.</div></div></div>
+<div class="layout"><div class="list box"><table id="episodes"></table></div><div class="panel" id="detail"><div class="empty">Select an episode on the left.</div></div></div>
 </main><script>
 const HARM={duplicate_charge:"Charged a customer twice",cancelled_request_fulfilled:"Gave a ticket to a customer who had cancelled",duplicate_sale:"Sold one customer two seats",
 accepted_request_changed:"Booked a customer at a different price than promised",unfunded_confirmation:"Confirmed a booking whose payment was missing or doubled",oversold:"Sold more seats than the plane has",
@@ -50,14 +50,14 @@ const kind=e=>e.success?"pass":(e.violations.length?"harm":"other");
 function badge(e){const k=kind(e);return k==="pass"?'<span class="badge pass">Solved</span>':k==="harm"?'<span class="badge fail">Harm</span>':'<span class="badge warn">Not finished</span>'}
 fetch("/replays/data.json").then(r=>r.json()).then(d=>{D=d;init()});
 function init(){const a=$("agent");a.innerHTML='<option value="">All agents</option>'+(D.agent_order||Object.keys(D.agents)).map(k=>`<option value="${k}">${esc(D.agents[k])}</option>`).join("");
-let rows="<tr><th>Agent</th><th class=n>Solved</th><th class=n>Harmed a customer</th><th class=n>Other failure</th><th>Level 1 / 2 / 3 solved</th></tr>";
+let rows="<tr><th>Agent</th><th class=n>Solved</th><th class=n>Harmed a customer</th><th class=n>Other failure</th><th class=n>Level 1 / 2 / 3 solved</th></tr>";
 for(const k of (D.agent_order||Object.keys(D.agents))){const name=D.agents[k];const es=D.episodes.filter(e=>e.agent===k);const lv=[1,2,3].map(l=>{const x=es.filter(e=>e.level===l);return `${x.filter(e=>e.success).length}/${x.length}`}).join(" · ");
-rows+=`<tr><td>${esc(name)}</td><td class=n>${es.filter(e=>e.success).length} / ${es.length}</td><td class=n>${es.filter(e=>kind(e)==="harm").length}</td><td class=n>${es.filter(e=>kind(e)==="other").length}</td><td>${lv}</td></tr>`}
+rows+=`<tr><td>${esc(name)}</td><td class=n>${es.filter(e=>e.success).length} / ${es.length}</td><td class=n>${es.filter(e=>kind(e)==="harm").length}</td><td class=n>${es.filter(e=>kind(e)==="other").length}</td><td class=n>${lv}</td></tr>`}
 $("summary").innerHTML=rows;["agent","outcome","level"].forEach(id=>$(id).onchange=list);list();
 const m=location.hash.slice(1).split("/");if(m.length===3){const i=D.episodes.findIndex(e=>e.agent===m[0]&&e.task===m[1]&&String(e.seed)===m[2]);if(i>=0)show(i)}}
 function list(){const a=$("agent").value,o=$("outcome").value,l=$("level").value;const es=D.episodes.filter(e=>(!a||e.agent===a)&&(!o||kind(e)===o)&&(!l||String(e.level)===l));
 let rows="<tr><th>Agent</th><th>Task</th><th class=n>Seed</th><th class=n>Level</th><th>Outcome</th><th class=n>Moves</th></tr>";
-es.forEach(e=>{const i=D.episodes.indexOf(e);rows+=`<tr class="pick${i===cur?" sel":""}" data-i="${i}"><td>${esc(D.agents[e.agent])}</td><td>${e.task}</td><td class=n>${e.seed}</td><td class=n>${e.level}</td><td>${badge(e)}</td><td class=n>${e.steps_taken??"—"}</td></tr>`});
+es.forEach(e=>{const i=D.episodes.indexOf(e);rows+=`<tr class="pick${i===cur?" sel":""}" data-i="${i}"><td title="${esc(D.agents[e.agent])}">${esc((D.agent_short||{})[e.agent]||D.agents[e.agent])}</td><td>${e.task}</td><td class=n>${e.seed}</td><td class=n>${e.level}</td><td>${badge(e)}</td><td class=n>${e.steps_taken??"—"}</td></tr>`});
 $("episodes").innerHTML=es.length?rows:'<tr><td class="empty">No episodes match.</td></tr>';document.querySelectorAll("tr.pick").forEach(r=>r.onclick=()=>show(+r.dataset.i))}
 function show(i){cur=i;const e=D.episodes[i];history.replaceState(null,"",`#${e.agent}/${e.task}/${e.seed}`);list();let h=`<h2 style="margin-top:0">${esc(D.agents[e.agent])} · hard ${e.task} · seed ${e.seed}</h2>`;
 h+=`<div class="meta"><span>Level ${e.level}</span><span>${e.steps_taken??"?"} of ${e.budget??"?"} moves</span>${e.truncated?"<span>Ran out of moves</span>":""}${e.finished===false?"<span>Never declared it fixed</span>":""}</div>`;
