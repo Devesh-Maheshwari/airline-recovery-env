@@ -1,0 +1,170 @@
+{
+ "actions": [
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, request_id, passenger_id, flight_id, amount_cents, status FROM bookings WHERE status = \"pending\" LIMIT 10"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 1000
+    }
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_bc983269c1e45f29a8c1142fd57ed1c5"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_bc983269c1e45f29a8c1142fd57ed1c5"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id, c.amount_cents, c.status FROM charges c WHERE c.booking_id IN (\"bkg_bc983269c1e45f29a8c1142fd57ed1c5\", \"bkg_74ac3d632e3d59328f2fd4055a9bb48e\", \"bkg_10da8807137c53c1a18883fe2512dc14\", \"bkg_dfcc8db1be2c5d60bde9f730f4c7b79a\", \"bkg_c492dde21d2c553587773b46129c3640\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT charge_id, booking_id, amount_cents FROM charges WHERE booking_id IN (\"bkg_bc983269c1e45f29a8c1142fd57ed1c5\", \"bkg_74ac3d632e3d59328f2fd4055a9bb48e\", \"bkg_10da8807137c53c1a18883fe2512dc14\", \"bkg_dfcc8db1be2c5d60bde9f730f4c7b79a\", \"bkg_c492dde21d2c553587773b46129c3640\")"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_bc983269c1e45f29a8c1142fd57ed1c5",
+    "existing_charge_id": "chg_7cf7af82046d5b999de7b2deca01354e"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT hold_id, booking_id, flight_id, passenger_id FROM holds WHERE booking_id IN (\"bkg_bc983269c1e45f29a8c1142fd57ed1c5\", \"bkg_74ac3d632e3d59328f2fd4055a9bb48e\", \"bkg_10da8807137c53c1a18883fe2512dc14\", \"bkg_dfcc8db1be2c5d60bde9f730f4c7b79a\", \"bkg_c492dde21d2c553587773b46129c3640\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM holds WHERE booking_id IN (\"bkg_bc983269c1e45f29a8c1142fd57ed1c5\", \"bkg_74ac3d632e3d59328f2fd4055a9bb48e\", \"bkg_10da8807137c53c1a18883fe2512dc14\", \"bkg_dfcc8db1be2c5d60bde9f730f4c7b79a\", \"bkg_c492dde21d2c553587773b46129c3640\")"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_74ac3d632e3d59328f2fd4055a9bb48e"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_bc983269c1e45f29a8c1142fd57ed1c5"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_74ac3d632e3d59328f2fd4055a9bb48e"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_10da8807137c53c1a18883fe2512dc14"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_dfcc8db1be2c5d60bde9f730f4c7b79a"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_c492dde21d2c553587773b46129c3640"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_74ac3d632e3d59328f2fd4055a9bb48e"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

@@ -1,0 +1,41 @@
+{
+ "num_turns": 20,
+ "result": "The episode ended with the action budget exhausted, not through `finish`. I never got a healthy probe, so the verification and success components of the reward are lost.\n\nI miscounted my actions. I assumed I had more left when I ran the two probes, and I never called `finish`. The budget ran out on the next read. A receipt was issued and is stored in `episode.json`. I haven't seen the score.\n\n**State at the end**\n- All 409 bookings are confirmed with 409 check-ins, and no bookings are pending.\n- The outbox has nothing pending: 408 events delivered and 4 quarantined.\n- Both probes came back unhealthy. The last metrics showed 22 inventory and booking 409s and 8 check-in 422s. I didn't have the budget to find out why.\n- The payment alert still reads \"elevated 504 rate\". The metrics showed zero payment errors, so it may be stale.\n\n**Fixes I made**\n- **Booking timeout:** `payment_timeout_ms` was 90 and the provider latency is 633 ms. That was why bookings stayed pending. I raised it to 3000.\n- **Pending bookings:** I reconciled all 11 with the default key. Their charges were already captured, so no new charges were created.\n- **Check-in consumer:** it had auto-paused after repeated failures on a poison event. I set `auto_pause_after_attempts` to 0, re-enabled the consumer and set `batch_size` to 50.\n- **Quarantined events:** I quarantined 4 events. Event 334 had a truncated payload. Events 335 and 339 had no `passenger_id`. Event 336's payload `booking_id` didn't match its row. Their bookings already had check-ins, so I judged them invalid rather than valid events.\n- **Replay:** I replayed the remaining 17 events and all were delivered.\n\n**What I'd do differently**\nI should have tracked the action count, probed earlier and called `finish` with spare budget. The reconcile and quarantine calls used about 20 actions, and I could have batched or skipped some of the read queries.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.24597560000000004,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 25994,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 25994,
+  "cache_read_input_tokens": 415838,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 36,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 440,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 440,
+    "cache_read_input_tokens": 31511,
+    "input_tokens": 2,
+    "output_tokens": 673,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 5876,
+  "output_tokens_details": {
+   "thinking_tokens": 1189
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

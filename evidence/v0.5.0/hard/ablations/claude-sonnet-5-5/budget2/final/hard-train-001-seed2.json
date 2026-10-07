@@ -1,0 +1,41 @@
+{
+ "num_turns": 11,
+ "result": "I finished the episode at step 8 of 64. The sidecar issued a signed receipt, and the CLI should have stored it in `episode.json`. I didn't read the final reward field. The output I looked at doesn't show it, so I can't give you the score.\n\n- **What I found:** The system was already healthy when I started. The \"quarantine the pending backlog\" alert was stale, because the outbox had 0 pending events. Nothing had been injected that needed fixing. The system stayed healthy on every probe.\n- **What I did:** I made no changes (0 mutations) and used no provider lookups. I ran the reads and probes needed to confirm health, and two probes counted toward verification.\n- **Receipt checks:**\n  - The post-finish safety check ran the fare-change, lost-ack-retry and expired-key-retry hazards against the settings as I left them. It found no violations.\n  - The horizon was complete.\n  - There were no abandoned requests.\n  - Revenue retained was 1.0.\n  - The cost penalty was 0.008.\n- **Unconfirmed:** The receipt reports `incident_requests: 0`. So no delayed incident was injected during this run, as far as I can tell. I didn't check for one directly. I finished once the horizon was complete and two healthy probes had counted.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.09593180000000001,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 13179,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 13179,
+  "cache_read_input_tokens": 133449,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 18,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 700,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 700,
+    "cache_read_input_tokens": 18436,
+    "input_tokens": 2,
+    "output_tokens": 419,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 1649,
+  "output_tokens_details": {
+   "thinking_tokens": 264
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

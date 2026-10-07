@@ -1,0 +1,41 @@
+{
+ "num_turns": 14,
+ "result": "Success! \ud83c\udf89 The airline recovery episode completed with a **reward of 0.92** out of 1.0.\n\n**What was fixed:**\n1. **Root cause identified**: One outbox event had an invalid payload (missing `passenger_id` field)\n2. **Impact**: This triggered the checkin consumer's circuit breaker, which paused and then disabled the consumer\n3. **Solution applied**:\n   - Quarantined the invalid event\n   - Re-enabled the checkin consumer\n   - Replayed remaining valid events (all 8 delivered successfully)\n\n**Results achieved:**\n- \u2705 All 29 customer requests completed successfully\n- \u2705 31 confirmed bookings with check-ins\n- \u2705 Zero integrity violations\n- \u2705 Full availability (100%)\n- \u2705 Full recovery (100% of incomplete requests resolved)\n- \u2705 Two healthy verification probes\n- \u2705 Post-finish safety check passed (tested cancel_then_retry, fare_change, lost_ack_retry hazards)\n- \u2705 Full revenue retained\n\n**Efficiency:**\n- Used only 12 of 32 available actions\n- 3 mutations with cost penalty of 0.08\n- No provider lookups needed\n- No abandoned requests or duplicate charges\n\nThe system is now fully operational and ready for normal traffic.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.1038421,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 21482,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 21482,
+  "cache_read_input_tokens": 333201,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 113,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 1969,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 1969,
+    "cache_read_input_tokens": 30732,
+    "input_tokens": 8,
+    "output_tokens": 660,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 5489,
+  "output_tokens_details": {
+   "thinking_tokens": 2978
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

@@ -1,0 +1,41 @@
+{
+ "num_turns": 19,
+ "result": "I finished the episode, but the recovery was only partial and the run almost certainly scored poorly. The receipt is stored in `episode.json`. I didn't see the final score, because my output filter cut it off.\n\n**What the receipt shows**\n- **Incomplete requests:** 4 customer requests were still incomplete.\n- **Abandoned requests:** 30 of the 61 incident requests were abandoned, so `revenue_retained` was about 0.51.\n- **Cost penalty:** it hit the 0.25 cap, with 20 mutations.\n- **Verification:** I never got a healthy probe, so `verification_windows` stayed at 0.\n- **Safety check:** it did not run (`ran: false`), because the other success conditions weren't met.\n- **Integrity:** no duplicate charges, and no pending bookings at the end.\n\n**What I did**\n- **Root cause:** `booking.payment_timeout_ms` was 131 ms while the payment provider takes about 520 ms, so captures timed out and bookings piled up pending. I raised the timeout to 2000 ms.\n- **Pending bookings:** I confirmed the ones with a captured charge using that charge ID. For the ones still submitted, I retried the capture with the same idempotency key, which won't double-charge. One provider lookup showed the payment still pending. The retries later succeeded.\n- **Outbox backlog:** I quarantined three malformed events: one missing `passenger_id`, one truncated payload, and one whose booking ID didn't match. I then replayed the rest in batches of 10 until the backlog was empty.\n\n**What went wrong**\n- **Wasted actions:** I spent actions on retries and replays while the incident was still creating new pending bookings. Several of my commands ran more than one action. The budget was nearly gone by the time the backlog was clear, with 5 actions left.\n- **Unhealthy probes:** that left room for only two probes, and neither was healthy. Both reported `backlog_complete: false` even though the outbox showed 0 pending, and I didn't find out why.\n- **Finish without verification:** I finished anyway, because without a receipt the episode scores 0.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.2114974,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 21299,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 21299,
+  "cache_read_input_tokens": 366197,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 36,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 721,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 721,
+    "cache_read_input_tokens": 26535,
+    "input_tokens": 2,
+    "output_tokens": 705,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 5299,
+  "output_tokens_details": {
+   "thinking_tokens": 742
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

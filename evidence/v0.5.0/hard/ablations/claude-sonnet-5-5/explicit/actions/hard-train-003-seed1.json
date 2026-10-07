@@ -1,0 +1,107 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select booking_id,client_reference,request_id,flight_id,passenger_id,status,amount_cents,created_step from bookings"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select name,sql from sqlite_master where name in (\"bookings\",\"charges\",\"outbox\",\"refunds\",\"customer_events\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,booking_id,payload,status,attempts from outbox where status!=\"delivered\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.flight_id,b.amount_cents a,b.status,b.client_reference cr,c.charge_id,c.idempotency_key k,c.amount_cents ca,c.state,(select count(*) from holds h where h.booking_id=b.booking_id) h from bookings b left join charges c on c.booking_id=b.booking_id where b.status!=\"confirmed\" or c.charge_id is null"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 3000
+    }
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_14536f0e49235a79808940dd95370ea0"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_14536f0e49235a79808940dd95370ea0"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_2fe0a87051865f3d903f9cab7f709281"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_f197a3ab0f1a501598661d2ee1ed1248"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_2c8d457f95ee5c7c9de510b396f9d9a6"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_2fe0a87051865f3d903f9cab7f709281"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_2c8d457f95ee5c7c9de510b396f9d9a6"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_62c9061cc9f1563793f5e05c467589f4"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ddc5dc7acc06538493b898672c38bb58"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.client_reference cr,c.state,c.created_step from bookings b left join charges c on c.booking_id=b.booking_id where b.client_reference is not null or b.status!=\"confirmed\""
+   }
+  }
+ ]
+}

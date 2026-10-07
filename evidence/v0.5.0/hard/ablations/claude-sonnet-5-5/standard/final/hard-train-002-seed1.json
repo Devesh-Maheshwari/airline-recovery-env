@@ -1,0 +1,41 @@
+{
+ "num_turns": 41,
+ "result": "The episode ended with a reward of 0.0 and was not a success. It was scored as an integrity failure with `verified` false.\n\nThe score listed `accepted_request_changed` violations on at least two bookings (`bkg_2a85d570\u2026` and `bkg_36695e38\u2026`). I didn't see the full list, because my output filter cut it off. Those bookings were created by live traffic while the booking worker was still broken. I never inspected them, so I can't say which field changed.\n\nAvailability and recovery both scored 1.0, and `incident_recovery` was about 0.60. The integrity violation zeroes the reward regardless.\n\n**What I did**\n- Raised the booking `payment_timeout_ms` from 139 to 3000, because it was below the provider latency of 383 ms and causing the 504s.\n- Restarted the check-in worker and re-enabled its consumer. It had switched itself off again after repeated failures, so I re-enabled it a second time.\n- Quarantined the outbox event whose payload pointed at a booking that doesn't exist.\n- Confirmed the pending bookings that already had a captured charge, using that charge. I confirmed two more by re-running their payment, after a provider lookup showed one captured and one still pending.\n- Voided the duplicate booking that shared a `client_reference` with a confirmed one, which refunded 25000 cents.\n- Replayed the outbox until it was empty.\n- Cleared the pricing cache and then disabled it, after booking logs showed stale-quote 409s.\n\n**What went wrong**\n- Probes stayed unhealthy throughout, so I never got a counted verification window.\n- I spent too many actions on one-at-a-time queries and per-booking reconciles. I was left with 3 actions, not enough for the 2 healthy probes plus finish, so I finished.\n- I found the stale-pricing cause only after the second unhealthy probe. Checking booking logs before the first probe would have saved several actions.\n- The cost penalty was 0.235, close to the 0.25 cap.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.3609856000000001,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 30925,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 30925,
+  "cache_read_input_tokens": 805128,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 60,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 749,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 749,
+    "cache_read_input_tokens": 36133,
+    "input_tokens": 2,
+    "output_tokens": 657,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 7614,
+  "output_tokens_details": {
+   "thinking_tokens": 1290
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

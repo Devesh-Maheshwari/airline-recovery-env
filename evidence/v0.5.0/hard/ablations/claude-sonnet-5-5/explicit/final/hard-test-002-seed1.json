@@ -1,0 +1,41 @@
+{
+ "num_turns": 24,
+ "result": "The episode is finished and scored 0.0. Two integrity violations made the reward zero, and I caused both.\n\n**What the score says**\n- **Violations:** `cancelled_request_fulfilled` on `bkg_21eab3bb\u2026` and on `bkg_573504\u2026`. These were two of the five pending bookings. The customers had cancelled, and I reconciled them, which captured charges and confirmed them.\n- **Why I missed it:** I never checked `customer_events` for cancel events before reconciling. The contract said a cancelled request must never be confirmed, and I didn't look. The right move for those two was `void_booking`, which would also have refunded any capture.\n- **Other components:** availability 1.0, incident recovery 1.0, verification false, cost 0.154. Verification was false because every probe came back unhealthy.\n\n**What I did**\n- Turned the check-in consumer back on, set `accepted_schema` to 2 and `auto_pause_after_attempts` to 0, then raised `batch_size` to 50.\n- Quarantined `evt_00000350\u2026`, whose payload booking ID didn't match its row, and replayed the rest of the outbox.\n- Voided the duplicate of client reference `CR-b4e163068814` (`bkg_2a3ebd\u2026`), which wrote its refund.\n- Reconciled the other three pending bookings. One was a captured charge confirmed with `existing_charge_id`. Two were new captures: one had no provider record, and the other's earlier charge was declined. The two new captures are the ones that turned out to be cancelled.\n- Raised `booking.payment_timeout_ms` from 200 to 2000.\n\n**What I didn't resolve**\n- All five probes were unhealthy. I never found the cause. My best guess is that the cancelled-but-confirmed bookings were making them unhealthy, but I didn't test that.\n- I ended with about two actions left, too few to get two healthy windows even if I had found it.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.29615139999999995,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 30148,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 30148,
+  "cache_read_input_tokens": 533457,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 44,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 645,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 645,
+    "cache_read_input_tokens": 33156,
+    "input_tokens": 2,
+    "output_tokens": 636,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 6878,
+  "output_tokens_details": {
+   "thinking_tokens": 2222
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

@@ -1,0 +1,166 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, b.flight_id, b.passenger_id, b.amount_cents, b.request_id, c.charge_id, c.state as charge_state FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id ORDER BY b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT h.hold_id, h.booking_id, h.flight_id, h.passenger_id, h.status FROM holds h ORDER BY h.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM holds LIMIT 5"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT o.event_id, o.booking_id, o.event_type, o.status, o.attempts FROM outbox o ORDER BY o.event_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM outbox LIMIT 5"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, c.charge_id, c.state as charge_state, ce.idempotency_key FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id LEFT JOIN customer_events ce ON b.request_id = ce.request_id WHERE b.status = \"pending\" ORDER BY b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM customer_events LIMIT 1"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_300c89ed5d1c58848fdf375626e2af1a",
+    "existing_charge_id": "chg_541db6161e27526091c593d8ba1ffa96"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_422f74e6ecf258ce99bb863750642c30",
+    "existing_charge_id": "chg_9273fe7f431c5636b540b4399b6f2a34"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d6d457a1b9485a2e9fd994620f198df9",
+    "existing_charge_id": "chg_163eff3fa37c55aeb6da813065751a05"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id, c.state, c.amount_cents, c.idempotency_key FROM charges c WHERE c.booking_id IN (\"bkg_d6d457a1b9485a2e9fd994620f198df9\", \"bkg_2878e7020ef95030b475cce7df598e35\")"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_d6d457a1b9485a2e9fd994620f198df9"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_d6d457a1b9485a2e9fd994620f198df9"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, b.request_id, b.flight_id, b.passenger_id, b.amount_cents FROM bookings b WHERE b.booking_id = \"bkg_2878e7020ef95030b475cce7df598e35\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT ce.event_id, ce.request_id, ce.kind, ce.step FROM customer_events ce WHERE ce.request_id = \"req_772cc7e060fc560090e417608f16ea09\""
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_2878e7020ef95030b475cce7df598e35"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_2878e7020ef95030b475cce7df598e35",
+    "idempotency_key": "booking-v2:bkg_2878e7020ef95030b475cce7df598e35"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, o.event_id FROM bookings b LEFT JOIN outbox o ON b.booking_id = o.booking_id WHERE b.status = \"confirmed\" AND o.event_id IS NULL"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT r.refund_id, r.booking_id, r.charge_id, r.amount_cents FROM refunds r"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

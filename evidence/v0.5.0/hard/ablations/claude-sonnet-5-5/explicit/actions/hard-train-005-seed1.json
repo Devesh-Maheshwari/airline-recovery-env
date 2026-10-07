@@ -1,0 +1,139 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.client_reference,b.flight_id,b.passenger_id,b.amount_cents,c.charge_id,c.idempotency_key,c.state from bookings b left join charges c on c.booking_id=b.booking_id where b.status<>\"confirmed\" or c.charge_id is null"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from outbox where status<>\"delivered\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from customer_events"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select booking_id,request_id,status,client_reference,flight_id from bookings where request_id in (\"req_f1d6e9739c14526eb516c1ad2642c8ce\",\"req_e195291896a9530c9bfbb1a4fba09354\") or booking_id in (\"bkg_c83732c8bf0d57b59030c53706cc62c0\",\"bkg_1fcac1731e5555f6a4f72b5b6d13634c\") or status=\"pending\""
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_49920c9269035711a9fe910faec7a967"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_770ca16985155b9c970ee80cc60f87f5"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_2f0ef909c78253c5a29eb5e49692e0de"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_2863a4a37bfa5ba68c5085739b90493c",
+    "existing_charge_id": "chg_25a98df5cbcd531f996f27b53d7995dd"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_31d0e2a6dd5c580ebcc881953fb99b1e"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000376_bkg_1fcac1731e5555f6a4f72b5b6d13634c"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,booking_id,substr(payload,1,170) p,attempts from outbox where status=\"pending\" order by event_id limit 12"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000387_bkg_1fcac1731e5555f6a4f72b5b6d13634c"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000388_bkg_26b93aa7a53c53cfb50175ac5b3b3f6b"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000389_bkg_f3ac0f6acdce55638b0a29b9514c7ee8"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

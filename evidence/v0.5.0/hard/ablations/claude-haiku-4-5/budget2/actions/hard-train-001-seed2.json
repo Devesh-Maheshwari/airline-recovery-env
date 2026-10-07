@@ -1,0 +1,86 @@
+{
+ "actions": [
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM outbox ORDER BY event_id DESC LIMIT 20"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT flight_id, capacity FROM flights ORDER BY flight_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT flight_id, COUNT(*) as hold_count FROM holds GROUP BY flight_id ORDER BY flight_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, status, flight_id, passenger_id, request_id FROM bookings ORDER BY booking_id DESC LIMIT 20"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, idempotency_key, amount_cents, status FROM charges ORDER BY booking_id DESC LIMIT 20"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM charges LIMIT 5"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, COUNT(c.charge_id) as charge_count FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id GROUP BY b.booking_id HAVING charge_count != 1 ORDER BY b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT h.hold_id, h.booking_id, b.status FROM holds h LEFT JOIN bookings b ON h.booking_id = b.booking_id WHERE b.status IS NULL OR b.status != confirmed"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM holds LIMIT 3"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as hold_count FROM holds h WHERE EXISTS (SELECT 1 FROM bookings b WHERE b.booking_id = h.booking_id AND b.status = confirmed AND b.flight_id = h.flight_id AND b.passenger_id = h.passenger_id)"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT h.booking_id, h.flight_id FROM holds h WHERE NOT EXISTS (SELECT 1 FROM bookings b WHERE b.booking_id = h.booking_id AND b.flight_id = h.flight_id AND b.passenger_id = h.passenger_id)"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

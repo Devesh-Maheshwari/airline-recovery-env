@@ -556,8 +556,7 @@ what a fault looks like and how to fix it, every fix is safe to apply
 everywhere, the ledger is complete, and nothing gets worse while you look. The
 hard tier removes those four properties. Payment truth is ambiguous, retries
 are not always safe, several states are traps, and waiting has a cost. Cases
-are generated from fault pools, so there are hundreds of distinct instances per
-level, and a bundled oracle solves every one of them from public evidence
+are generated from fault pools: 17 case structures at level 1 (4 of them alert-only), 600 at level 2 and about 6,000 at level 3 (see [scenarios](SCENARIOS.md)), and a bundled oracle solves every one of them from public evidence
 alone.
 
 Select it with `reset(options={"split": ..., "index": ..., "tier": "hard"})`.
@@ -579,7 +578,7 @@ only their parameters. Two seeds of the same task are different incidents.
 
 | Level | Composition | Budget |
 |---|---|---:|
-| hard-1 | One payment or event fault plus one trap | 32 actions |
+| hard-1 | One fault from the payment, event or process pools. About 43% of instances add a trap, 40% are a single fault with no trap and about one in six is alert-only | 32 actions |
 | hard-2 | A payment fault and an event fault (a pricing fault half the time), two traps, and one delayed event or pricing fault | 36 actions |
 | hard-3 | hard-2 plus one or two noise faults, 300–400 historical confirmed bookings in the tables, and a bias towards the circuit breaker | 34 actions |
 
@@ -738,7 +737,7 @@ In addition to the easy-tier codes:
 | `duplicate_sale` | client reference | Two or more confirmed bookings share a `client_reference` |
 | `unfunded_confirmation` | booking ID | A confirmed booking does not have exactly one provider-captured charge |
 | `refund_missing` | booking ID | A cancelled booking has a captured charge and no refund of equal amount |
-| `refund_unwarranted` | booking ID | A refund exists for a booking that is not cancelled |
+| `refund_unwarranted` | booking ID | A refund exists for a confirmed booking, or for no booking |
 | `cancelled_booking_backed` | booking ID | A cancelled booking still has a seat hold or a check-in |
 
 `duplicate_charge` counts provider-captured charges when the provider has a

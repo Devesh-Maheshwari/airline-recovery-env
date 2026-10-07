@@ -1,0 +1,41 @@
+{
+ "num_turns": 13,
+ "result": "Perfect! The episode has been completed successfully with an excellent score of **0.976 (97.6%)**.\n\n## Summary of Results:\n\n\u2705 **All Success Conditions Met:**\n- **Integrity**: No violations - all graded invariants passed\n- **Recovery**: 100% - all 27 required customer requests completed\n- **Availability**: 1.0 - last three traffic windows all healthy  \n- **Verification**: 2 healthy probes obtained\n- **Horizon**: Complete with all incidents injected\n- **Budget**: Only 11 of 32 actions used (very efficient)\n\n**Key Performance Metrics:**\n- 27/27 customer requests with correct outcomes (confirmed, charged, checked in)\n- 0 integrity violations\n- 0 duplicate charges or missing charges\n- 0 provider-pending payments\n- All safety hazards handled correctly (fare changes, expired key retries, cancellations)\n- Perfect revenue retention (1.0)\n\n**Approach Used:**\n1. Inspected the system state via metrics and database queries\n2. Verified all bookings had exactly one captured charge each\n3. Ran two healthy probes to achieve verification windows\n4. Called finish to complete the episode\n\nThe system recovered cleanly with minimal intervention needed - the booking workflow was already functioning correctly despite the initial alert about outbox events. The excellent score reflects both the correct system state and the efficient use of resources (11 steps of 32 budget, minimal cost penalty).",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.0916786,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 19717,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 19717,
+  "cache_read_input_tokens": 292396,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 105,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 1887,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 1887,
+    "cache_read_input_tokens": 29049,
+    "input_tokens": 8,
+    "output_tokens": 819,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 4580,
+  "output_tokens_details": {
+   "thinking_tokens": 1933
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

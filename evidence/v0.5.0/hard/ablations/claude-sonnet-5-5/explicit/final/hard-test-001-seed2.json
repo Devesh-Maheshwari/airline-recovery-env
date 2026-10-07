@@ -1,0 +1,41 @@
+{
+ "num_turns": 38,
+ "result": "The episode is finished and the sidecar issued a signed receipt. I couldn't confirm the final score from the output I saw.\n\nI never got a healthy probe. All three probes I ran came back unhealthy, so `verified` almost certainly earned nothing, and the `success` condition (two counted healthy probes) probably failed too. I didn't find out why the probes were unhealthy. I ran out of actions before I could investigate. That was a budget-planning mistake on my part.\n\nWhat I did:\n- **Payment timeout:** I raised the booking payment timeout from 200 ms to 2000 ms. The provider takes about 80 ms, but the original 200 ms setting was producing 504 errors.\n- **Check-in events:** I quarantined three malformed events: one truncated payload, one pointing at the wrong booking, and one missing its passenger. I then set the check-in consumer to accept schema 2 so the rest could be delivered. All the remaining events were delivered.\n- **Settled payments:** I used 2 of the 4 provider lookups and let the others settle over time. I then confirmed two bookings, plus one of the two bookings that shared a client reference, against their existing charges. I did not capture again.\n- **Voided bookings:** I voided the cancelled booking, the duplicate client-reference booking, and the three bookings whose payment was declined.\n\nAt the end, 75 bookings were confirmed, each with a check-in, and none were pending. The 5 cancelled bookings had no seat or check-in. The finish output showed no abandoned requests, revenue retained at 1.0 and the horizon complete.\n\nThe cost penalty hit its 0.25 cap. I made 16 mutating calls, and many were needed because I handled each booking individually.\n\nI did not check the post-finish integrity result. The receipt is in `episode.json`.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.32008780000000003,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 30506,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 30506,
+  "cache_read_input_tokens": 637539,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 48,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 408,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 408,
+    "cache_read_input_tokens": 36055,
+    "input_tokens": 2,
+    "output_tokens": 591,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 7046,
+  "output_tokens_details": {
+   "thinking_tokens": 1392
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

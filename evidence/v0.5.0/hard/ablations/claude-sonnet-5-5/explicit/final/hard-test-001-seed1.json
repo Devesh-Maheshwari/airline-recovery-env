@@ -1,0 +1,41 @@
+{
+ "num_turns": 41,
+ "result": "The episode ended on the action budget with no healthy probe, so it scored 0. `episode.json` shows `\"reward\": 0.0`. I didn't call finish. I also don't know whether the sidecar issued a signed receipt, because I only grepped `episode.json` for the score and didn't check for one.\n\n**Fixed:**\n- Reconciled the 5 stuck pending bookings to confirmed. I used `provider_lookup` on 2 of them (both captured). The booking worker returned a pending-at-provider error on the third, so I retried it later and it confirmed.\n- Voided the duplicate booking that shared a `client_reference`. That refunded 20000 cents.\n- Quarantined 4 malformed or mismatched outbox events and kept the legacy-import event.\n- Re-enabled the check-in consumer, which had been auto-paused, and set `auto_pause_after_attempts` to 0. After that the backlog drained. The last query showed every confirmed booking with a hold, a check-in and a delivered event.\n\n**Not fixed:**\n- Probes stayed unhealthy. The booking logs showed many \"stale pricing quote\" 409s, and F100's fare is 22300 at version 2. I turned off the pricing cache and invalidated it, but two later probes were still unhealthy.\n- I was running low on actions and hadn't found the remaining cause. Booking and pricing logs both looked fine in my last reads. My read of the booking 409s and the cache change was probably too shallow.\n\nI spent too many actions on reads and one-at-a-time calls early on. I also should have checked the pricing and probe path sooner, before the budget ran out.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.38743819999999995,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 31836,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 31836,
+  "cache_read_input_tokens": 957411,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 66,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 134,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 134,
+    "cache_read_input_tokens": 37659,
+    "input_tokens": 2,
+    "output_tokens": 537,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 6848,
+  "output_tokens_details": {
+   "thinking_tokens": 1623
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

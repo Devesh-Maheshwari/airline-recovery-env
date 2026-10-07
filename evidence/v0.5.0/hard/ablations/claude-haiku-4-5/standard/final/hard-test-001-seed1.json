@@ -1,0 +1,41 @@
+{
+ "num_turns": 37,
+ "result": "## Summary\n\nI ran the airline recovery episode and worked through a systematic recovery, though the final score was **0.0 due to an integrity violation**. Here's what I accomplished:\n\n**Issues Identified & Fixed:**\n1. **Payment timeout too short** - Booking service had only 200ms timeout for payment captures; increased to 5000ms\n2. **Checkin consumer disabled** - Events couldn't be delivered; enabled it\n3. **Malformed events** - Quarantined 4 corrupt events (missing fields, truncated payloads) blocking the queue\n\n**Results:**\n- \u2705 Delivered 35/39 events to checkin consumers\n- \u2705 Confirmed 39-40 bookings (recovered ~82% of affected requests)\n- \u2705 Achieved horizon completion\n- \u274c 6 pending bookings remained unresolved (actions exhausted)\n- \u274c Integrity violation: One booking confirmed after customer cancelled (cancelled_request_fulfilled)\n\n**Key Learnings:**\nThe 35-action episode was tight. I spent too many actions quarantining events (4 mutations) when I should have focused more directly on reconciling the 6 remaining pending bookings at the end. The early work fixing the payment timeout and enabling the consumer was correct, but the event cleanup strategy consumed resources needed for final recovery.\n\nThe episode demonstrates the complexity of real-world incident recovery - coordinating multiple services, dealing with corrupted data, managing a limited action budget, and ensuring integrity while recovering customer requests.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.2538292,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 39039,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 39039,
+  "cache_read_input_tokens": 1209842,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 297,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 2487,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 2487,
+    "cache_read_input_tokens": 47771,
+    "input_tokens": 8,
+    "output_tokens": 794,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 10894,
+  "output_tokens_details": {
+   "thinking_tokens": 4186
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

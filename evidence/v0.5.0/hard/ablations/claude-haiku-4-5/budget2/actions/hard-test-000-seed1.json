@@ -1,0 +1,179 @@
+{
+ "actions": [
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 5000
+    }
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, status, amount_cents, flight_id, passenger_id FROM bookings ORDER BY booking_id DESC LIMIT 20"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id, c.status, c.amount_cents, b.status as booking_status FROM charges c LEFT JOIN bookings b ON c.booking_id = b.booking_id WHERE b.status = \"pending\" ORDER BY c.charge_id DESC LIMIT 20"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name=\"charges\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status as booking_status, c.charge_id, c.state as charge_state, c.amount_cents FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = \"pending\" ORDER BY b.booking_id LIMIT 20"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_0277e52e34aa59b2b71cb9df9c78568b",
+    "existing_charge_id": "chg_12d4fa919bf951158fea976ce486f261"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_27197f34945053aa8d361722ca8001e1",
+    "existing_charge_id": "chg_98f06f2bfdff56538708b607a96ffee7"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_35add96e42535d238c20c913c8203960",
+    "existing_charge_id": "chg_9521ce798a3e5bc7ad38c1a8caad86aa"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_54a910c0cf61532caa55b4ae675ba1f3",
+    "existing_charge_id": "chg_0be422feed6250f896ce0b4f799356a2"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_6af49db3fdff5920b84a59c2c0423467",
+    "existing_charge_id": "chg_04fb2cc42cd75702935e871aa9bedb39"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_6cce86ffa8205cc5812648c29c2b81db",
+    "existing_charge_id": "chg_eb6b3d6bad3a58f9a54345313744bcc2"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_803731c55555598bb63d5de9fb62aa37",
+    "existing_charge_id": "chg_2218f72b740d5798875d6256f95a0775"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b25ace621fd4510b8f52b2980a1aa051",
+    "existing_charge_id": "chg_b13972740d495e2e90dafde5d82c4778"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b68b1c60b04a5018b80f313465858ab7",
+    "existing_charge_id": "chg_a7243cecb6c0560db2dfbdd5cd835585"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ece5a5347f405a03b3dc95b6d87a4882",
+    "existing_charge_id": "chg_614bc69833225f76ad089d93c750f4f7"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, c.charge_id, c.idempotency_key, c.state FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = \"pending\" ORDER BY b.booking_id"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_5bed26a828875f50972467fce5deffb8"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_f8cfd99e2b5750d88bfb51b06a407ede"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_5bed26a828875f50972467fce5deffb8"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_f8cfd99e2b5750d88bfb51b06a407ede"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

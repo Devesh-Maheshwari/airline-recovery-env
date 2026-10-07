@@ -1,0 +1,41 @@
+{
+ "num_turns": 38,
+ "result": "The episode ended with a reward of 0.0. I ran out of actions before getting any healthy probe, so verification never started, and I never found why the probes stayed unhealthy. The receipt was issued.\n\n**What I fixed**\n- **Cancelled requests:** I voided the two bookings whose customers had cancelled. Both had captured charges, so they should now have refunds.\n- **Declined payment:** I voided the booking whose provider charge came back declined.\n- **Duplicate sale:** two bookings shared one client reference. I voided `bkg_d8a4\u2026` and confirmed `bkg_2093\u2026` against its existing charge. I guessed that `bkg_d8a4\u2026` was the later duplicate; I didn't check.\n- **Check-in:** I restarted the worker and re-enabled the consumer. I also set `auto_pause_after_attempts` to 0 and `batch_size` to 50.\n- **Event backlog:** I quarantined the truncated outbox event and replayed the rest. The outbox ended with 0 pending, and no confirmed booking lacked a check-in.\n- **Pricing:** booking logs showed \"stale pricing quote\" 409s, so I disabled the pricing cache and invalidated it.\n- **Payment timeout:** the payment provider returned some 504s, so I raised `payment_timeout_ms` from 200 to 1000.\n\n**What went wrong**\n- All four probes I ran reported unhealthy, and the last two checks showed no outstanding backlog, so I never found the cause.\n- Each config change reset the verification count anyway. With two actions left I couldn't reach the two healthy probes needed, so I finished instead.\n- Charges looked clean at the end: every confirmed booking had exactly one captured charge and none were still submitted.\n\n**What I'd change**\n- I spent too many early actions on reads and on the parallel calls, which each counted as steps.\n- Checking the booking logs before the first probe would have shown the stale-quote problem sooner.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.2664052,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 21550,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 21550,
+  "cache_read_input_tokens": 567036,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 54,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 305,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 305,
+    "cache_read_input_tokens": 27202,
+    "input_tokens": 2,
+    "output_tokens": 647,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 6669,
+  "output_tokens_details": {
+   "thinking_tokens": 1440
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

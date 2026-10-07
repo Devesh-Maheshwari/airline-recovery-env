@@ -68,6 +68,34 @@ def wilson_interval(successes: int, trials: int, z: float = 1.959963984540054) -
     return [max(0.0, centre - margin), min(1.0, centre + margin)]
 
 
+def repeated_attempts(episodes: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """pass@k and pass^k over instances attempted several times (same task and seed).
+
+    Unbiased estimators per instance with n attempts and c successes, averaged over
+    instances: pass@k = 1 - C(n-c, k) / C(n, k) (solved at least once in k tries) and
+    pass^k = C(c, k) / C(n, k) (solved on all k tries).
+    """
+    from math import comb
+    outcomes: dict[tuple, list[bool]] = {}
+    for row in episodes:
+        outcomes.setdefault((row["split"], row["task_index"], row["seed"]), []).append(bool(row["success"]))
+    counts = {len(values) for values in outcomes.values()}
+    if not outcomes or counts == {1}:
+        return None
+    if len(counts) != 1:
+        raise ValueError("every instance needs the same number of attempts")
+    n = counts.pop()
+    def table(groups: list[list[bool]]) -> dict[str, dict[str, float]]:
+        return {"pass@k": {str(k): statistics.mean(1 - comb(n - sum(g), k) / comb(n, k) for g in groups) for k in range(1, n + 1)},
+                "pass^k": {str(k): statistics.mean(comb(sum(g), k) / comb(n, k) for g in groups) for k in range(1, n + 1)}}
+    level_of = {(r["split"], r["task_index"], r["seed"]): r.get("level") for r in episodes}
+    by_level = {}
+    for level in sorted({lv for lv in level_of.values() if isinstance(lv, int)}):
+        groups = [g for key, g in outcomes.items() if level_of[key] == level]
+        by_level[str(level)] = {"instances": len(groups), **table(groups)}
+    return {"instances": len(outcomes), "attempts_per_instance": n, **table(list(outcomes.values())), "by_level": by_level}
+
+
 def aggregate(episodes: list[dict[str, Any]]) -> dict[str, Any]:
     successes = sum(bool(row["success"]) for row in episodes)
     def mean(key: str) -> float | None:

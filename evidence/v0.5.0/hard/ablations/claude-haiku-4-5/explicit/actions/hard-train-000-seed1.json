@@ -1,0 +1,176 @@
+{
+ "actions": [
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.id, b.status, b.request_id, b.amount_cents, b.trace_id, COUNT(c.id) as charge_count FROM bookings b LEFT JOIN charges c ON b.id = c.booking_id GROUP BY b.id ORDER BY b.id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM bookings LIMIT 1"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, status, request_id, flight_id, amount_cents FROM bookings WHERE status = 'pending'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id, c.idempotency_key, c.status FROM charges c WHERE c.booking_id IN ('bkg_e7b1b0d06bf55634bb522eda9d99e6cf', 'bkg_1aab19fae4645f6194cfba54fa11602c', 'bkg_132a93f7512554cca97daf1de2dfc661', 'bkg_7623e879cd5d514e922118b9fccd2e0b')"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM charges LIMIT 1"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT charge_id, booking_id, idempotency_key, state FROM charges WHERE booking_id IN ('bkg_e7b1b0d06bf55634bb522eda9d99e6cf', 'bkg_1aab19fae4645f6194cfba54fa11602c', 'bkg_132a93f7512554cca97daf1de2dfc661', 'bkg_7623e879cd5d514e922118b9fccd2e0b')"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_1aab19fae4645f6194cfba54fa11602c"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_7623e879cd5d514e922118b9fccd2e0b",
+    "existing_charge_id": "chg_728544259d1c59a9b100d6d32fb872ab"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e7b1b0d06bf55634bb522eda9d99e6cf",
+    "existing_charge_id": "chg_8e129336ab875cd6a0b00860cbbbacd5"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_1aab19fae4645f6194cfba54fa11602c"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM bookings WHERE booking_id = 'bkg_132a93f7512554cca97daf1de2dfc661'"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_132a93f7512554cca97daf1de2dfc661",
+    "idempotency_key": "booking:bkg_132a93f7512554cca97daf1de2dfc661"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 500
+    }
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "inventory"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM outbox WHERE status = 'pending'"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT flight_id, COUNT(DISTINCT passenger_id) as passenger_count FROM holds GROUP BY flight_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM flights"
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

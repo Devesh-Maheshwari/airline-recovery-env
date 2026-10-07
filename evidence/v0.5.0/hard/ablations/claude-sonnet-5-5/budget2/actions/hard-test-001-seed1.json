@@ -1,0 +1,232 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select o.event_id,o.status,o.attempts,o.booking_id,o.payload from outbox o"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "pricing",
+    "values": {
+     "cache_enabled": false
+    }
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 3000
+    }
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,b.amount_cents,b.request_id,(select count(*) from holds h where h.booking_id=b.booking_id) holds,(select group_concat(c.charge_id) from charges c where c.booking_id=b.booking_id) ch from bookings b where status<>\"confirmed\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from charges where booking_id in (select booking_id from bookings where status=\"pending\")"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_66050ecfcdad58b9a713dba1f82a912f"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_221a47a21d9658a88ce05d17220b3388"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_a2b70194529c50369fb0d363bbe89cd5"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_c8af606b327854f88f62e7dac998971d"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e37ed6c221cc5d38bb85c47673829b5c"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_16e33252bdbf5c4b9cd0ae71dca59203"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d077cfe5a190502789d9b1b88c7989d3"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_a2b70194529c50369fb0d363bbe89cd5"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,status,attempts,substr(payload,1,200) p from outbox where status<>\"delivered\" order by event_id"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_b45849489e1952d580734683c5594acb"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000005_bkg_8ed0c2cdf5ae5156854c206472552272"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000007_bkg_8ed0c2cdf5ae5156854c206472552272"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000011_bkg_b45849489e1952d580734683c5594acb"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "batch_size": 50
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,status,message,count(*) n,max(id) last from request_logs where id>(select max(id)-60 from request_logs) group by 1,2,3"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select (select count(*) from bookings where status=\"confirmed\") conf,(select count(*) from checkins) ci,(select count(*) from charges) ch,(select group_concat(distinct state) from charges) st,(select count(*) from bookings b where status=\"confirmed\" and not exists(select 1 from checkins c where c.booking_id=b.booking_id)) noci,(select count(*) from bookings b where (select count(*) from charges c where c.booking_id=b.booking_id)<>1) badch,(select count(*) from charges c where not exists(select 1 from bookings b where b.booking_id=c.booking_id)) orphan,(select group_concat(distinct status) from outbox) os,(select count(*) from bookings b where status=\"confirmed\" and (select count(*) from holds h where h.booking_id=b.booking_id)<>1) nohold"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,b.amount_cents,(select group_concat(c.state||\":\"||c.amount_cents||\":\"||c.idempotency_key) from charges c where c.booking_id=b.booking_id) ch from bookings b where (select count(*) from charges c where c.booking_id=b.booking_id)<>1"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select id,service,path,status,message from request_logs where id>(select max(id)-45 from request_logs) and service in (\"booking\",\"payment\",\"checkin\",\"inventory\") order by id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select id,service,path,status,message from request_logs where id>(select max(id)-45 from request_logs) and service in (\"booking\",\"payment\",\"checkin\",\"inventory\") order by id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from customer_events where event_type<>\"requested\" limit 30"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from customer_events order by rowid desc limit 8"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_66050ecfcdad58b9a713dba1f82a912f"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

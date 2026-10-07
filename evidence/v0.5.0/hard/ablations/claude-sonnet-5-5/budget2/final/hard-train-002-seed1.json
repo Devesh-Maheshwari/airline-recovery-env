@@ -1,0 +1,41 @@
+{
+ "num_turns": 55,
+ "result": "The episode is over and scored 0.0. I made a mistake that caused an integrity violation, and it couldn't be undone. The receipt is stored in `episode.json`.\n\n**The mistake:** two customers had cancelled their requests, as the `customer_events` table showed. I never checked that table. I confirmed those two bookings anyway, `bkg_d3dacd\u2026` and `bkg_8fc618\u2026`, while clearing the pending-booking backlog. Both now hold a seat and a captured charge. That is a \"cancelled request fulfilled\" violation. `void_booking` refuses to void a confirmed booking, so I had no way to reverse it.\n\nI didn't pull up the violation text from the receipt, but a violation alone zeroes the reward under the contract. The probe never reached a healthy window, so the verification component was lost as well.\n\n**What I fixed:**\n- Raised the booking payment timeout from 139 ms to 3000 ms. It was below the provider's 383 ms latency, which caused the 504s.\n- Restarted check-in and re-enabled its consumer. I set `auto_pause_after_attempts` to 0 and raised the batch size to 50.\n- Quarantined `evt_00000004_\u2026`, whose payload pointed at a booking that doesn't exist.\n- Voided the duplicate-sale booking `bkg_f30333\u2026`, which refunded its captured charge.\n- Confirmed the other pending bookings that already had captured charges, using their existing charge IDs.\n- Checked two bookings with unresolved charges against the provider. One was captured and one was pending. Both were later confirmed.\n- Invalidated the pricing cache and turned it off, because stale quotes were rejecting F100 bookings.\n\nBy the end every other confirmed booking had its hold, one captured charge, a check-in and a delivered event.\n\n**The correct order:** read `customer_events` first and void any booking whose request was cancelled, before reconciling anything. A reconcile on a pending booking confirms it.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.43862500000000004,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 33744,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 33744,
+  "cache_read_input_tokens": 984445,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 70,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 260,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 260,
+    "cache_read_input_tokens": 39441,
+    "input_tokens": 2,
+    "output_tokens": 649,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 10662,
+  "output_tokens_details": {
+   "thinking_tokens": 2038
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

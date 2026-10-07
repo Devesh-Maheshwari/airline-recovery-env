@@ -1,0 +1,80 @@
+{
+ "actions": [
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, status, payload FROM outbox WHERE status = 'pending'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, status, payload FROM outbox"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as cnt FROM bookings WHERE status = 'confirmed'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, COUNT(DISTINCT h.hold_id) as holds, COUNT(DISTINCT c.charge_id) as charges FROM bookings b LEFT JOIN holds h ON b.booking_id = h.booking_id LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = 'confirmed' GROUP BY b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM sqlite_master WHERE type='table' AND name IN ('holds', 'charges')"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, COUNT(CASE WHEN c.state = 'captured' THEN 1 END) as captured_charges, (SELECT COUNT(*) FROM holds h WHERE h.booking_id = b.booking_id) as has_hold FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = 'confirmed' GROUP BY b.booking_id HAVING captured_charges != 1 OR has_hold != 1"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, (SELECT COUNT(*) FROM checkins ci WHERE ci.booking_id = b.booking_id) as checkin_count FROM bookings b WHERE b.status = 'confirmed' AND (SELECT COUNT(*) FROM checkins ci WHERE ci.booking_id = b.booking_id) != 1"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id FROM charges c LEFT JOIN bookings b ON c.booking_id = b.booking_id WHERE b.booking_id IS NULL"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

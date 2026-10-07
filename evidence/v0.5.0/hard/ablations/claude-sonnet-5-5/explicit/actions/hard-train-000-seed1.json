@@ -1,0 +1,63 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,b.passenger_id,b.client_reference,b.amount_cents,c.charge_id,c.idempotency_key,c.state from bookings b left join charges c on c.booking_id=b.booking_id"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_bb0b33d8ae645bd6a581779a949f2566"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_bb0b33d8ae645bd6a581779a949f2566"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_460cf67c01005242acf990d1a8600d34"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_adfd8244040b5b578ac856df8a96b20c",
+    "existing_charge_id": "chg_bef24d3db1c85fa79b6a7151a0bd5eb9"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_bb0b33d8ae645bd6a581779a949f2566"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d797af8bf95f5edfa0eadb1812be32d5"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

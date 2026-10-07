@@ -1,0 +1,221 @@
+{
+ "actions": [
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, c.charge_id, c.provider_state FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id ORDER BY b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name FROM sqlite_master WHERE type=\"table\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, COUNT(c.charge_id) as charge_count FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id GROUP BY b.booking_id HAVING status=\"pending\" ORDER BY b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.idempotency_key, c.charge_id, c.captured_at FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status=\"pending\" ORDER BY b.booking_id LIMIT 20"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "PRAGMA table_info(bookings)"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, c.charge_id, c.captured_at FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status=\"pending\" ORDER BY b.booking_id LIMIT 20"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM bookings WHERE status=\"pending\" LIMIT 8"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM charges WHERE booking_id IN (\"bkg_3f9f295f22e350eaa97f5cb1f6df9c32\", \"bkg_8de1086ce42c5b3495a2a195edebb2e6\", \"bkg_891ad095f1eb5eee9f6c894174834e51\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id, c.idempotency_key, c.state FROM charges c WHERE c.booking_id IN (SELECT booking_id FROM bookings WHERE status=\"pending\") ORDER BY c.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, payload, status FROM outbox ORDER BY event_id LIMIT 40"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_891ad095f1eb5eee9f6c894174834e51"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_8de1086ce42c5b3495a2a195edebb2e6"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_8fb5c565f56959fcaf34071438fca640"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_3f9f295f22e350eaa97f5cb1f6df9c32"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_891ad095f1eb5eee9f6c894174834e51",
+    "idempotency_key": "booking:bkg_891ad095f1eb5eee9f6c894174834e51"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8976adb7bea856f7baed4fd060d38bed",
+    "idempotency_key": "booking:bkg_8976adb7bea856f7baed4fd060d38bed"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8fb5c565f56959fcaf34071438fca640",
+    "idempotency_key": "booking:bkg_8fb5c565f56959fcaf34071438fca640"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_fced953367d95c92a8d92ea4aae28176",
+    "idempotency_key": "booking:bkg_fced953367d95c92a8d92ea4aae28176"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_3f9f295f22e350eaa97f5cb1f6df9c32"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_40b6027bd9975b7e8571426200b7c9fd"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_8b7a4ee1e3c25d8c828bd5315455aa90"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_8de1086ce42c5b3495a2a195edebb2e6"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_df0fe36fe9475ecd80099c5a7039a484"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000005_bkg_c8b186be79d15127a2abd6d14ce27527"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "accepted_schema": 2
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000007_bkg_c8b186be79d15127a2abd6d14ce27527"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

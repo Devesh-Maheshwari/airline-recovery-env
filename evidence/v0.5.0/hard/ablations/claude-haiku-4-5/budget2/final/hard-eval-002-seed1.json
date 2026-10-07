@@ -1,0 +1,41 @@
+{
+ "num_turns": 50,
+ "result": "The episode completed with a score of 0.0. The main issues were:\n- **Integrity violations**: Several bookings had \"accepted_request_changed\" violations (8 bookings) and a \"duplicate_sale\" violation - meaning some booking details were modified after being accepted, which violates the integrity rules\n- **Verification**: No healthy probes achieved (needed 2)\n- **Safety check**: Didn't run because integrity was already violated\n\nThe key problem: When I reconciled the pending bookings, some reconciliations appear to have inadvertently changed booking details instead of cleanly confirming them with existing charges. This created integrity violations for the \"accepted_request_changed\" rule.\n\nThe recovery itself was successful (all 84 required customer requests ultimately completed), but the way I recovered them violated data integrity constraints. A more careful approach to reconciliation - perhaps only using the `existing_charge_id` option for bookings that had definitely been captured at the provider - would have been safer.\n\nEpisode finished at step 52 of 68 actions. Score: 0.0 (failure due to integrity violations)",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.44687230000000006,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 66976,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 66976,
+  "cache_read_input_tokens": 2283993,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 401,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 2663,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 2663,
+    "cache_read_input_tokens": 75532,
+    "input_tokens": 8,
+    "output_tokens": 792,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 16824,
+  "output_tokens_details": {
+   "thinking_tokens": 7312
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

@@ -1,0 +1,216 @@
+{
+ "actions": [
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 5000
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {}
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {}
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "validate_price": false
+    }
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, flight_id, passenger_id, status, hold_id FROM bookings WHERE status = 'pending'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, status, flight_id, passenger_id FROM bookings WHERE status = 'pending'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, charge_id, captured_at FROM charges WHERE booking_id IN ('bkg_264e6f87f1aa5bffa42a4cff89989aef', 'bkg_5fe79296fa0f54ae963e6bb57c649762', 'bkg_b5d05d5eefde5a4d94e4333fa3aef95a', 'bkg_1d326b6f0fe15b3782d581742810b406', 'bkg_2b352d3363905a71a582cc8633ebaaad')"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM charges WHERE booking_id = 'bkg_264e6f87f1aa5bffa42a4cff89989aef'"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_264e6f87f1aa5bffa42a4cff89989aef",
+    "existing_charge_id": "chg_7014556f72285980ba0d299d155a7061"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, charge_id FROM charges WHERE booking_id IN ('bkg_5fe79296fa0f54ae963e6bb57c649762', 'bkg_b5d05d5eefde5a4d94e4333fa3aef95a', 'bkg_1d326b6f0fe15b3782d581742810b406', 'bkg_2b352d3363905a71a582cc8633ebaaad')"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_5fe79296fa0f54ae963e6bb57c649762",
+    "existing_charge_id": "chg_0372d586877e522aac73ac7cbf57f653"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM charges WHERE booking_id = 'bkg_5fe79296fa0f54ae963e6bb57c649762'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, charge_id, state FROM charges WHERE booking_id IN ('bkg_b5d05d5eefde5a4d94e4333fa3aef95a', 'bkg_1d326b6f0fe15b3782d581742810b406', 'bkg_2b352d3363905a71a582cc8633ebaaad')"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b5d05d5eefde5a4d94e4333fa3aef95a",
+    "existing_charge_id": "chg_64c6c927950d527a90c570ecac48837a"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_1d326b6f0fe15b3782d581742810b406",
+    "existing_charge_id": "chg_329b4642176b5d789585b09480cd3afb"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_2b352d3363905a71a582cc8633ebaaad",
+    "existing_charge_id": "chg_d2be7d296c9d56d08f39fba45fa00217"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_5fe79296fa0f54ae963e6bb57c649762"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  }
+ ]
+}

@@ -1,0 +1,41 @@
+{
+ "num_turns": 22,
+ "result": "I finished the episode with a reward of 0.43. It did not succeed: I never got a healthy probe, so verification failed.\n\nNo integrity violations were recorded, and availability was 1.0. Incident recovery was 0.67, so one of the three requests that were left incomplete is still not complete.\n\nThe four pending bookings were handled like this:\n- **`bkg_d560\u2026`**: it had a charge captured at the provider, so I confirmed it against that charge.\n- **`bkg_c063\u2026`**: it had no charge, so I re-ran the booking capture and it confirmed.\n- **`bkg_db8c\u2026`**: it duplicated the client reference of an already-confirmed booking. I voided it, and the system refunded the captured 20,000 cents.\n- **`bkg_9ecb\u2026`**: the provider reported its payment as declined, so I voided it. There was no captured charge, so no refund.\n\nEvery probe came back unhealthy with `backlog_complete: false`, even though the booking, hold, charge, check-in and outbox rows all looked correct. I didn't find the cause before the budget ran down. My best guess is that voiding `bkg_9ecb\u2026` was the wrong call and that request should have ended confirmed. I can't confirm that, and a void can't be undone.\n\nThe reward also includes a cost penalty of 0.067 for reads, mutations and one provider lookup.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.2615098,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 29142,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 29142,
+  "cache_read_input_tokens": 440139,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 42,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 740,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 740,
+    "cache_read_input_tokens": 28402,
+    "input_tokens": 2,
+    "output_tokens": 444,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 5683,
+  "output_tokens_details": {
+   "thinking_tokens": 2000
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

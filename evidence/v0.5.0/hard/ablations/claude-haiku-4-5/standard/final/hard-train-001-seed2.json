@@ -1,0 +1,41 @@
+{
+ "num_turns": 20,
+ "result": "Perfect! \ud83c\udf89 The airline booking system has been successfully recovered with a score of **0.952**.\n\n**Summary of Results:**\n- \u2705 **Success**: All required customer requests completed (41/41)\n- \u2705 **Integrity**: No violations detected\n- \u2705 **Verified**: 2 healthy verification probes passed\n- \u2705 **Availability**: 100% - all requests in last three traffic windows succeeded\n- \u2705 **Revenue**: 100% retained - no abandoned requests\n- \u2705 **Safety Check**: Passed with flying colors (no violations despite fare changes, lost ACKs, and expired key retries)\n\n**Actions Used**: 18 out of 32 budget\n\nThe system recovered by:\n1. Running probes to verify system health at step 6+\n2. Achieving 2 successful verification windows with healthy traffic\n3. Confirming all bookings had proper holds and captured charges\n4. Validating all integrity rules were maintained\n5. Finishing within the action budget to receive the signed receipt\n\nThe alert about malformed events in the checkin outbox was resolved automatically, and all customer transactions completed successfully.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.1266372,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 24885,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 24885,
+  "cache_read_input_tokens": 513362,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 161,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 1900,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 1900,
+    "cache_read_input_tokens": 34204,
+    "input_tokens": 8,
+    "output_tokens": 495,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 5074,
+  "output_tokens_details": {
+   "thinking_tokens": 1943
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

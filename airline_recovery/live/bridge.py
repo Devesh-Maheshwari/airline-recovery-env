@@ -28,7 +28,9 @@ def sign(key, body):
 RECEIPT_SCHEMA = {"easy":3,"hard":4}
 
 
-def serve(spec_path, key_path, host="0.0.0.0", port=8081):
+def serve(spec_path, key_path, host="0.0.0.0", port=8081, trace_path=None):
+    """``trace_path``, when given, receives one JSON line per request: the reset
+    observation first, then every action with the full reply or the rejection."""
     spec = json.loads(Path(spec_path).read_text())
     key = Path(key_path).read_bytes().strip()
     tier = spec.get("tier","easy")
@@ -39,11 +41,19 @@ def serve(spec_path, key_path, host="0.0.0.0", port=8081):
     options = {"split":spec["split"],"index":spec["index"]}
     if tier != "easy":
         options["tier"] = tier
-    # The easy budget is 48; a hard episode takes its budget from the case.
-    with LiveAirlineEnv(max_steps=48 if tier == "easy" else None) as env:
+    # The easy budget is 48; a hard episode takes its budget from the case unless the
+    # spec raises it (the budget ablation). The environment rejects a budget below the case's.
+    max_steps = spec.get("max_steps", 48 if tier == "easy" else None)
+    trace = open(trace_path, "a") if trace_path else None
+    def record(entry):
+        if trace:
+            trace.write(json.dumps(entry, allow_nan=False) + "\n")
+            trace.flush()
+    with LiveAirlineEnv(max_steps=max_steps) as env:
         observation,info = env.reset(seed=seed,options=options)
         current = {"observation":observation,"reward":0,"terminated":False,"truncated":False,"info":info}
         actions = []
+        record({"step":0,"kind":"reset","seed":seed,**current})
         class Handler(BaseHTTPRequestHandler):
             def log_message(self,*args):
                 pass
@@ -70,6 +80,7 @@ def serve(spec_path, key_path, host="0.0.0.0", port=8081):
                     obs,reward,terminated,truncated,info=env.step(action)
                     actions.append(action)
                     current={"observation":obs,"reward":reward,"terminated":terminated,"truncated":truncated,"info":info}
+                    record({"step":len(actions),"kind":"action","action":action,**current})
                     if terminated or truncated:
                         body={"schema_version":RECEIPT_SCHEMA[tier],"task":{"split":spec["split"],"index":spec["index"]},
                               "tier":tier,"seed":seed,"steps":len(actions),"actions_sha256":hashlib.sha256(canonical(actions)).hexdigest(),
@@ -77,6 +88,7 @@ def serve(spec_path, key_path, host="0.0.0.0", port=8081):
                         current["receipt"]={"body":body,"signature":sign(key,body)}
                     self.respond(200,current)
                 except (ValueError,TypeError,RuntimeError) as error:
+                    record({"step":len(actions),"kind":"rejected","error":str(error)})
                     self.respond(400,{"error":str(error)})
         server=HTTPServer((host,port),Handler)
         if threading.current_thread() is threading.main_thread():
@@ -87,6 +99,8 @@ def serve(spec_path, key_path, host="0.0.0.0", port=8081):
             server.serve_forever()
         finally:
             server.server_close()
+            if trace:
+                trace.close()
 
 
 if __name__ == "__main__":
@@ -95,5 +109,6 @@ if __name__ == "__main__":
     parser.add_argument("--key",required=True)
     parser.add_argument("--host",default="0.0.0.0")
     parser.add_argument("--port",type=int,default=8081)
+    parser.add_argument("--trace",help="append a JSON line per request (reset, actions, rejections) to this file")
     args=parser.parse_args()
-    serve(args.spec,args.key,host=args.host,port=args.port)
+    serve(args.spec,args.key,host=args.host,port=args.port,trace_path=args.trace)

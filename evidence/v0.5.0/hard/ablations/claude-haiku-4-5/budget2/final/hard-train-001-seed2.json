@@ -1,0 +1,41 @@
+{
+ "num_turns": 17,
+ "result": "\ud83c\udf89 **Episode Complete! Excellent Recovery**\n\n**Final Reward: 0.964 / 1.0**\n\n**Success Metrics:**\n- \u2705 **Integrity**: All business rules satisfied (0 violations)\n- \u2705 **Availability**: 100% (all customer requests in last 3 windows succeeded)\n- \u2705 **Recovery**: 100% (all 35 required customer requests completed)\n- \u2705 **Verification**: 2 healthy probes confirmed post-recovery\n- \u2705 **Revenue Retained**: 100% (no abandoned requests)\n\n**System State at Finish:**\n- 37 confirmed bookings with corresponding checkins\n- All charges captured (1 per booking)\n- All outbox events delivered (0 pending)\n- No oversold flights\n- Horizon complete\n- Safety check passed (tested 3 scenarios: fare_change, lost_ack_retry, expired_key_retry)\n\n**Efficiency:**\n- Used only 15 out of 64 action budget\n- 0 mutations required (system was already in correct state)\n- Minimal query cost (0.036 penalty, capped at 0.25)\n\nThe airline booking system was recovered to full operational health with perfect customer satisfaction and revenue retention. The system verified stable under repeated load and hazard scenarios.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.1213512,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 23958,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 23958,
+  "cache_read_input_tokens": 425482,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 137,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 2283,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 2283,
+    "cache_read_input_tokens": 32894,
+    "input_tokens": 8,
+    "output_tokens": 707,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 6150,
+  "output_tokens_details": {
+   "thinking_tokens": 2835
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

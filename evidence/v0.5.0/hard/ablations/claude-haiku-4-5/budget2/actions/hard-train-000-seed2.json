@@ -1,0 +1,204 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT id, flight_id, passenger_id, status, amount_cents, hold_id, charge_id FROM bookings ORDER BY id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name=\"bookings\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, request_id, flight_id, passenger_id, amount_cents, status, confirmed_at FROM bookings"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, status, provider_state, amount_cents, attempts, idempotency_key FROM charges"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name IN (\"charges\", \"holds\", \"outbox\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT charge_id, booking_id, idempotency_key, amount_cents, state FROM charges WHERE booking_id IN (\"bkg_7cc0a4935cab5aafb24b9a7fc139ead0\", \"bkg_53aafce7529e53d98a6bb57884e4f3a4\", \"bkg_d3928372017f5fea96a2878680882d49\", \"bkg_ac36eaebe39a503eac1cbba70587ea79\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, flight_id, passenger_id FROM holds WHERE booking_id IN (\"bkg_7cc0a4935cab5aafb24b9a7fc139ead0\", \"bkg_53aafce7529e53d98a6bb57884e4f3a4\", \"bkg_d3928372017f5fea96a2878680882d49\", \"bkg_ac36eaebe39a503eac1cbba70587ea79\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, booking_id, status, attempts, payload FROM outbox"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM charges WHERE booking_id=\"bkg_d3928372017f5fea96a2878680882d49\""
+   }
+  },
+  {
+   "tool": "get_config"
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 5000
+    }
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_7cc0a4935cab5aafb24b9a7fc139ead0",
+    "existing_charge_id": "chg_84e23c3aacb9541287a0eca2517401fb"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ac36eaebe39a503eac1cbba70587ea79",
+    "existing_charge_id": "chg_3806273f95865987b65088ac73cc6915"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_53aafce7529e53d98a6bb57884e4f3a4"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_53aafce7529e53d98a6bb57884e4f3a4"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d3928372017f5fea96a2878680882d49"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT charge_id, booking_id, idempotency_key, state FROM charges WHERE state != \"captured\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT charge_id, booking_id, idempotency_key, state FROM charges WHERE booking_id=\"bkg_53aafce7529e53d98a6bb57884e4f3a4\""
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, COUNT(c.charge_id) as captured_count FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id AND c.state=\"captured\" WHERE b.status=\"confirmed\" GROUP BY b.booking_id HAVING captured_count != 1"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM charges WHERE state=\"lost\""
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name=\"checkins\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as count FROM bookings WHERE status=\"confirmed\" AND booking_id NOT IN (SELECT booking_id FROM checkins)"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.amount_cents as booking_amount, c.amount_cents as charge_amount FROM bookings b JOIN charges c ON b.booking_id = c.booking_id AND c.state=\"captured\" WHERE b.amount_cents != c.amount_cents"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

@@ -120,7 +120,7 @@ tier** removes those properties and generates its cases:
 
 | | Easy | Hard |
 |---|---|---|
-| Cases | 11 hand-written | Generated from fault pools; 12 task slots at three levels, hundreds of distinct instances per level |
+| Cases | 11 hand-written | Generated from fault pools; 12 task slots at three levels; 17 case structures at level 1, 600 at level 2, about 6,000 at level 3 |
 | Tool text | Explains what to look for and how to fix it | States what each call does to which rows |
 | Payment truth | Every charge is in the local ledger | A capture can be captured, declined or pending at a private provider; two to four rationed lookups (shown as `provider_lookups_remaining`), or wait for settlement |
 | Retries | Idempotent | Keys expire; a cancelled request must be voided, a duplicate request must not become two sales |
@@ -210,7 +210,10 @@ are the designed ones:
 - **Codex** solved every level-1 instance. All 13 of its integrity failures were
   bookings accepted at a fare other than the one promised: it turned the fare
   cache off early (or later evicted the held flight's quote), so a fare hold that
-  arrived mid-episode was never honoured.
+  arrived mid-episode was never honoured. The environment honours a fare hold
+  only through its cached quote; an agent can infer this from the `cache` and
+  `fare_holds` tables, but no tool or setting description states it. Treat these
+  13 as an open validity question ([scenarios](docs/SCENARIOS.md)).
 - **Claude Code** completed bookings the customer had cancelled (Sonnet in 35
   episodes, Haiku in 27), sold one customer two seats (10 and 27), and charged
   provider-captured payments again (6 and 9; $1,500 and $2,850 of synthetic
@@ -224,6 +227,25 @@ not a leaderboard. Reproduce with
 `python -m airline_recovery.live.external --agent <claude-code|codex> --model <model> --tier hard --split all --seeds 1,2,3,4,5 --output runs/<name>`.
 Per-episode records, token usage and every episode's action log:
 [`evidence/v0.5.0/hard/agents/`](evidence/v0.5.0/hard/agents/).
+
+**Do the failures come from the task or from the environment's limits?**
+- [Failure analysis](evidence/v0.5.0/hard/failure-analysis/README.md): 96 of the
+  110 failed episodes above are integrity harm caused by the agent's own action,
+  first harm at a median of 36% of the budget; 10 could plausibly be blamed on the
+  budget or the interface.
+- [Ablations](evidence/v0.5.0/hard/ablations/README.md): rerunning Sonnet and
+  Haiku on 24 instances with the integrity rules spelled out, or with twice the
+  action budget, changes each score by at most two episodes, and level 2 stays
+  unsolved. These runs keep full traces (every observation the agent saw).
+- [Scenarios](docs/SCENARIOS.md): which real-world failure each mechanism stands
+  for, what is simplified, and how many distinct case structures exist (17, 600
+  and about 6,000 at levels 1–3).
+- [Throughput](evidence/v0.5.0/throughput/README.md): about 1,000 oracle episodes
+  per hour per episode slot, 4,100 per hour with eight in flight on one laptop.
+
+Not yet done: independent expert review of the payment and refund rules, a human
+check of the grader's verdicts, a solver who did not build the environment, and
+any training run.
 
 **Open models (partial).** Four open models were run through Together AI with
 `examples/openai_compatible_agent.py` before the account hit its credit limit, so

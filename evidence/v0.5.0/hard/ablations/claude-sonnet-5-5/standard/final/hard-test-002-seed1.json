@@ -1,0 +1,41 @@
+{
+ "num_turns": 16,
+ "result": "The episode is finished and the sidecar issued a signed receipt. It scored a reward of 0.75 and `success: true`. The cost penalty hit its 0.25 cap, so the other 0.25 of the possible score was lost to cost.\n\nI used 19 of the 34 actions: 10 were mutations and 1 was a provider lookup. The 0.25 cap was reached even though I stayed well under budget. The three early reads and one lookup cost little, so the 10 mutations (0.02 each, 0.20 in total) were the main driver.\n\nWhat I did, in order:\n- **Cancelled requests:** I voided the two pending bookings whose customers had cancelled. One had no charge. The other had a charge the provider showed as declined.\n- **Duplicate sale:** two pending bookings shared one `client_reference`. I voided the second, `bkg_b8f5\u2026`, so its captured charge was refunded. I assumed it was the later of the two and didn't check timestamps.\n- **Pending bookings:** I reconciled the other two pending bookings, `bkg_9156\u2026` and `bkg_f818\u2026`, with the default capture.\n- **Check-in backlog:** the check-in consumer was disabled and set to accept only schema 1. Newer events were schema 2, so I enabled the consumer, raised batch size to 50, set auto-pause to 0 and set `accepted_schema` to 2.\n- **Quarantined event:** one event (`evt_00000350\u2026`) had a payload for a different booking than the one it was filed under, so I quarantined it as invalid.\n- **Verification:** after the last mutation I ran two healthy probes, then called `finish`.\n\nThe receipt shows no abandoned requests, `revenue_retained` of 1.0 and no integrity violations. It also lists 2 cancelled requests voided, 1 duplicate voided and 1 unknown payment resolved by lookup.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.1911596,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 21712,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 21712,
+  "cache_read_input_tokens": 297458,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 30,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 182,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 182,
+    "cache_read_input_tokens": 27487,
+    "input_tokens": 2,
+    "output_tokens": 618,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 4476,
+  "output_tokens_details": {
+   "thinking_tokens": 1061
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

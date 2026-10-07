@@ -1,0 +1,41 @@
+{
+ "num_turns": 11,
+ "result": "I finished the episode with a reward of 0.882, and the receipt is stored in `episode.json`. I didn't open `episode.json` to confirm the receipt is there; the `finish` output did show one.\n\nThe four stuck bookings were the problem, and I fixed each one directly. I changed no configuration:\n- **`bkg_460cf67c\u2026`** was a retry of an already-confirmed booking (`client_reference` CR-00a1f80f1ae7) that already had a captured charge. I voided it, which cancelled it and refunded the 20000 cents.\n- **`bkg_adfd8244\u2026`** already had a captured charge in the durable rows. I confirmed it against that charge without a new capture.\n- **`bkg_bb0b33d8\u2026`** had a lost charge. The provider showed its `booking-v2:` key as declined, and the `booking:` key was unknown to the provider. I captured it with the default key.\n- **`bkg_d797af8b\u2026`** had no charge. I captured it with the default key.\n\nTwo probes after the last change were both healthy, which met the verification requirement. At the first probe, no bookings were pending, the outbox was empty, and every confirmed booking had a check-in.\n\nI haven't looked at how the 0.882 breaks down. I used 2 provider lookups (the full quota) and spent the 32-action budget lightly (about 13 actions), so the cost penalty should be small.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.146843,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 21868,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 21868,
+  "cache_read_input_tokens": 177635,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 22,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 191,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 191,
+    "cache_read_input_tokens": 21677,
+    "input_tokens": 2,
+    "output_tokens": 455,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 2380,
+  "output_tokens_details": {
+   "thinking_tokens": 417
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

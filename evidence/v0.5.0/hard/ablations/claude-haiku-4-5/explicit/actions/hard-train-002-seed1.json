@@ -1,0 +1,230 @@
+{
+ "actions": [
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 1000
+    }
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.id, b.status, b.flight_id, b.passenger_id, b.idempotency_key, c.id as charge_id, c.provider_state FROM bookings b LEFT JOIN charges c ON b.id = c.booking_id ORDER BY b.created_at"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type='table'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, b.flight_id, b.passenger_id, b.amount_cents, c.charge_id, c.state FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id ORDER BY b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, booking_id, status FROM outbox WHERE status IN ('pending', 'quarantined') ORDER BY event_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id, c.idempotency_key, c.state, pl.state as provider_state FROM charges c LEFT JOIN provider_ledger pl ON c.idempotency_key = pl.idempotency_key WHERE c.state IN ('submitted', 'lost')"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT charge_id, booking_id, idempotency_key, state FROM charges WHERE state = 'submitted' OR state = 'lost'"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_686e604405915f0c859fd0be1609fa5b",
+    "existing_charge_id": "chg_e824ad02daa652b08cd8226a87775d51"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_80b0f7c257ce5458a0d82342299c780a",
+    "existing_charge_id": "chg_08932919d38355f0bb087819677970b1"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_878416136a8f5415803ac64214e88e1c",
+    "existing_charge_id": "chg_4a08bc156e3e53839eb477c79a984a1a"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_9b5f26ef317c5637b01e909e620f72b3",
+    "existing_charge_id": "chg_fa1e1462e9535eae9d37959f9a17421a"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_a0e6a28afe095612b8d7ccbe15635c96",
+    "existing_charge_id": "chg_6f8e90c3bc4052fa8114a798ad9b1833"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ba92b9e92a765b468145f0dc390b345d",
+    "existing_charge_id": "chg_8f5a7ba01f715a62b0cbcdcf6b7de085"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_f5bbfe283a8351d09ef14d2db40b7b4f",
+    "existing_charge_id": "chg_5b0a23cd41725c4f8b9953cede8a494f"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_5c5d5af577ec5700a5f056834b639772"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_5c5d5af577ec5700a5f056834b639772",
+    "existing_charge_id": "chg_f2cd4cc89eac574484ceca004aa6a3e4"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_a7efbf5235ef5b3d8b8cfa6ae7e17487"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_a7efbf5235ef5b3d8b8cfa6ae7e17487",
+    "existing_charge_id": "chg_8fa0cc52b7ee5d29af4633fabbc1c5f0"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

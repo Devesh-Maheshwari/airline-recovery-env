@@ -1,0 +1,41 @@
+{
+ "num_turns": 39,
+ "result": "The episode failed: the final reward is 0.0 and `success` is false. I never got a healthy probe, so `verification_windows` stayed at 0 and the two required healthy probes never happened.\n\n**What I fixed:**\n- **Check-in consumer:** it only accepted schema 1, so I set `accepted_schema` to 2.\n- **Bad outbox events:** I quarantined three events that failed the consumer's validation:\n  - one had no `passenger_id`\n  - one was a truncated payload\n  - one carried the wrong `booking_id`\n- **Backlog:** replay then delivered the rest. Pending events went to 0.\n- **Pending bookings:** all 7 are now confirmed. I reconciled each with its original idempotency key, and one provider lookup confirmed that charge was captured.\n- **Final data check:** every booking had a hold and a check-in, and there were no pending events.\n- **Payment timeout:** I raised `payment_timeout_ms` from 200 to 2000 after seeing 504s on payment capture, though the logs showed those 504s were old.\n\n**What I didn't resolve:**\n- **Probe health:** all four probes came back `healthy: false` with `backlog_complete: false`. I never found out why.\n- **Recent errors:** the newest errors in the logs were only the expected sold-out 409s.\n- **Declined charge:** I saw one declined charge and didn't investigate it. It may be a legitimate decline, or it may be what the probe was flagging.\n- **Budget:** I spent too many actions on reads and one-at-a-time reconciles. By the time probes kept failing, only a few actions were left to diagnose, so I finished.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.35033899999999996,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 31680,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 31680,
+  "cache_read_input_tokens": 788365,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 58,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 251,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 251,
+    "cache_read_input_tokens": 37386,
+    "input_tokens": 2,
+    "output_tokens": 546,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 6583,
+  "output_tokens_details": {
+   "thinking_tokens": 1136
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

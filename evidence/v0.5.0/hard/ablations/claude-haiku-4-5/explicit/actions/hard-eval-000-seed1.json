@@ -1,0 +1,186 @@
+{
+ "actions": [
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.id, b.client_reference, b.status, b.amount_cents, c.id as charge_id, c.state as charge_state FROM bookings b LEFT JOIN charges c ON b.id = c.booking_id ORDER BY b.id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM sqlite_master WHERE type='table'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, status, amount_cents FROM bookings WHERE status = 'pending' ORDER BY booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id, c.idempotency_key, c.state, c.amount_cents FROM charges c JOIN bookings b ON c.booking_id = b.booking_id WHERE b.status = 'pending' ORDER BY c.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT idempotency_key, booking_id, state, final_state FROM provider_ledger ORDER BY idempotency_key"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM provider_plan ORDER BY idempotency_key"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_395c52b3e9d158f6a1f147fda7239267"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_3fd3211c165e5fec91f972c13f892f81"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_395c52b3e9d158f6a1f147fda7239267",
+    "existing_charge_id": "chg_627ffa97afad5da2b7d5c623f8553b78"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_3fd3211c165e5fec91f972c13f892f81"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_7cd8b2db8b78556fba7149f356f6cbab",
+    "idempotency_key": "booking:bkg_7cd8b2db8b78556fba7149f356f6cbab"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8131ff3afc7d50358040e9da41e38a04",
+    "idempotency_key": "booking:bkg_8131ff3afc7d50358040e9da41e38a04"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_9ea1f2f2a4af53a4a0970d5747274a91",
+    "idempotency_key": "booking:bkg_9ea1f2f2a4af53a4a0970d5747274a91"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_7cd8b2db8b78556fba7149f356f6cbab",
+    "idempotency_key": "booking:bkg_7cd8b2db8b78556fba7149f356f6cbab"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_7cd8b2db8b78556fba7149f356f6cbab"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, status FROM bookings WHERE booking_id IN ('bkg_7cd8b2db8b78556fba7149f356f6cbab', 'bkg_8131ff3afc7d50358040e9da41e38a04')"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT charge_id, booking_id, state FROM charges WHERE booking_id IN ('bkg_7cd8b2db8b78556fba7149f356f6cbab', 'bkg_8131ff3afc7d50358040e9da41e38a04')"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_7cd8b2db8b78556fba7149f356f6cbab"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8131ff3afc7d50358040e9da41e38a04",
+    "existing_charge_id": "chg_a0c022ba8ce75cab917ffe36689d0670"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT status, COUNT(*) as count FROM bookings GROUP BY status"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as count FROM customer_events"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

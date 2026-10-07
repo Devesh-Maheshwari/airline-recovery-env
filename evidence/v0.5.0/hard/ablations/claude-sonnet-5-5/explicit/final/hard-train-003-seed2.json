@@ -1,0 +1,41 @@
+{
+ "num_turns": 32,
+ "result": "The episode ended before I could get a healthy probe, and I never called `finish`. The 36-action budget ran out. The sidecar will have issued the receipt when the budget ran out, so the episode should still be scored. I haven't looked at `episode.json` or the score.\n\n**What I fixed**\n- **Pricing worker:** it was down, so I restarted it.\n- **Cancelled customers:** I voided the three bookings whose customers had cancelled. One was declined at the provider, which I confirmed with one `provider_lookup`. The other two had captured charges, and the void is meant to refund those. I didn't check the `refunds` table afterwards.\n- **Duplicate `client_reference`:** `CR-7ed2adcc833d` had two bookings, both with a captured charge. I voided `bkg_53c88c3d\u2026` and kept `bkg_5ba4c9d0\u2026`.\n- **Pending bookings:** I confirmed `bkg_70d68778\u2026` and `bkg_5ba4c9d0\u2026` against their existing captured charges, with no second capture.\n- **Check-in backlog:** the consumer had paused itself after repeated failures on a bad event. I re-enabled it and set `auto_pause_after_attempts` to 0. I quarantined four malformed events:\n  - `evt_\u202604`: no passenger.\n  - `evt_\u202605` and `evt_\u202608`: truncated payloads.\n  - `evt_\u202607`: its payload names a booking that doesn't exist.\n\n  I replayed the rest, and the outbox backlog reached 0 pending.\n- **Stale price quotes:** these were causing 409s on `/book`. I invalidated the pricing cache, which didn't stop them, so I set `pricing.cache_enabled` to false.\n\n**What I didn't achieve**\n- All four probes came back unhealthy, so there are 0 verification windows. That costs the verified component of the reward.\n- The last booking logs I read showed fewer stale-quote 409s, but a few were still there. I didn't find out whether anything else was failing.\n- After my last read of the booking rows, no booking was missing a hold or a check-in. I didn't re-check that after the final changes.\n- `evt_\u202606` was a legacy-import duplicate for a booking that was already delivered. I replayed it, and the consumer accepted it. The post-finish \"event delivered twice\" check could still flag it.\n\n**Why the budget ran out**\n- I spent actions on separate reads and one call per void or quarantine, instead of batching or skipping reads.\n- I also lost actions probing before the cache problem was fixed. Two quarantines (5 and 8) could have waited to see whether the consumer rejected those events at all.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.33334080000000005,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 31886,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 31886,
+  "cache_read_input_tokens": 668984,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 50,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 226,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 226,
+    "cache_read_input_tokens": 37617,
+    "input_tokens": 2,
+    "output_tokens": 933,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 7190,
+  "output_tokens_details": {
+   "thinking_tokens": 1449
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

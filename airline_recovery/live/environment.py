@@ -89,7 +89,7 @@ GRADED_INVARIANTS = {
     "duplicate_sale": "two confirmed bookings share one client_reference",
     "unfunded_confirmation": "a confirmed booking does not have exactly one provider-captured charge",
     "refund_missing": "a cancelled booking keeps a provider-captured charge without an equal refund",
-    "refund_unwarranted": "a refund exists for a booking that is not cancelled",
+    "refund_unwarranted": "a refund exists for a confirmed booking, or for no booking",
     "cancelled_booking_backed": "a cancelled booking still holds a seat or a check-in",
 }
 
@@ -492,7 +492,12 @@ class LiveAirlineEnv:
                 raise ValueError("provider_latency_ms is an external observation, not an operator setting")
             if self.tier == "hard" and service == "payment" and {"lookup_quota","idempotency_window_steps"} & set(args["values"]):
                 raise ValueError("lookup_quota and idempotency_window_steps are read-only provider terms")
-            return self.stack.patch_config(service,args["values"])
+            result = self.stack.patch_config(service,args["values"])
+            # A promised fare lives only in its cache row, so turning the cache off hides it like an eviction.
+            if (self.tier == "hard" and service == "pricing" and args["values"].get("cache_enabled") is False
+                    and any(until >= self.step_count for until in self.trace.held_flights.values())):
+                self.trace.fare_hold_broken = True
+            return result
         if tool == "restart_service":
             if self.tier == "hard" and service == "payment" and self.stack.lookup("SELECT 1 FROM charges WHERE state='submitted' LIMIT 1"):
                 self.trace.payment_restarted_with_inflight = True

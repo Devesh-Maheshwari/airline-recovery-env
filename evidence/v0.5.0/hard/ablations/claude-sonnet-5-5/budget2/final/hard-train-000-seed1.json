@@ -1,0 +1,41 @@
+{
+ "num_turns": 18,
+ "result": "I finished the episode in 12 of the 64 actions, and the sidecar issued a signed receipt, which is stored in `episode.json`. I didn't see the final reward figure in the output I read. The receipt does show no abandoned requests, `revenue_retained` of 1.0, `horizon_complete` true and a cost penalty of 0.126.\n\nFour bookings were stuck pending at the start. I fixed each one by what the database showed:\n\n- **`bkg_f166\u2026`**: it already had a captured charge, so I confirmed it against that charge.\n- **`bkg_0f0e\u2026`**: its charge was marked `lost` under a `booking-v2:` key. One provider lookup showed that charge as declined, so no money had been taken. I retried the capture with the standard key.\n- **`bkg_bf34\u2026`**: it had no charge, so I ran a normal capture.\n- **`bkg_a7a9\u2026`**: it duplicated the `client_reference` of an already-confirmed booking and had its own captured charge. I voided it, which refunds that charge.\n\nI changed no configuration. I made two probes after the last change. Both were healthy, so verification completed. The receipt's `trap_outcomes` show the duplicate booking voided and the unknown charge resolved by lookup.\n\nMy last `finish` call was rejected because the episode had already ended.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.1704258,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 24180,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 24180,
+  "cache_read_input_tokens": 233369,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 26,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 166,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 166,
+    "cache_read_input_tokens": 24014,
+    "input_tokens": 2,
+    "output_tokens": 434,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 2698,
+  "output_tokens_details": {
+   "thinking_tokens": 312
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

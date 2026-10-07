@@ -1,0 +1,218 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.*, (select group_concat(state||\":\"||idempotency_key) from charges c where c.booking_id=b.booking_id) ch from bookings b"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select name, sql from sqlite_master where name in (\"charges\",\"outbox\",\"customer_events\",\"holds\",\"fare_holds\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select \"o\" t,event_id a,booking_id b,status c,attempts d,payload e from outbox union all select \"e\",event_id,request_id,kind,step,\"\" from customer_events union all select \"h\",booking_id,flight_id,passenger_id,\"\",\"\" from holds union all select \"f\",hold_id,flight_id,price_cents,until_step,\"\" from fare_holds union all select \"c\",charge_id,booking_id,state,idempotency_key,amount_cents from charges"
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "pricing"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_e49508354d68565faaa9d0a480053306"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_e5f67ca6317e5ef0a8e011a651d07817"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_85a9b710434455e59d489799cab66099"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_e49508354d68565faaa9d0a480053306"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_53c88c3dc74958a7b4661f237ede172f"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_70d6877837e552d7bfdfe2257076a64d",
+    "existing_charge_id": "chg_c0fe0f162d535ab18899fbee7bce96ef"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_5ba4c9d053655c708348ca90e52ffc5c",
+    "existing_charge_id": "chg_ce6c884218fb5364857d943f2969bf5f"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {}
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,b.status bs,o.status,attempts,payload from outbox o join bookings b using(booking_id) where o.status=\"pending\""
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_646cafc5c51a51649fa3738b4496a833"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000005_bkg_1051742c33b758e786dfa5c7973724ea"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000007_bkg_1051742c33b758e786dfa5c7973724ea"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000008_bkg_646cafc5c51a51649fa3738b4496a833"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.client_reference,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select count(*) from checkins c where c.booking_id=b.booking_id) ci,(select group_concat(state) from charges c where c.booking_id=b.booking_id) ch,(select group_concat(o.status) from outbox o where o.booking_id=b.booking_id) ob from bookings b where b.status!=\"confirmed\" or ci=0 or h=0"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "pricing",
+    "values": {
+     "cache_enabled": false
+    }
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from fare_holds union all select key,value,0,0 from cache"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  }
+ ]
+}

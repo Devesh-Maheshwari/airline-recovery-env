@@ -91,14 +91,30 @@ except Exception as error:
 '''
 
 
-def instruction(control="python /app/control.py", store="/app/episode.json", tier="easy", budget=None):
+EXPLICIT_HARD_RULES = '''
+The rules that decide the grade, in plain words (the episode contract has the exact definitions):
+- A customer who cancelled must end cancelled: never confirm, seat, check in or charge that request, and refund any charge that was captured (void_booking cancels and refunds).
+- Each confirmed booking has exactly one charge captured at the payment provider. A retry with the same client_reference is the same customer, not a new sale: never give it a second booking, seat or charge.
+- Book every customer on the flight, passenger and fare they requested and were quoted. Do not change prices or settings in a way that books anyone at a different fare.
+- A provider payment can stay pending and settle later; pending is not captured. Before completing a stuck booking, confirm its payment at the provider (provider_lookup, limited quota) or in durable rows. Alerts, logs and metrics can be stale or wrong.
+- Do not change bookings accepted before the incident, and do not quarantine valid events.
+- After you finish, ordinary customer traffic is replayed against the settings you leave deployed: lost payment acknowledgements that the customer retries, fare changes, a cancellation followed by a new purchase, a retry after an idempotency key has expired, and an event delivered twice.
+A sound order of work: inspect, fix the underlying cause, give every affected request its correct outcome, then obtain two healthy probe windows after your last change and call finish. Each read, change and provider lookup adds a small cost (see the cost rule).
+'''
+
+
+def instruction(control="python /app/control.py", store="/app/episode.json", tier="easy", budget=None, explicit=False):
     """Agent-facing task text, shared by the Harbor tasks and the external-agent runner.
 
     The easy text is unchanged from before tiers existed. The hard text states the
     case's budget and keeps only the mechanics: no hints about what to inspect,
-    what to preserve or how to verify.
+    what to preserve or how to verify. ``explicit=True`` appends the integrity rules
+    in plain words and a general order of work; it exists for the instruction-clarity
+    ablation and is not used by the published tasks.
     """
     check_tier(tier)
+    if explicit and tier == "easy":
+        raise ValueError("the explicit instruction variant exists only for the hard tier")
     if tier=="easy":
         budget=EASY_MAX_STEPS if budget is None else budget
         return f'''Recover a synthetic airline booking-to-checkin system running in separate HTTP worker processes.
@@ -114,7 +130,7 @@ This benchmark executes local HTTP and SQLite transactions; it does not connect 
 '''
     if type(budget) is not int or budget<1:
         raise ValueError("the hard instruction needs the case's action budget")
-    return f'''Recover a synthetic airline booking-to-checkin system running in separate HTTP worker processes.
+    text = f'''Recover a synthetic airline booking-to-checkin system running in separate HTTP worker processes.
 Run `{control}` for the current observation, the tool schemas, the configuration contracts and the episode contract.
 Run `{control} action '{{"tool":"get_metrics","arguments":{{}}}}'` to act.
 Every tool action advances customer traffic. Budget: {budget} actions.
@@ -124,6 +140,7 @@ When you call finish (or exhaust the budget) the sidecar issues a signed receipt
 Reward measures the outcome of every customer request, the integrity rules in the episode contract and the cost of your actions; correct configuration names or a written explanation do not earn credit.
 This benchmark executes local HTTP and SQLite transactions; it does not connect to real airlines, payments or cloud infrastructure.
 '''
+    return text + EXPLICIT_HARD_RULES if explicit else text
 
 
 def verify_receipt(artifact, key, split, index, tier="easy"):

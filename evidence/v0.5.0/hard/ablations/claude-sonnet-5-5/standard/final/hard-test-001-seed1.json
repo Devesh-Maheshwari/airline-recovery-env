@@ -1,0 +1,41 @@
+{
+ "num_turns": 42,
+ "result": "The episode is over and the sidecar issued a signed receipt, but the recovery was incomplete: the system never passed a healthy probe. I couldn't read the final reward. The receipt shows `safety_check: {\"ran\": false}`, so the post-finish check did not run.\n\nThe receipt shows:\n- **Incomplete requests:** 4 of the 68 incident requests were still incomplete at the end.\n- **Abandoned requests:** 32 requests were abandoned. Revenue retained was about 0.53.\n- **Cost penalty:** it hit the 0.25 cap, mostly from mutating actions (21 of 35).\n- **Payments:** no duplicate captured charges, no excess captures and no pending bookings remained.\n- **Verification:** both probes I ran (steps 29 and 34) came back unhealthy, so there are no counted healthy windows. I ran out of actions before I could find out why.\n\nWhat I did:\n1. **Booking timeout:** Booking's `payment_timeout_ms` was 200, which caused the 504s from uncertain payments. I raised it to 3000.\n2. **Reconciliation:** I used `reconcile_booking` to confirm all seven pending bookings. One of them (`bkg_4e049e8f\u2026`) was still pending at the provider the first time and succeeded on retry.\n3. **Check-in consumer:** it had auto-paused after repeated poison events, so I re-enabled it and set `auto_pause_after_attempts` to 0.\n4. **Bad events:** I quarantined four outbox events and replayed the rest. Two had a booking ID that didn't match the booking, one had a truncated payload and one had no `passenger_id`.\n\nI never found the cause of the unhealthy probes. I spent several actions on one-booking-at-a-time reconciles, plus config patches, that I could have batched or ordered better. That left too few actions for diagnosis and verification.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.3563428,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 34180,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 34180,
+  "cache_read_input_tokens": 720924,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 54,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 158,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 158,
+    "cache_read_input_tokens": 37675,
+    "input_tokens": 2,
+    "output_tokens": 623,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 7533,
+  "output_tokens_details": {
+   "thinking_tokens": 1725
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

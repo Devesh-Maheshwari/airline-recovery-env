@@ -1,0 +1,62 @@
+{
+ "actions": [
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, b.flight_id, b.passenger_id, b.amount_cents, c.charge_id, c.provider_state, c.amount_cents as charge_amount, h.hold_id FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id LEFT JOIN holds h ON b.booking_id = h.booking_id ORDER BY b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, b.flight_id, b.passenger_id, b.amount_cents, c.charge_id, c.state, c.amount_cents as charge_amount, h.hold_id FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id LEFT JOIN holds h ON b.booking_id = h.booking_id ORDER BY b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM outbox LIMIT 5"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, COUNT(c.charge_id) as charge_count, b.amount_cents FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE c.state = \"captured\" GROUP BY b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, c.state as charge_state FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = \"confirmed\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM customer_events LIMIT 20"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as pending_count FROM charges WHERE state = \"pending\""
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

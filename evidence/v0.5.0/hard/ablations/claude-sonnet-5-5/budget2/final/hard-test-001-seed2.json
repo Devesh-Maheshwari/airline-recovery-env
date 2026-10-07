@@ -1,0 +1,41 @@
+{
+ "num_turns": 44,
+ "result": "The episode ended with a reward of 0.0, and the cause was my mistake. I confirmed a booking whose customer had cancelled the request, and a confirmed booking can't be voided, so I couldn't undo it.\n\n**What I got wrong:** I ran `reconcile_booking` on `bkg_f450937e\u2026` without first checking whether its request had a cancel event. The request (`req_623ee39c\u2026`) had one in `customer_events`. The booking ended up confirmed and charged, which violates `cancelled_request_fulfilled`. A later `void_booking` call returned 409. I only found the cancel event after the booking was confirmed.\n\n**What I fixed:**\n- **Pending bookings:** I reconciled the pending bookings. For `bkg_f5c52da3\u2026`, I used `existing_charge_id`, because the provider already showed a capture and a plain reconcile risked a second charge.\n- **Declined charges:** Two old bookings, `bkg_50337add\u2026` and `bkg_6cb3d079\u2026`, had charges the provider had declined, so I voided them.\n- **Outbox events:** I quarantined three corrupt outbox events (a truncated payload, a mismatched booking id and a missing passenger). I set `checkin.accepted_schema` to 2 and `batch_size` to 50, which cleared the rest of the backlog.\n- **Final state:** By the end, all 60 confirmed bookings had a hold, one captured charge and a check-in.\n\n**What didn't work:** All three probes came back unhealthy, so `verification_windows` stayed at 0. I never confirmed why, and I suspect the cancelled-request violation.\n\n**What to change next time:** Check `customer_events` for cancel events before reconciling any booking, and void cancelled requests instead of reconciling them. The `finish` receipt is stored in `episode.json`.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.3585906,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 31977,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 31977,
+  "cache_read_input_tokens": 742453,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 56,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 258,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 258,
+    "cache_read_input_tokens": 37676,
+    "input_tokens": 2,
+    "output_tokens": 605,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 8208,
+  "output_tokens_details": {
+   "thinking_tokens": 1843
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

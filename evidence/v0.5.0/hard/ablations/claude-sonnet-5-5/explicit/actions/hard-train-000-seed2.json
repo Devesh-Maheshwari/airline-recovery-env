@@ -1,0 +1,161 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,b.passenger_id,b.client_reference,b.amount_cents,(select group_concat(charge_id||\":\"||idempotency_key||\":\"||status) from charges c where c.booking_id=b.booking_id) ch from bookings b"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_a9054b2dd6445e48a2f39e40a5b5abad"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_be367167750d5f51a0659d0efc74d18f"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_0bcda00993625b25873496855f3acc06"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from customer_events"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select request_id,booking_id,status,client_reference from bookings where status=\"pending\""
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_a9054b2dd6445e48a2f39e40a5b5abad"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_0bcda00993625b25873496855f3acc06",
+    "existing_charge_id": "chg_062d83e40a205e6ebb295e37a1124535"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_630d81f97720511a89a3cfca6d7af21f"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_be367167750d5f51a0659d0efc74d18f"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,status,attempts,substr(payload,1,150) p from outbox where status!=\"delivered\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,path,status,duration_ms,message,trace_id from request_logs where status>=400 order by rowid desc limit 12"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select booking_id,status,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select count(*) from checkins c where c.booking_id=b.booking_id) ci,(select group_concat(status) from charges c where c.booking_id=b.booking_id) ch from bookings b where status!=\"confirmed\" or booking_id not in (select booking_id from checkins)"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,b.amount_cents,b.client_reference,(select group_concat(c.status||\":\"||c.idempotency_key) from charges c where c.booking_id=b.booking_id) ch from bookings b where b.rowid>9 or b.status!=\"confirmed\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from charges"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,path,status,duration_ms,message from request_logs where status>=500 or (status>=400 and status!=409) order by rowid desc limit 10"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select count(*) from checkins k where k.booking_id=b.booking_id) ci,(select count(*) from charges c where c.booking_id=b.booking_id and c.state=\"captured\") cap from bookings b where b.booking_id in (\"bkg_630d81f97720511a89a3cfca6d7af21f\",\"bkg_0bcda00993625b25873496855f3acc06\",\"bkg_be367167750d5f51a0659d0efc74d18f\",\"bkg_a9054b2dd6445e48a2f39e40a5b5abad\")"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select booking_id,request_id,status,flight_id,created_step from bookings order by rowid desc limit 6"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select sql from sqlite_master where name in (\"bookings\",\"outbox\")"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

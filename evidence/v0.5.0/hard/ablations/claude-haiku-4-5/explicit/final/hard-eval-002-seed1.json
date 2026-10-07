@@ -1,0 +1,41 @@
+{
+ "num_turns": 41,
+ "result": "I can see the final results. The recovery was partially successful but didn't achieve a passing score. Let me summarize what happened:\n\n**Final Score: 0.0 (Failure)**\n\n**Key Metrics:**\n- Integrity: \u2713 Maintained (no violations)\n- Recovery: 32.6% of incomplete requests completed\n- Verified: \u2717 Failed to achieve 2 healthy probe windows\n- Pending bookings: 28 (couldn't be confirmed)\n- Incident requests handled: Only 15 of 46\n\n**Root Causes Identified and Fixed:**\n1. \u2713 Payment service state machine corruption (restarted)\n2. \u2713 Booking-to-payment timeout mismatch (131ms vs 520ms latency - fixed with config patch)\n3. \u2713 Corrupted outbox events (quarantined 3 events)\n4. \u2713 Booking service stuck state (restarted)\n\n**Why It Failed:**\nThe system couldn't stabilize enough to:\n1. Achieve 2 consecutive healthy probe windows (all requests succeeding)\n2. Complete recovery of all 46 incident requests (only 15 completed)\n3. Confirm the 28 pending bookings before action budget exhausted\n\n**Lessons Learned:**\n1. The payment service degradation (74/99 requests timing out initially) required more aggressive intervention\n2. The timeout configuration fix helped but wasn't sufficient - even at 2000ms timeout, payment still had ~37/67 failures\n3. With 31 abandoned requests (after 4 retry attempts), the system was too degraded to recover within the 34-action budget\n4. Should have focused more on clearing the pending bookings or getting verification windows earlier\n\nThe recovery did maintain data integrity (no duplicate charges, no orphaned payments) but couldn't restore full system health before the action budget was exhausted.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.3434253,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 52796,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 52796,
+  "cache_read_input_tokens": 1590793,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 329,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 2882,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 2882,
+    "cache_read_input_tokens": 61133,
+    "input_tokens": 8,
+    "output_tokens": 950,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 15685,
+  "output_tokens_details": {
+   "thinking_tokens": 8373
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

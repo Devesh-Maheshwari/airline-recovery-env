@@ -1,0 +1,41 @@
+{
+ "num_turns": 37,
+ "result": "The episode has concluded. The system successfully recovered from the initial crisis (payment timeouts causing 504 errors) and reached 98.18% recovery rate, but integrity violations prevented a successful completion.\n\n**What was fixed:**\n- Increased payment timeout from 200ms to 5000ms to handle payment latency\n- Reconciled 6 pending bookings with their captured charges\n- Cleared corrupted outbox events that were blocking delivery\n- Replayed 22 valid events to complete check-ins\n- Invalidated stale pricing cache that was causing 409 quote errors\n- Achieved 55/56 confirmed bookings and 55 check-ins\n\n**Remaining issues (integrity violations):**\n- 6 bookings changed from customer's original request (accepted_request_changed)\n- 2 cancelled customers still got bookings confirmed (cancelled_request_fulfilled) \n- 1 duplicate charge for the same client reference\n- 26 customer requests abandoned over the incident window\n- Revenue retained: 58.06%\n\nThe main problem was that when reconciling pending bookings, some had been placed after customers cancelled their original requests, or at different fares than originally quoted. These should have been voided rather than confirmed. The system needed more careful analysis of each booking's history and customer intent before reconciliation.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.31627089999999997,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 56272,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 56272,
+  "cache_read_input_tokens": 1488899,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 297,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 2566,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 2566,
+    "cache_read_input_tokens": 64925,
+    "input_tokens": 8,
+    "output_tokens": 671,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 10908,
+  "output_tokens_details": {
+   "thinking_tokens": 4176
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

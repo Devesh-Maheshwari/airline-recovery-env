@@ -26,8 +26,8 @@ public evidence alone:
    requests, a circuit breaker that re-pauses the consumer when only the
    symptom was treated, and a settlement horizon so finishing early fails.
 5. **Procedural generation.** `generate_case(level, slot, seed)` samples faults
-   from pools under constraints, so a seed is a structural sample and there are
-   hundreds of distinct instances per level.
+   from pools under constraints, so a seed is a structural sample: 17 case
+   structures at level 1, 600 at level 2 and about 6,000 at level 3.
 
 Workers stay tier-agnostic: no tier flag reaches `worker.py`. Hard behaviour is
 data-driven (rows in new tables, non-default config values) and therefore
@@ -118,8 +118,11 @@ Requires a ledger-captured charge for that `charge_id`'s key; inserts a
 
 ### pricing `GET /quote`
 
-If a live fare hold exists for the flight, the quote carries the held price and
-is cached like any other quote.
+The quote does not read `fare_holds`. A promised fare exists only as the cached
+`quote:<flight_id>` row, seeded with the held price. Disabling the cache or
+evicting that row makes new quotes carry the current fare, which breaks the
+promise; booking validation accepts a quote at the held price while the hold is
+live.
 
 ### runtime
 
@@ -238,7 +241,7 @@ New codes (row predicates only):
 | `duplicate_sale:<client_reference>` | two or more `confirmed` bookings share a non-null `client_reference` |
 | `unfunded_confirmation:<bkg>` | status `confirmed` and ledger-captured charges ≠ 1 (only when the booking has ledger rows; otherwise today's `unbacked_confirmation` applies) |
 | `refund_missing:<bkg>` | status `cancelled`, a ledger-captured charge, no refund of equal amount |
-| `refund_unwarranted:<bkg>` | a refund for a booking that is not `cancelled` |
+| `refund_unwarranted:<bkg>` | a refund for a `confirmed` booking, or for no booking |
 | `cancelled_booking_backed:<bkg>` | status `cancelled` with a hold or a check-in |
 
 `duplicate_charge` counts captured charges (ledger when present). Fare holds

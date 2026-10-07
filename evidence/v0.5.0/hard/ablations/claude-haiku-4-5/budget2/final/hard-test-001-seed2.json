@@ -1,0 +1,41 @@
+{
+ "num_turns": 67,
+ "result": "The episode has been successfully completed with a recovery score of **0.453448** (approximately 45.3%).\n\n## Summary of Recovery Actions\n\n**Root Cause Identified:** The payment service timeout was set too low (200ms), causing payment capture operations to timeout and preventing bookings from being confirmed.\n\n**Key Recovery Steps:**\n1. **Fixed Payment Timeout** - Increased `payment_timeout_ms` from 200ms to 5000ms in the booking service configuration, allowing payment operations to complete successfully\n2. **Updated Checkin Configuration** - Changed `accepted_schema` from 1 to 2 to accept legacy event formats\n3. **Cleared Event Backlog** - Replayed and delivered 38+ pending outbox events to the checkin service, increasing completed checkins from 3 to 128\n4. **Voided Problematic Bookings** - Cancelled 8 stuck pending bookings that had underlying data corruption issues\n5. **Cleaned Up Invalid Events** - Quarantined 2 corrupted events blocking event delivery\n\n**Final State:**\n- 128 confirmed bookings with completed checkins\n- 8 cancelled bookings with proper refunds\n- All outbox events delivered (0 pending)\n- No service alerts\n- 61 actions used out of 72 budget\n\nThe system recovered from the incident with 45.3% of the maximum score, successfully restoring customer booking confirmations and checkin processing while maintaining data integrity.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.4777333000000001,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 46935,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 46935,
+  "cache_read_input_tokens": 2751163,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 537,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 247,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 247,
+    "cache_read_input_tokens": 57907,
+    "input_tokens": 8,
+    "output_tokens": 347,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 21642,
+  "output_tokens_details": {
+   "thinking_tokens": 7893
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

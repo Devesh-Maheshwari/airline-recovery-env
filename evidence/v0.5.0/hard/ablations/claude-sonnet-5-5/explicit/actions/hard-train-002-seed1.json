@@ -1,0 +1,230 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select sql from sqlite_master where name in (\"bookings\",\"charges\",\"outbox\",\"customer_events\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.client_reference cr,b.flight_id f,b.passenger_id p,b.amount_cents a,(select group_concat(charge_id||\":\"||state||\":\"||idempotency_key||\":\"||amount_cents) from charges c where c.booking_id=b.booking_id) ch,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select group_concat(kind) from customer_events e where e.request_id=b.request_id) ev from bookings b"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,booking_id,payload,status,attempts from outbox"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 2000
+    }
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_a9c94cf90d335e9781cae9186e6ade11"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_42f72b86b1a55a93b3553b0e1c4e897c"
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.client_reference cr,(select group_concat(charge_id||\":\"||state) from charges c where c.booking_id=b.booking_id) ch,(select count(*) from holds h where h.booking_id=b.booking_id) h from bookings b where b.status!=\"confirmed\" or b.booking_id not in (select booking_id from checkins)"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_9bf233c0ac5d54ac91bbf40868d2bae2",
+    "existing_charge_id": "chg_01e4b72486965b92a8c671c2f2571f51"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_78825c0afb4d521084e26039299b84ec",
+    "existing_charge_id": "chg_c99d485f219556b781a0903bb09391b6"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_7ec652f7fd645d8895052aeab8eb76e0",
+    "existing_charge_id": "chg_68afb6a9dad4560fa5a6d6e363557607"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_bda486cf5191508da80c3904baf20f12",
+    "existing_charge_id": "chg_c8ee9d4e041552cd934682d9998ee8ac"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ad4e7462fc2b5cbb9d351b7543dec489",
+    "existing_charge_id": "chg_808a02ba83eb5f4e9213303885fb67c8"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_2daf820cea795fd797642bdd9d1212ec",
+    "existing_charge_id": "chg_594aabec8f4953cd87dc999b67fc519d"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_73da04478e2854c08b7e1f72ecf71011",
+    "existing_charge_id": "chg_c82d0a10d71351f1ab2bff753e0ade8a"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_696dcd7b734f542aad65df183e2271b0",
+    "existing_charge_id": "chg_fc5373b55ad85145a4465698b5834af9"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_dcd48c84ad735d13b22c89c3492fdace"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_4842cab5287858038e80eef45863709c"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_4842cab5287858038e80eef45863709c",
+    "idempotency_key": "booking:bkg_4842cab5287858038e80eef45863709c"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.client_reference cr,(select group_concat(state) from charges c where c.booking_id=b.booking_id) ch,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select count(*) from checkins k where k.booking_id=b.booking_id) k,(select group_concat(status) from outbox o where o.booking_id=b.booking_id) o from bookings b where b.status!=\"confirmed\" or k=0 or o!=\"delivered\""
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_dcd48c84ad735d13b22c89c3492fdace",
+    "existing_charge_id": "chg_b6656f9e8dc8530c930b55917e425b44"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select booking_id,amount_cents from refunds"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id f,b.client_reference cr,(select group_concat(state) from charges c where c.booking_id=b.booking_id) ch,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select count(*) from checkins k where k.booking_id=b.booking_id) k,(select group_concat(status) from outbox o where o.booking_id=b.booking_id) o from bookings b where b.status!=\"confirmed\" or h=0 or k=0 or ifnull(o,\"\")!=\"delivered\""
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

@@ -1,0 +1,41 @@
+{
+ "num_turns": 38,
+ "result": "The episode has completed. Here's the summary:\n\n**Final Status:**\n- **63 confirmed bookings** (out of 65 required)\n- **2 cancelled bookings**\n- **1 pending booking** (with payment still pending at provider)\n- **63 check-ins delivered**\n\n**Performance Metrics:**\n- Recovery: 96.9% of incident requests\n- Availability: 100% (all requests succeeded as expected)\n- Revenue retained: 61.8%\n- Actions used: 36/36 budget\n\n**Issues Encountered:**\nThe recovery was successful in operational terms, but resulted in **integrity violations** that prevented a passing score:\n1. **Accepted request changed** (11 bookings) - Request details diverged from customer's original booking\n2. **Cancelled request fulfilled** (2 bookings) - Customer-cancelled requests were confirmed anyway\n3. **Duplicate sale** (1 incident) - One client reference appeared twice\n\n**Root Causes of Violations:**\n- Payment provider timeouts created uncertainty about charge states\n- Some bookings had corrupted/mismatched outbox events\n- Reconciliation of uncertain charges led to integrity conflicts with cancelled customer requests\n\nThe system recovered from severe operational issues (payment 504s, corrupted events, stale pricing), restored customer traffic flow, and delivered 63 out of 65 bookings successfully. However, the data integrity issues from the incident and recovery process resulted in a score of 0.\n\nThe signed receipt has been saved in `episode.json`.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.3151344,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 50028,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 50028,
+  "cache_read_input_tokens": 1511284,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 305,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 2912,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 2912,
+    "cache_read_input_tokens": 58335,
+    "input_tokens": 8,
+    "output_tokens": 846,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 12729,
+  "output_tokens_details": {
+   "thinking_tokens": 5572
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

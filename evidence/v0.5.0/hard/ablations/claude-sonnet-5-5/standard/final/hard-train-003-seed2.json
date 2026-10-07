@@ -1,0 +1,41 @@
+{
+ "num_turns": 38,
+ "result": "The episode ended with a reward of 0.0. I finished without any counted healthy probes, and the signed receipt is stored. The score output didn't give a reason for the zero, so I can't say whether an integrity violation or the missing verification caused it.\n\nAll four probes I ran came back unhealthy, so `verification_windows` stayed at 0. By the time the cache fix landed I had too few actions left to get the two healthy probes plus a finish. The last window's logs showed only the expected sold-out rejections, so I never found why the probes still failed.\n\n**What I did:**\n- **Pricing worker:** it was down, so I restarted it.\n- **Cancelled requests:** I voided the three bookings whose customers had cancelled. Two had captured charges and now have refunds. The third had a declined charge, which I confirmed with one provider lookup.\n- **Duplicate sale:** two bookings shared one client reference. I confirmed one against its captured charge and voided the other, which also got a refund.\n- **Pending booking with a charge:** I confirmed it against its existing captured charge.\n- **Outbox:** I quarantined four malformed events (truncated payloads, a missing passenger, a wrong booking id). I re-enabled the check-in consumer and set `auto_pause_after_attempts` back to 0, and the backlog drained. The legacy-format event was delivered normally.\n- **Stale quotes:** most booking failures were \"stale pricing quote\" errors. I cleared the pricing cache and turned caching off.\n\nThe final data showed 28 confirmed bookings, 4 cancelled, and 0 pending or undelivered events.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.32693199999999994,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 29308,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 29308,
+  "cache_read_input_tokens": 687680,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 52,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 228,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 228,
+    "cache_read_input_tokens": 35037,
+    "input_tokens": 2,
+    "output_tokens": 528,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 7206,
+  "output_tokens_details": {
+   "thinking_tokens": 2000
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

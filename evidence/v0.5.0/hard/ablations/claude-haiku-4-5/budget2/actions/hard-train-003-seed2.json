@@ -1,0 +1,288 @@
+{
+ "actions": [
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "pricing"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "pricing"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 2000
+    }
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM service_config WHERE service = 'checkin';"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, status, payload FROM outbox ORDER BY event_id LIMIT 10;"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_5531d69049595af4a35fd0af18843889"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT value FROM service_config WHERE service = 'checkin';"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, payload FROM outbox WHERE status = 'pending' ORDER BY event_id;"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000005_bkg_5d67d46ed062592ab7c274805129832d"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000008_bkg_5531d69049595af4a35fd0af18843889"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT service, value FROM service_config;"
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, type FROM sqlite_master WHERE type='table' ORDER BY name;"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM provider_ledger LIMIT 5;"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, flight_id, status FROM bookings WHERE status = 'pending' LIMIT 10;"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, charge_id, status FROM charges WHERE booking_id IN ('bkg_490dad369299567cbbf05813c652e7d8', 'bkg_7623392e026a550e9376a826d111b393', 'bkg_b24728230f995c6bb865a6a6447b52af', 'bkg_d0b573791f6b5754ae747084c1de685f', 'bkg_2b275b12f433528c894dd1746d87cf9f', 'bkg_b97415313900513b9f75e50d3c1e427f');"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, charge_id FROM charges WHERE booking_id IN ('bkg_490dad369299567cbbf05813c652e7d8', 'bkg_7623392e026a550e9376a826d111b393', 'bkg_b24728230f995c6bb865a6a6447b52af', 'bkg_d0b573791f6b5754ae747084c1de685f', 'bkg_2b275b12f433528c894dd1746d87cf9f', 'bkg_b97415313900513b9f75e50d3c1e427f');"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_490dad369299567cbbf05813c652e7d8",
+    "existing_charge_id": "chg_d3d346b503ba55bc9b30c0e11d4408de"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_7623392e026a550e9376a826d111b393",
+    "existing_charge_id": "chg_63fabea65c045c97bf5941c9ad3bdee9"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b24728230f995c6bb865a6a6447b52af",
+    "existing_charge_id": "chg_a3f9a39df8d3591bb4e7a7d6b4de9b0f"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d0b573791f6b5754ae747084c1de685f",
+    "existing_charge_id": "chg_0f5614e4cbc85acaacac5588e468cdac"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_2b275b12f433528c894dd1746d87cf9f",
+    "existing_charge_id": "chg_37ce694a44d65ae9be3a65d871bee232"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b97415313900513b9f75e50d3c1e427f",
+    "existing_charge_id": "chg_06daeddc9d4754ab9744ac2be8b176f8"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "batch_size": 20
+    }
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT value FROM service_config WHERE service = 'checkin';"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 1
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as count FROM checkins;"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_d0b573791f6b5754ae747084c1de685f"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

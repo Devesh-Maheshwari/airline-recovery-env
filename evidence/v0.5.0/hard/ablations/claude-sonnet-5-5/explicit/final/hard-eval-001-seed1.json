@@ -1,0 +1,41 @@
+{
+ "num_turns": 38,
+ "result": "The episode ended before I got the system healthy. I used all 36 actions and never got a healthy probe, so there are no verification windows. The final probes were unhealthy and still showed `backlog_complete: false`. I'm not sure the sidecar issued a receipt, because I couldn't read `episode.json` in this session (the command needed approval).\n\n**What I changed**\n- **Payment timeouts:** I raised booking `payment_timeout_ms` from 200 to 2000. The booking logs showed 504s with \"payment outcome is uncertain\" at the 200 ms deadline, with the payment provider's latency at 80 ms.\n- **Pricing cache:** I invalidated the pricing quote cache. I left `validate_price` on, so nobody gets booked at a different fare.\n- **Pending bookings:**\n  - Reconciled three against their captured charges: `bkg_1d80\u2026`, `bkg_9849\u2026` and `bkg_47f3\u2026` (this one had no charge row, so I reconciled it with a fresh capture). All three are confirmed.\n  - Voided `bkg_ace9\u2026`, the duplicate `client_reference` retry, and refunded it.\n  - Voided `bkg_874465\u2026` and `bkg_da9dbd\u2026`, which had matching customer cancel events. The first was refunded; the second had no charge.\n  - Voided `bkg_ae924208\u2026` after `provider_lookup` showed its payment as declined.\n- **Event backlog:** I quarantined three invalid events (a truncated payload, a booking-id mismatch and a missing `passenger_id`). I raised check-in `batch_size` to 50 and replayed the rest; the outbox ended with nothing pending.\n\n**What is still wrong or uncertain**\n- **`bkg_ae924208\u2026`:** The decline was probably an artifact of its `booking-v2:` key prefix. I voided it on a guess, and a void can't be undone. If that customer should have been booked, it counts as an unrecovered request.\n- **Stale-quote 409s:** The cumulative request logs still showed 38 of these. I never checked whether they were still happening after the cache invalidation, and that may be what kept the probes unhealthy.\n- **Wasted actions:** I spent several on reads (outbox, charges, metrics, config) that I could have combined.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.39789,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 33234,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 33234,
+  "cache_read_input_tokens": 911400,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 62,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 152,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 152,
+    "cache_read_input_tokens": 39039,
+    "input_tokens": 2,
+    "output_tokens": 814,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 8255,
+  "output_tokens_details": {
+   "thinking_tokens": 1981
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

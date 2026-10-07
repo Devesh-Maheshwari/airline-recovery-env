@@ -1,0 +1,153 @@
+{
+ "actions": [
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 5000
+    }
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, status, flight_id, passenger_id, amount_cents FROM bookings ORDER BY booking_id LIMIT 30"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, c.charge_id, c.idempotency_key, c.amount_cents, c.provider_state, h.hold_id FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id LEFT JOIN holds h ON b.booking_id = h.booking_id WHERE b.status = \"pending\" ORDER BY b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name IN (\"charges\", \"holds\", \"bookings\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, COUNT(DISTINCT c.charge_id) as charge_count, MAX(c.state) as charge_state, COUNT(DISTINCT h.hold_id) as hold_count FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id LEFT JOIN holds h ON b.booking_id = h.booking_id WHERE b.status = \"pending\" GROUP BY b.booking_id ORDER BY b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, COUNT(DISTINCT c.charge_id) as charge_count, MAX(c.state) as charge_state, CASE WHEN h.booking_id IS NOT NULL THEN 1 ELSE 0 END as has_hold FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id LEFT JOIN holds h ON b.booking_id = h.booking_id WHERE b.status = \"pending\" GROUP BY b.booking_id ORDER BY b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, c.charge_id, c.state FROM bookings b JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = \"pending\" AND c.state = \"captured\" ORDER BY b.booking_id"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_16e7554f86495a7c9f9ceedd10dabc1c",
+    "existing_charge_id": "chg_2eea60a8f227519d9e02933f8932a48f"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_47921036a8b853c9a1fe2e4f9c749b8a",
+    "existing_charge_id": "chg_f6800b280689549eb9ed5f09df6bdc96"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_9589bb5ca24753e89413f06edd884352",
+    "existing_charge_id": "chg_1236fe197c125e6faf4406ce6f2d1818"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_be1ee3dff247522485fad247875ba03e",
+    "existing_charge_id": "chg_0261f875340c5e95a7b4089b709235bf"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e6f9ef167b0c53f8ab6e25715d579c91",
+    "existing_charge_id": "chg_1f0faddf5c8257e889bbe8ab2e17c93d"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_eaa19ae8024856648ec69e8ae7d5c6a6",
+    "existing_charge_id": "chg_673f00936c265bf3add00cda9bc04088"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ec42e825dded5be88c232dbfdc84d3e7",
+    "existing_charge_id": "chg_4d2e1f04e7ad59d2882074499a9c6b17"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_fd8e0c8c27b35bad93732944a2706728",
+    "existing_charge_id": "chg_30c94d0a37bd564a90200b3caef0fdc5"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_3ecc1bb132cf5cafb6b6678d9f0b82f2"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_f643854582155d3f8c3ffa997b0009c4"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

@@ -1,0 +1,41 @@
+{
+ "num_turns": 34,
+ "result": "The episode failed. It finished with a reward of 0.0 because of an integrity violation: `duplicate_sale:CR-49f4a2cbb434`, meaning two confirmed bookings share one client reference.\n\nI never checked for duplicate client references before reconciling the pending bookings. The score doesn't say which bookings were involved, so I don't know whether reconciling caused the duplicate or it was already there.\n\nThe other scores:\n\n| Measure | Result |\n|---|---|\n| Completed requests | 42 of 46 required |\n| Incident recovery | 0.41 |\n| Availability (last three windows) | 0.375 |\n| Verification | Not achieved |\n| Cost penalty | 0.254, which hit the 0.25 cap |\n\n**What I did:**\n- **Payment timeouts:** I raised the booking `payment_timeout_ms` from 131 to 3000. The provider takes about 520 ms, so every capture was timing out and leaving bookings pending.\n- **Outbox:** I quarantined three invalid events (a missing `passenger_id`, a booking ID that didn't match its payload, and a truncated payload) and replayed the rest. The backlog went to 0 and no valid events were discarded.\n- **Pending bookings:** The provider showed the charges as pending for several steps, then as captured. I reconciled the eight pending bookings after that, but reconciling failed repeatedly in between and used up a lot of the budget.\n\n**Verification:** The one probe I ran was unhealthy, and there weren't enough actions left for two healthy ones.\n\n**What went wrong:** I spent actions on reconcile retries and a payment restart that didn't help. That left no room for verification or for investigating the duplicate sale.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.35627020000000004,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 33514,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 33514,
+  "cache_read_input_tokens": 725261,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 56,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 1015,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 1015,
+    "cache_read_input_tokens": 36152,
+    "input_tokens": 2,
+    "output_tokens": 562,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 7705,
+  "output_tokens_details": {
+   "thinking_tokens": 2389
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

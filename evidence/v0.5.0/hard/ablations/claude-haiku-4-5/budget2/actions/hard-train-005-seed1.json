@@ -1,0 +1,283 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "accepted_schema": 2
+    }
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "accepted_schema": 1
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT id, booking_id, payload FROM outbox WHERE status = 'pending' LIMIT 5"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type = \"table\" AND name = \"outbox\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, booking_id, payload FROM outbox WHERE status = \"pending\" LIMIT 3"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, status FROM bookings WHERE booking_id = \"bkg_7fb9795123b352ce9081be038e7a1e56\""
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000376_bkg_5a4d62a3c7ac561999a7534ac32f7771"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000387_bkg_5a4d62a3c7ac561999a7534ac32f7771"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000388_bkg_20dca668ee63587a90e6884e00f3873c"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000389_bkg_b08eb12c7c8d57f0838dbf0a99fb68bc"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, status, amount_cents FROM bookings WHERE status = \"pending\" LIMIT 10"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.booking_id, c.provider_charge_id, c.status FROM charges c WHERE c.booking_id IN (\"bkg_1b03bb4ac03451ca8e41c6e1559b5e03\", \"bkg_0214dfd9b6965f26925ee3d0b3b6d95a\", \"bkg_df255c725f4e5cb7bbd4724084c418ea\", \"bkg_79f8f95e0a63585cad00ac354223f9b7\", \"bkg_fbcf25de09835b7d9f23ccf294d60dc7\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type = \"table\" AND name = \"charges\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, idempotency_key, amount_cents, state FROM charges WHERE booking_id IN (\"bkg_1b03bb4ac03451ca8e41c6e1559b5e03\", \"bkg_0214dfd9b6965f26925ee3d0b3b6d95a\", \"bkg_df255c725f4e5cb7bbd4724084c418ea\", \"bkg_79f8f95e0a63585cad00ac354223f9b7\", \"bkg_fbcf25de09835b7d9f23ccf294d60dc7\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, flight_id, passenger_id FROM holds WHERE booking_id IN (\"bkg_1b03bb4ac03451ca8e41c6e1559b5e03\", \"bkg_0214dfd9b6965f26925ee3d0b3b6d95a\", \"bkg_df255c725f4e5cb7bbd4724084c418ea\", \"bkg_79f8f95e0a63585cad00ac354223f9b7\", \"bkg_fbcf25de09835b7d9f23ccf294d60dc7\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT charge_id, booking_id, state FROM charges WHERE booking_id IN (\"bkg_0214dfd9b6965f26925ee3d0b3b6d95a\", \"bkg_79f8f95e0a63585cad00ac354223f9b7\", \"bkg_fbcf25de09835b7d9f23ccf294d60dc7\") AND state = \"captured\""
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_0214dfd9b6965f26925ee3d0b3b6d95a",
+    "existing_charge_id": "chg_2b19223f5f81579dacb36b24ab64533f"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_79f8f95e0a63585cad00ac354223f9b7",
+    "existing_charge_id": "chg_e8043d72b16051228e8a5a578c25f312"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_fbcf25de09835b7d9f23ccf294d60dc7",
+    "existing_charge_id": "chg_e13c4e805df45445aacb8f9268ce04f4"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_1b03bb4ac03451ca8e41c6e1559b5e03"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_df255c725f4e5cb7bbd4724084c418ea"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

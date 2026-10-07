@@ -1,0 +1,41 @@
+{
+ "num_turns": 26,
+ "result": "The episode is finished and scored 0.75. The sidecar issued a receipt, and the run ended inside the 32-action budget.\n\n- **Cause:** Five accepted bookings were stuck pending because their payment captures hadn't settled at the provider. I changed no configuration.\n- **Cancelled customer:** `bkg_f92d\u2026` was a request the customer had cancelled. I voided it, which cancelled the booking and refunded the 25000 cents already captured.\n- **Other four bookings:** I confirmed them with `reconcile_booking` once each charge had settled. Before that, each attempt returned a 504 \"pending at provider\". Both provider lookups went on two of these bookings, and both showed pending. I reconciled the other two only after the first two settled and then succeeded.\n- **Verification:** The probe turned healthy and backlog complete once the last booking was confirmed. I got two healthy windows after my last change, then called finish.\n\nThe first two probes before the fix were unhealthy, which was expected while bookings were stuck. I didn't check the individual score components, so I can't say what cost the other 0.25. I also didn't see how the post-finish replay of lost acknowledgements and expired keys came out.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.2201532,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 23332,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 23332,
+  "cache_read_input_tokens": 422026,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 40,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 223,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 223,
+    "cache_read_input_tokens": 26762,
+    "input_tokens": 2,
+    "output_tokens": 391,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 4234,
+  "output_tokens_details": {
+   "thinking_tokens": 895
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

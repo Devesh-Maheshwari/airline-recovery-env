@@ -1,0 +1,41 @@
+{
+ "num_turns": 12,
+ "result": "The episode is finished and the sidecar issued a signed receipt. I used 10 of the 64 actions.\n\n- **Cause:** The check-in backlog was blocked by malformed outbox events. Event 4 was a truncated payload. Event 5 had no `passenger_id`. Event 6 pointed at a booking that doesn't exist.\n- **Fix:** I quarantined those three events, then replayed the rest. All 5 delivered, and the backlog went to zero. Check-ins caught up with confirmed bookings (21 of 21 at the second probe).\n- **Verification:** Both probes were healthy, so verification_windows reached 2.\n- **Receipt details:** The post-finish safety check ran the duplicate-delivery, fare-change and cancel-then-retry hazards and found no violations. There were no abandoned requests, and revenue retained was 1.0.\n- **Cost:** The cost penalty was 0.092, from 4 mutations and the reads. I made no provider lookups. I didn't change any configuration.\n\nI didn't see the final reward number in the output I read, so I can't give you the score.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.124726,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 16155,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 16155,
+  "cache_read_input_tokens": 183810,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 22,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 638,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 638,
+    "cache_read_input_tokens": 21474,
+    "input_tokens": 2,
+    "output_tokens": 363,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 2330,
+  "output_tokens_details": {
+   "thinking_tokens": 511
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

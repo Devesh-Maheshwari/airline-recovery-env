@@ -364,6 +364,16 @@ class HardEpisodeRuleTests(unittest.TestCase):
         self.assertTrue(observation["result"]["ok"], observation["result"])
         self.assertTrue(env.trace.fare_hold_broken)
 
+    def test_turning_the_cache_off_breaks_the_fare_hold(self):
+        # The promised fare lives only in its cache row; with the cache off, quotes carry the list fare.
+        env, _ = self.hard_env(index=3, seed=4)
+        self.assertTrue(any(until >= env.step_count for until in env.trace.held_flights.values()))
+        act(env, "patch_config", service="pricing", values={"cache_enabled": True})
+        self.assertFalse(env.trace.fare_hold_broken)
+        observation, *_ = act(env, "patch_config", service="pricing", values={"cache_enabled": False})
+        self.assertTrue(observation["result"]["ok"], observation["result"])
+        self.assertTrue(env.trace.fare_hold_broken)
+
 
 if __name__ == "__main__":
     unittest.main()

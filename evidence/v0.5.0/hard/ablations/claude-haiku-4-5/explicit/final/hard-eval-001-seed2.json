@@ -1,0 +1,41 @@
+{
+ "num_turns": 38,
+ "result": "The episode ended with a score of 0.0 due to integrity violations. While I achieved full recovery on customer requests (86 completed) and cleared all alerts and outbox backlog, there were two critical integrity issues detected:\n\n1. **Cancelled customer fulfilled** - I reconciled `bkg_1404e860d70059c1939dc9ae9508e7f3` when it should have been cancelled. This booking had a pending charge at the provider (verified via provider_lookup), which I shouldn't have confirmed.\n\n2. **Duplicate sale** - The system detected a duplicate sale for customer reference CR-493517b43171.\n\n**What went well:**\n- Identified and fixed the schema version mismatch (checkin accepting schema_version 2)\n- Confirmed 86 bookings that had captured charges\n- Delivered all 83 outbox events successfully\n- Cleared all operational alerts\n- Completed the incident recovery fully\n\n**What went wrong:**\n- Reconciling the pending payment booking created a violation by confirming a customer who should have been cancelled\n- Failed to achieve 2 healthy verification windows (probes showed health issues)\n- Duplicate sale issue that wasn't fully resolved\n\nThe recovery algorithm needs to be more careful about reconciling bookings with pending provider charges - the presence of a confirmed charge in the database doesn't guarantee the payment settled if the provider says it's pending.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.3246397000000001,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 49297,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 49297,
+  "cache_read_input_tokens": 1509157,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 305,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 2007,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 2007,
+    "cache_read_input_tokens": 56587,
+    "input_tokens": 8,
+    "output_tokens": 718,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 14965,
+  "output_tokens_details": {
+   "thinking_tokens": 8077
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

@@ -1,0 +1,41 @@
+{
+ "num_turns": 39,
+ "result": "I finished the episode, but the reward is 0.0 and I never got a healthy probe window. Every probe from step 19 on reported `healthy: false` with `backlog_complete: false`, so `verification_windows` stayed at 0. I don't know why. I ran out of actions before I could find out.\n\nWhat I changed:\n- **Customer who cancelled:** `bkg_7167\u2026` was cancelled by the customer but had a captured charge. I voided it.\n- **Declined payment:** the provider lookup showed `bkg_335b\u2026` as declined, so I voided it. No refund was needed.\n- **Bookings with no provider record:** `bkg_56ad\u2026` and `bkg_9d63\u2026` were unknown to the provider (both lookups returned 404). I reconciled them with a fresh capture and both are now confirmed.\n- **Bookings with a captured charge:** `bkg_f7ac\u2026` and `bkg_67b9\u2026` each already had a captured charge. I reconciled them against those charges and both are now confirmed.\n- **Check-in backlog:** I quarantined the one malformed event (`evt_\u2026308`, whose payload named a different booking), turned the check-in consumer on and raised its batch size to 50. The remaining backlog delivered by itself, with 0 events pending afterwards.\n- **Stale quotes:** the booking logs showed many \"stale pricing quote\" rejections, so I turned the pricing cache off and cleared it.\n\nThe stale-quote rejections kept appearing after that. The flight fares had gone up (version 2), so some of those rejections may be correct: customers quoted the old fare should not be booked at the new one. If so, they are not the cause of the unhealthy probes.\n\nAt step 25 the summary showed no pending bookings, no pending outbox events, and 348 confirmed bookings with 348 check-ins. I never checked per-booking for a missing hold, charge or event, because the one query I tried for that failed with \"interrupted\".\n\nThe receipt was issued. The \"malformed events\" alert was still showing at the end.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.32200619999999996,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 29494,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 29494,
+  "cache_read_input_tokens": 649251,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 50,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 213,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 213,
+    "cache_read_input_tokens": 35238,
+    "input_tokens": 2,
+    "output_tokens": 660,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 7408,
+  "output_tokens_details": {
+   "thinking_tokens": 1799
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

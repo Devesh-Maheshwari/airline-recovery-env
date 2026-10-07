@@ -1,0 +1,168 @@
+{
+ "actions": [
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, b.request_id, b.flight_id, b.passenger_id, b.amount_cents, h.flight_id as hold_flight, c.booking_id as charge_booking FROM bookings b LEFT JOIN holds h ON b.booking_id = h.booking_id LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = \"pending\" ORDER BY b.booking_id LIMIT 20"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id, c.amount_cents, c.status, c.idempotency_key FROM charges c WHERE c.booking_id IN (\"bkg_7e9c5c467d785aafb2ef006a4e11d192\", \"bkg_8e0c6768232051e6949e5d89df9aa761\", \"bkg_ade3ea72db235a2b9bea7f373d293be7\", \"bkg_d7f779e3ccda56a4afdfdf5cea698b56\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM charges WHERE booking_id IN (\"bkg_8e0c6768232051e6949e5d89df9aa761\", \"bkg_ade3ea72db235a2b9bea7f373d293be7\", \"bkg_d7f779e3ccda56a4afdfdf5cea698b56\") LIMIT 10"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM outbox ORDER BY event_id LIMIT 20"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 1000
+    }
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8e0c6768232051e6949e5d89df9aa761",
+    "existing_charge_id": "chg_16ba1d711bcf5040966c39c479892db8"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ade3ea72db235a2b9bea7f373d293be7",
+    "existing_charge_id": "chg_46ffbb8033ed5153b3d70b7d7b5109b2"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d7f779e3ccda56a4afdfdf5cea698b56",
+    "existing_charge_id": "chg_b4003a1735ae57529635851231271a1c"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d7f779e3ccda56a4afdfdf5cea698b56"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_7e9c5c467d785aafb2ef006a4e11d192"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as count, b.status FROM bookings b GROUP BY b.status"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, COUNT(c.charge_id) as charge_count FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = \"confirmed\" GROUP BY b.booking_id HAVING charge_count = 0 LIMIT 10"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as count, c.state FROM charges c GROUP BY c.state"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id, b.status FROM charges c JOIN bookings b ON c.booking_id = b.booking_id WHERE c.state = \"lost\""
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_d7f779e3ccda56a4afdfdf5cea698b56"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM charges WHERE booking_id = \"bkg_d7f779e3ccda56a4afdfdf5cea698b56\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT r.*, b.status FROM refunds r JOIN bookings b ON r.booking_id = b.booking_id WHERE b.status = \"confirmed\""
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) FROM bookings b WHERE b.status = \"confirmed\" AND NOT EXISTS (SELECT 1 FROM holds h WHERE h.booking_id = b.booking_id) LIMIT 10"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

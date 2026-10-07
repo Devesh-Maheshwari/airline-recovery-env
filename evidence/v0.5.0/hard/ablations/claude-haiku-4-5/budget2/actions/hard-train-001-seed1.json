@@ -1,0 +1,98 @@
+{
+ "actions": [
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT id, booking_id, event_type, status, attempts, payload FROM outbox ORDER BY id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name=\"outbox\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, booking_id, payload, status, attempts FROM outbox WHERE status=\"pending\" ORDER BY event_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, booking_id, status, attempts, payload FROM outbox ORDER BY event_id"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as booking_count, SUM(CASE WHEN status=\"confirmed\" THEN 1 ELSE 0 END) as confirmed, SUM(CASE WHEN status=\"pending\" THEN 1 ELSE 0 END) as pending FROM bookings"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as hold_count FROM holds WHERE status=\"active\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name=\"holds\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as with_hold FROM bookings b WHERE status=\"confirmed\" AND EXISTS (SELECT 1 FROM holds h WHERE h.booking_id = b.booking_id)"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(DISTINCT b.booking_id) as with_charge FROM bookings b WHERE status=\"confirmed\" AND EXISTS (SELECT 1 FROM charges c WHERE c.booking_id = b.booking_id AND c.status=\"captured\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name=\"charges\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(DISTINCT b.booking_id) as confirmed FROM bookings b WHERE status=\"confirmed\", (SELECT COUNT(DISTINCT booking_id) as with_charge FROM charges WHERE state=\"captured\") as c"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as total_charges FROM charges WHERE state=\"captured\""
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

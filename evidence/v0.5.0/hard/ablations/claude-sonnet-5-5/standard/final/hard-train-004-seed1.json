@@ -1,0 +1,41 @@
+{
+ "num_turns": 40,
+ "result": "The episode is finished with a reward of **0.0**, so the recovery failed. I never got a healthy probe, and the receipt is stored in `episode.json`.\n\n**What I fixed**\n- **Booking timeout:** `payment_timeout_ms` was 98 ms against a provider latency of 421 ms. I raised it to 3000 ms, which stopped new payment timeouts.\n- **Pending bookings:** all 12 are resolved. I reconciled 11 of them with the default key, and the 12th had been declined, so I voided it. At the end there were 0 pending bookings, 0 pending outbox events, and confirmed bookings matched check-ins.\n- **Pricing cache:** I turned `cache_enabled` off and invalidated the cache.\n\n**What went wrong**\n- All 5 probes came back unhealthy with `backlog_complete: false`.\n- The probes were failing on `/book` returning 409 \"stale pricing quote\". F100 kept failing after I changed the pricing cache setting. F200 and the sold-out flight behaved as expected.\n- The F100 failures are unexplained. I never found a cause, and I never confirmed they were still happening after the cache change. I spent the budget on repeated probes instead of finding out. One idea I didn't test is that `validate_price` or the F100 flight version is the cause.\n- Probes also reset the verification count when they come back unhealthy, so I never got the two healthy windows the contract requires.\n- I skipped the earlier reads (`get_logs` and `get_metrics` for booking and pricing) that might have caught the stale-quote problem sooner.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.302456,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 25537,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 25537,
+  "cache_read_input_tokens": 652060,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 58,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 215,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 215,
+    "cache_read_input_tokens": 31279,
+    "input_tokens": 2,
+    "output_tokens": 526,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 6978,
+  "output_tokens_details": {
+   "thinking_tokens": 1115
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

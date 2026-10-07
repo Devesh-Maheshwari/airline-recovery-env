@@ -9,6 +9,49 @@ dates are build dates. 0.4.0 was the last internal build; 0.5.0 is the first ver
 The reasons behind the 0.2.1, 0.3.0, 0.4.0 and 0.5.0 changes are summarised in
 [docs/LIMITATIONS.md](docs/LIMITATIONS.md#review-history).
 
+## [Unreleased]
+
+### Added
+
+- Full traces for coding-agent runs: the world process writes `trace.jsonl` per
+  episode (the reset observation, then every action with the reply the agent
+  saw, or the rejection). `scripts/collect_agent_run.py` copies a run into the
+  evidence layout with gzipped traces.
+- `--trials N` on the external runner: repeated attempts per task and seed, with
+  pass@k and pass^k (overall and by level) in `summary.json`.
+- Ablation options on the external runner: `--budget-scale` (multiply the hard
+  case's action budget) and `--explicit-instructions` (append the integrity
+  rules in plain words). Records carry `budget_scale` and `instruction_variant`.
+- `docs/SCENARIOS.md`: every fault mechanism and trap with the real-world failure
+  it stands for, what a correct recovery does, which invariants catch a wrong
+  one, and what is simplified; per-slot composition; counts of distinct case
+  structures; open validation items.
+- `scripts/throughput_benchmark.py`: oracle episodes per hour, step latency and
+  memory at several concurrency levels.
+
+### Measured
+
+- Ablations (Sonnet 5.5 and Haiku 4.5, 24 instances each): neither clearer
+  instructions nor twice the budget changes the outcome by more than two
+  episodes; level 2 stays unsolved
+  ([evidence](evidence/v0.5.0/hard/ablations/README.md)).
+- Failure analysis of the 180 published agent episodes: 96 of 110 failures are
+  integrity harm caused by the agent's own action, first harm at a median of 36%
+  of the budget ([evidence](evidence/v0.5.0/hard/failure-analysis/README.md)).
+
+### Fixed
+
+- `trap_outcomes.fare_hold_broken` now also records a live fare hold hidden by
+  turning the pricing cache off, not only one evicted by `invalidate_cache`.
+  Diagnostic only: rewards and success are unchanged.
+- The agent-facing `refund_unwarranted` description now matches the grader:
+  a refund on a confirmed booking, or on no booking.
+- Documentation that disagreed with the code: the pricing quote never reads
+  `fare_holds` (a promised fare lives only in its cache row); level 1 can draw a
+  process fault and often has no trap; distinct case structures are 17, 600 and
+  about 6,000 at levels 1–3, not "hundreds per level"; `refund_unwarranted`
+  flags refunds on confirmed or missing bookings only.
+
 ## [0.5.0] - 2026-10-06
 
 ### Measured

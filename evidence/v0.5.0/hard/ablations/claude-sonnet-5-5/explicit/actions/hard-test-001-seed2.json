@@ -1,0 +1,218 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,b.passenger_id,b.client_reference,b.amount_cents,b.request_id,(select group_concat(charge_id||\":\"||idempotency_key||\":\"||status) from charges c where c.booking_id=b.booking_id) ch from bookings b"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,booking_id,status,attempts,substr(payload,1,150) p from outbox"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from customer_events"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,payload from outbox where status=\"pending\" and attempts>=0 and event_id<=\"evt_00000007\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from charges where status<>\"confirmed\""
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_5f622df69f7b546b8f0ce6e52864696b"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select sql from sqlite_master where name=\"charges\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select substr(b.booking_id,1,12) b,b.status,c.state,c.idempotency_key from bookings b join charges c using(booking_id) where b.status<>\"confirmed\""
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_5f622df69f7b546b8f0ce6e52864696b"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_3b1137c227d85e00a24325ddaf0e2e10"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 2000
+    }
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_52543d82280951f6ae9e484ce3ff92fd"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000005_bkg_31e5e01e9edf57e3b61b48327622282d"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000007_bkg_31e5e01e9edf57e3b61b48327622282d"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 20
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "accepted_schema": 2,
+     "batch_size": 50
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select substr(b.booking_id,1,12) b,b.status,b.client_reference cr,c.state,(select count(*) from checkins k where k.booking_id=b.booking_id) ck,(select count(*) from holds h where h.booking_id=b.booking_id) h from bookings b left join charges c using(booking_id) where b.status<>\"confirmed\" or ck=0"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select booking_id,charge_id from charges where state=\"captured\" and booking_id in (select booking_id from bookings where status=\"pending\")"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_3b1137c227d85e00a24325ddaf0e2e10",
+    "existing_charge_id": "chg_c948c8b47af959a891b34de50c2056a8"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_4be671c8059c5325a4e29702e41dda85",
+    "existing_charge_id": "chg_d4fb9389444a58d786e219fea9e89829"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b71f8111b75351c59dfa6c51c13f0626",
+    "existing_charge_id": "chg_03d0d33856d45f509ad2cb87de3f025d"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_e5ccc6ce0f5b536c82ab18507a0102a6"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_5f622df69f7b546b8f0ce6e52864696b"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_fc6bc9381ac25316bd7f84b03d7e216d"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_ee1ea5fa5d295f62a9fd755033367e86"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_dfc7215863345c6a99661fd7489c0ace"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select substr(b.booking_id,1,12) b,b.status,(select count(*) from checkins k where k.booking_id=b.booking_id) ck,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select count(*) from outbox o where o.booking_id=b.booking_id and o.status=\"delivered\") ev from bookings b where ck=0 or h>1"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

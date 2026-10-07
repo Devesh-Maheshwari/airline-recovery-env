@@ -1,0 +1,180 @@
+{
+ "actions": [
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.id, b.client_reference, b.status, c.provider_status FROM bookings b LEFT JOIN charges c ON b.id = c.booking_id WHERE b.status = 'pending' ORDER BY b.id LIMIT 50"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM bookings WHERE status = 'pending' LIMIT 10"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, provider_status, message FROM charges WHERE booking_id IN (SELECT booking_id FROM bookings WHERE status = 'pending') LIMIT 50"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM charges WHERE booking_id IN (SELECT booking_id FROM bookings WHERE status = 'pending') LIMIT 20"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT DISTINCT b.booking_id, b.client_reference FROM bookings b JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = 'pending' AND c.state = 'lost'"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 600
+    }
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, c.state, b.amount_cents FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = 'pending' ORDER BY c.state DESC LIMIT 50"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "booking_id": "bkg_ad353e8c0f6b5187944e47f8359ac819"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "charge_id": "chg_4b41c735e136532886b9a4795744d5a6"
+   }
+  },
+  {
+   "tool": "provider_lookup"
+  },
+  {
+   "tool": "confirm_booking",
+   "arguments": {
+    "booking_id": "bkg_a0687d201cbe5528bbb35756610f7f1e"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "verify_payments",
+   "arguments": {}
+  },
+  {
+   "tool": "resolve_booking",
+   "arguments": {
+    "booking_id": "bkg_a0687d201cbe5528bbb35756610f7f1e"
+   }
+  },
+  {
+   "tool": "list_tools",
+   "arguments": {}
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "test"
+   }
+  },
+  {
+   "tool": "confirm_booking",
+   "arguments": {
+    "booking_id": "bkg_a0687d201cbe5528bbb35756610f7f1e"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "booking": "bkg_ad353e8c0f6b5187944e47f8359ac819"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "booking_id": "bkg_ad353e8c0f6b5187944e47f8359ac819"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "charge_id": "chg_4b41c735e136532886b9a4795744d5a6"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

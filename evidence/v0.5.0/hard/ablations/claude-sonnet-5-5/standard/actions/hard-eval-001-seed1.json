@@ -1,0 +1,206 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from bookings"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from charges"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,booking_id,status,attempts,substr(payload,1,150) p from outbox"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "pricing",
+    "values": {
+     "cache_enabled": false
+    }
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select o.event_id,o.status,o.attempts,o.payload,b.status bs,b.flight_id,b.passenger_id from outbox o left join bookings b on b.booking_id=o.booking_id where o.status!=\"delivered\" and o.event_id<\"evt_00000008\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select booking_id,status,client_reference from bookings where booking_id not in (select booking_id from holds) and status!=\"cancelled\""
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_fca9c29976e057f4a1221d7cbb391b34"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_7172aff0cbec5f64b10ded24e95b7220"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000006_bkg_7172aff0cbec5f64b10ded24e95b7220"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000007_bkg_e1c4a2420b5155e8a9272fe2a1771f09"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e0337238297f5034b41754af1956a482",
+    "existing_charge_id": "chg_19e855ef4953505f8d545a3de5b7f553"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_14e3961288b15bb787f00678b8c2771e",
+    "existing_charge_id": "chg_5f507ffe756a5c5895583b5d73fc39e5"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b49260ddf5345ba7b1ebb5534e43af58",
+    "existing_charge_id": "chg_45f01891ea3259239a08477302f80ecb"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_ed396091eca85c46a8ff87761bc84612"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_fca9c29976e057f4a1221d7cbb391b34"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_621e147917d35fe898f7c620cca3b7cd"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_2cf97911cf0250aeb2cce7488841f0d4"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_621e147917d35fe898f7c620cca3b7cd"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_2cf97911cf0250aeb2cce7488841f0d4"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 20
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select status,count(*) n,min(event_id) m from outbox group by status"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.status,count(*) n from bookings b group by 1"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,status,message,count(*) n from (select * from request_logs order by id desc limit 60) group by 1,2,3"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select (select count(*) from bookings where status=\"confirmed\") conf,(select count(*) from holds) holds,(select count(*) from checkins) ck,(select count(*) from charges where state=\"captured\") cap,(select count(*) from charges where state!=\"captured\") other,(select count(*) from charges where booking_id not in (select booking_id from bookings)) orphan,(select count(*) from refunds) refunds,(select count(*) from customer_events) ce"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select request_id,count(*) n,group_concat(status) s from bookings group by 1 having n>1 union all select \"nocheckin\",count(*),group_concat(booking_id) from bookings where status=\"confirmed\" and booking_id not in (select booking_id from checkins)"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from customer_events"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

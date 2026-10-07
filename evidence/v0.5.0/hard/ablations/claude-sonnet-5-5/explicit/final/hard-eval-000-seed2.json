@@ -1,0 +1,41 @@
+{
+ "num_turns": 9,
+ "result": "I finished the episode in 12 of the 32 actions, and the sidecar issued the signed receipt. I didn't capture the terminal reward from the output, only the end of the receipt. Abandoned requests were 0, revenue retained was 1.0, and the cost penalty was 0.116.\n\nThe cause was three bad events in the checkin backlog. They were blocking delivery of the valid events behind them:\n- **`evt_\u202604`:** the payload was truncated.\n- **`evt_\u202605`:** the payload had no `passenger_id`.\n- **`evt_\u202606`:** the event id named one booking but the payload named another, so the consumer rejected it as an identity mismatch.\n\nI quarantined those three and replayed the backlog, and all 7 remaining events were delivered. I left `evt_\u202607` (legacy-import, extra fields) alone because its booking and passenger matched, and it was delivered fine. No configuration changes were needed.\n\nAfterwards I queried the bookings table. All 21 bookings were confirmed, and each had one charge, one hold and one check-in. Both probes were healthy (verification windows 1, then 2), and the backlog was complete.\n\nI never needed `provider_lookup`, `void_booking` or `reconcile_booking`, and I didn't touch the settings. The post-finish replay of customer hazards (lost acknowledgements, expired keys and so on) ran against the settings as they were at the start.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.1218038,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 17343,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 17343,
+  "cache_read_input_tokens": 148879,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 18,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 637,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 637,
+    "cache_read_input_tokens": 22663,
+    "input_tokens": 2,
+    "output_tokens": 462,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 2262,
+  "output_tokens_details": {
+   "thinking_tokens": 413
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

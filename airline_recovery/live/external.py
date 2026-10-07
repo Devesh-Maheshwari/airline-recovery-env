@@ -14,11 +14,19 @@ Code is restricted to the control script, Codex runs in its workspace sandbox
 with network access, and neither is told where the environment's source lives.
 Treat results as model baselines on the published tasks, not as adversarial
 robustness evidence.
+
+Each episode folder keeps ``trace.jsonl``: the world's reset observation and, for
+every action the agent sent, the full reply (or the rejection), written by the
+world process itself. ``--budget-scale`` and ``--explicit-instructions`` exist for
+ablations (does a larger action budget, or the integrity rules stated in plain
+words, change the outcome?); results run with them are not comparable to the
+published baselines and are labelled as such in every record.
 """
 from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import secrets
 import shutil
@@ -31,7 +39,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .evaluate import TIERS, _jsonl, _source_hashes, aggregate, check_tier, manifest_for, run_id_for, wilson_interval
+from .evaluate import TIERS, _jsonl, _source_hashes, aggregate, check_tier, manifest_for, repeated_attempts, run_id_for, wilson_interval
 from .harbor import CONTROL, case_for_tier, instruction, verify_receipt
 
 AGENTS = {
@@ -88,8 +96,19 @@ def _sidecar_observation(url: str) -> dict:
         return json.load(response)
 
 
+def _scaled_budget(split: str, index: int, tier: str, scale: float) -> int | None:
+    if scale == 1.0:
+        return None
+    if tier == "easy":
+        raise ValueError("--budget-scale is for the hard tier")
+    if not 1.0 < scale <= 4.0:
+        raise ValueError("budget scale must be in (1, 4]")
+    return min(256, math.ceil(case_for_tier(split, index, tier).budget * scale))
+
+
 def run_episode(agent: str, model: str, split: str, index: int, seed: int, workdir: Path, *,
-                timeout: float, turns: int, tier: str = "easy") -> dict:
+                timeout: float, turns: int, tier: str = "easy", budget_scale: float = 1.0,
+                explicit: bool = False) -> dict:
     check_tier(tier)
     key = secrets.token_hex(32)
     port = _free_port()
@@ -97,7 +116,11 @@ def run_episode(agent: str, model: str, split: str, index: int, seed: int, workd
     agent_dir = workdir / "agent"
     world.mkdir(parents=True)
     agent_dir.mkdir()
-    (world / "task_spec.json").write_text(json.dumps({"split": split, "index": index, "seed": seed, "tier": tier}))
+    spec = {"split": split, "index": index, "seed": seed, "tier": tier}
+    scaled = _scaled_budget(split, index, tier, budget_scale)
+    if scaled is not None:
+        spec["max_steps"] = scaled
+    (world / "task_spec.json").write_text(json.dumps(spec))
     (world / "receipt.key").write_text(key)
     (agent_dir / "control.py").write_text(CONTROL)
     (agent_dir / "episode.json").write_text(json.dumps({"schema_version": 3, "actions": []}))
@@ -105,11 +128,13 @@ def run_episode(agent: str, model: str, split: str, index: int, seed: int, workd
     bridge_log = (world / "bridge.log").open("wb")
     bridge = subprocess.Popen(
         [sys.executable, "-m", "airline_recovery.live.bridge", "--spec", str(world / "task_spec.json"),
-         "--key", str(world / "receipt.key"), "--host", "127.0.0.1", "--port", str(port)],
+         "--key", str(world / "receipt.key"), "--host", "127.0.0.1", "--port", str(port),
+         "--trace", str(workdir / "trace.jsonl")],
         env={**os.environ, "PYTHONPATH": package_root}, stdout=subprocess.DEVNULL, stderr=bridge_log)
     url = f"http://127.0.0.1:{port}"
     record = {"agent": agent, "model": model, "tier": tier, "level": None, "split": split, "task_index": index,
-              "seed": seed, "success": False, "reward": 0.0, "steps": None, "finished": False, "error": None}
+              "seed": seed, "success": False, "reward": 0.0, "steps": None, "finished": False, "error": None,
+              "budget_scale": budget_scale, "instruction_variant": "explicit" if explicit else "standard"}
     started = time.perf_counter()
     try:
         deadline = time.monotonic() + 30
@@ -128,7 +153,7 @@ def run_episode(agent: str, model: str, split: str, index: int, seed: int, workd
             budget = initial["episode_contract"]["max_actions"]
             record["level"] = initial.get("level")
             record["budget"] = budget
-        task_text = instruction("python control.py", "episode.json", tier=tier, budget=budget)
+        task_text = instruction("python control.py", "episode.json", tier=tier, budget=budget, explicit=explicit)
         (world / "instruction.md").write_text(task_text)
         env = {k: v for k, v in os.environ.items() if not k.startswith(("ANTHROPIC_", "OPENAI_"))} | {
             "AIRLINE_RECOVERY_WORLD": url}
@@ -181,10 +206,17 @@ def run_episode(agent: str, model: str, split: str, index: int, seed: int, workd
 
 
 def run(agent: str, model: str | None, split: str, seeds: list[int], output: Path, *,
-        timeout: float, turns: int, index: int | None = None, keep: bool = False, tier: str = "easy") -> dict:
+        timeout: float, turns: int, index: int | None = None, keep: bool = False, tier: str = "easy",
+        budget_scale: float = 1.0, explicit: bool = False, trials: int = 1) -> dict:
     if agent not in AGENTS:
         raise ValueError(f"agent must be one of {', '.join(AGENTS)}")
     check_tier(tier)
+    if tier == "easy" and (budget_scale != 1.0 or explicit):
+        raise ValueError("--budget-scale and --explicit-instructions are for the hard tier")
+    if budget_scale != 1.0 and not 1.0 < budget_scale <= 4.0:
+        raise ValueError("budget scale must be in (1, 4]")
+    if type(trials) is not int or not 1 <= trials <= 64:
+        raise ValueError("trials must be an integer in 1..64")
     if not seeds or len(set(seeds)) != len(seeds):
         # As in evaluate.py: a repeated seed reuses an episode folder and would abort the run partway.
         raise ValueError("provide one or more unique integer seeds")
@@ -196,25 +228,33 @@ def run(agent: str, model: str | None, split: str, seeds: list[int], output: Pat
         raise FileExistsError(f"results already exist in {output}")
     splits = ["train", "eval", "test"] if split == "all" else [split]
     manifest = manifest_for(tier)
-    grid = [(name, task["index"], seed) for name in splits for task in manifest[name]
-            if index is None or task["index"] == index for seed in seeds]
+    # Repeated attempts of one instance (same task and seed) measure pass@k and pass^k.
+    grid = [(name, task["index"], seed, trial) for name in splits for task in manifest[name]
+            if index is None or task["index"] == index for seed in seeds for trial in range(1, trials + 1)]
     provenance = {"started_utc": datetime.now(timezone.utc).isoformat(), "agent": agent, "model": model,
                   "command": AGENTS[agent]["command"](model, "<instruction>", turns), "seeds": seeds, "tier": tier,
-                  "trust_boundary": "external-process", "source_sha256": _source_hashes()}
+                  "trust_boundary": "external-process", "source_sha256": _source_hashes(),
+                  "budget_scale": budget_scale, "instruction_variant": "explicit" if explicit else "standard",
+                  "trials": trials}
     if tier == "easy":
         provenance["instruction"] = instruction("python control.py", "episode.json")
     elif grid:
         # Hard budgets differ by level; the text of the first task stands in for the template.
         provenance["instruction"] = instruction("python control.py", "episode.json", tier=tier,
-                                                budget=case_for_tier(grid[0][0], grid[0][1], tier).budget)
+                                                budget=_scaled_budget(grid[0][0], grid[0][1], tier, budget_scale)
+                                                or case_for_tier(grid[0][0], grid[0][1], tier).budget,
+                                                explicit=explicit)
     (output / "provenance.json").write_text(json.dumps(provenance, indent=2, sort_keys=True) + "\n")
     records = []
     with (output / "episodes.jsonl").open("w") as handle:
-        for name, task_index, seed in grid:
-            run_dir = output / "episodes" / f"{'' if tier == 'easy' else tier + '-'}{name}-{task_index:03d}-seed{seed}"
+        for name, task_index, seed, trial in grid:
+            suffix = f"-t{trial}" if trials > 1 else ""
+            run_dir = output / "episodes" / f"{'' if tier == 'easy' else tier + '-'}{name}-{task_index:03d}-seed{seed}{suffix}"
             run_dir.mkdir(parents=True, exist_ok=True)
-            record = run_episode(agent, model, name, task_index, seed, run_dir, timeout=timeout, turns=turns, tier=tier)
-            record["run_id"] = run_id_for(name, task_index, seed, tier)
+            record = run_episode(agent, model, name, task_index, seed, run_dir, timeout=timeout, turns=turns, tier=tier,
+                                 budget_scale=budget_scale, explicit=explicit)
+            record["run_id"] = run_id_for(name, task_index, seed, tier) + (f":t{trial}" if trials > 1 else "")
+            record["trial"] = trial
             records.append(record)
             _jsonl(handle, record)
             if not keep:
@@ -226,12 +266,14 @@ def run(agent: str, model: str | None, split: str, seeds: list[int], output: Pat
         row.setdefault("terminated", False)
         row.setdefault("truncated", False)
     summary = {"schema_version": 1, "agent": agent, "model": model, "seeds": seeds, "tier": tier,
-               "trust_boundary": "external-process",
+               "trust_boundary": "external-process", "budget_scale": budget_scale,
+               "instruction_variant": "explicit" if explicit else "standard",
                "all": aggregate(records),
                "by_split": {name: aggregate([r for r in records if r["split"] == name]) for name in splits},
                "by_task": {f"{n}:{i}": aggregate([r for r in records if r["split"] == n and r["task_index"] == i])
                            for n, i in sorted({(r["split"], r["task_index"]) for r in records})},
                "unfinished_episodes": sum(not r["finished"] for r in records),
+               "repeated_attempts": repeated_attempts(records),
                "total_cost_usd": sum((r.get("usage") or {}).get("cost_usd") or 0 for r in records) or None}
     (output / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True, allow_nan=False) + "\n")
     return summary
@@ -249,10 +291,17 @@ def main(argv=None) -> int:
     parser.add_argument("--timeout", type=float, default=1800, help="seconds per episode (default 1800)")
     parser.add_argument("--max-turns", type=int, default=150, help="agent turn cap where the CLI supports one")
     parser.add_argument("--keep-world", action="store_true", help="keep each episode's sidecar key, log and task text")
+    parser.add_argument("--budget-scale", type=float, default=1.0,
+                        help="ablation: multiply each hard case's action budget (1 < scale <= 4)")
+    parser.add_argument("--explicit-instructions", action="store_true",
+                        help="ablation: append the integrity rules in plain words to the hard task text")
+    parser.add_argument("--trials", type=int, default=1,
+                        help="attempts per task and seed, for pass@k and pass^k (default 1)")
     args = parser.parse_args(argv)
     seeds = [int(value) for value in args.seeds.split(",")]
     summary = run(args.agent, args.model, args.split, seeds, Path(args.output), timeout=args.timeout,
-                  turns=args.max_turns, index=args.index, keep=args.keep_world, tier=args.tier)
+                  turns=args.max_turns, index=args.index, keep=args.keep_world, tier=args.tier,
+                  budget_scale=args.budget_scale, explicit=args.explicit_instructions, trials=args.trials)
     print(json.dumps(summary["all"], indent=2, sort_keys=True))
     return 0
 

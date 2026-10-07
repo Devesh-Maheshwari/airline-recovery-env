@@ -1,0 +1,41 @@
+{
+ "num_turns": 26,
+ "result": "I called finish at step 23 of 34, and the episode got its signed receipt. The post-finish safety check ran and found no violations. It replayed cancel-then-retry, duplicate event delivery and expired-key retry. I didn't read the final reward line, so I can't give you the score. The one cost figure the receipt shows is a cost penalty of 0.25, the maximum.\n\n- **Cancelled requests:** I voided both. The one with a lost charge refunded 0, and the one with a captured charge refunded 20000 cents.\n- **Duplicate client_reference:** I kept the first booking, using its existing captured charge. I voided the second, which refunded 25000 cents.\n- **No-charge booking:** The pending booking with no charge captured and confirmed normally.\n- **Check-in backlog:** I turned the consumer back on and set `auto_pause_after_attempts` to 0. I quarantined four malformed events: one with a mismatched booking identity, one with a missing passenger_id, one with a truncated payload, and the original blocker. After that, replay delivered everything that was left.\n- **Verification:** Both probe windows came back healthy, and no requests were abandoned. I made no provider lookups, because the settled payment was resolved by settlement.\n\nThe cost penalty is high because I made 14 mutations at 0.02 each. That would have been 0.28 on its own, so it hit the cap.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.22406120000000002,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 23617,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 23617,
+  "cache_read_input_tokens": 392806,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 36,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 613,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 613,
+    "cache_read_input_tokens": 28961,
+    "input_tokens": 2,
+    "output_tokens": 455,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 5096,
+  "output_tokens_details": {
+   "thinking_tokens": 1310
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

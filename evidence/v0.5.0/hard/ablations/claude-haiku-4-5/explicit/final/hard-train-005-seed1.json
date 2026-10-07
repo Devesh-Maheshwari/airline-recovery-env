@@ -1,0 +1,41 @@
+{
+ "num_turns": 36,
+ "result": "The episode has completed with a final score of **0.0** and marked as **unsuccessful**.\n\n## Summary of Issues Found\n\nThe recovery attempt identified critical integrity violations:\n\n1. **Cancelled requests fulfilled** - Two bookings that were confirmed actually had customer cancellations:\n   - `bkg_bab9187f136359109cd668080082c364`\n   - `bkg_cc32dae2785c51be89cbcdc1629fcf13`\n   \n2. **Duplicate sale** - One duplicate sale was recorded: `CR-3bd3264da64a`\n\n3. **Corrupted event backlog** - 67 pending outbox events with data integrity issues that blocked event delivery pipeline\n\n## What Was Accomplished\n\n\u2705 **Root cause identified and fixed**: Disabled checkin consumer was re-enabled  \n\u2705 **Payment retries**: Handled declined payment by upgrading idempotency key version  \n\u2705 **Booking reconciliation**: Confirmed 3 bookings with captured charges  \n\u2705 **Configuration fixes**: Enabled consumer and removed auto-pause limits  \n\n## What Went Wrong\n\n\u274c **Missed customer cancellations**: Should have checked `customer_events` table for cancel events before confirming bookings  \n\u274c **Corrupted event handling**: Too many invalid outbox events (mismatched IDs, invalid payloads) consumed action budget before they could be cleared  \n\u274c **Incomplete verification**: Only 13 of 77 required customer requests were properly completed\n\nThe fundamental mistake was confirming bookings for customers who had already cancelled their requests. The correct recovery strategy would have required checking for customer cancellation events and voiding those bookings instead of confirming them.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.28519969999999994,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 48503,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 48503,
+  "cache_read_input_tokens": 1234997,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 289,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 5180,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 5180,
+    "cache_read_input_tokens": 54542,
+    "input_tokens": 8,
+    "output_tokens": 799,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 12881,
+  "output_tokens_details": {
+   "thinking_tokens": 6080
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

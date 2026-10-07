@@ -1,0 +1,207 @@
+{
+ "actions": [
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.id, b.status, b.flight_id, b.passenger_id, b.amount_cents, c.id as charge_id, c.state FROM bookings b LEFT JOIN charges c ON b.id = c.booking_id ORDER BY b.id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM bookings LIMIT 5"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM charges LIMIT 20"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 5000
+    }
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, status, flight_id, passenger_id, amount_cents FROM bookings WHERE status = pending"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, status, flight_id, passenger_id, amount_cents FROM bookings WHERE status = \"pending\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT charge_id, booking_id, idempotency_key, state FROM charges WHERE booking_id IN (\"bkg_4ad11dedc98451328cf8728bdff5d1eb\", \"bkg_3b3ef6f8c6105c01a6284dac2225d2d6\", \"bkg_cba9578df76153d09635dac6f79b6932\", \"bkg_1111f171941b5106b1647f3eda3311cc\", \"bkg_976b7648b76f5029a7e9f51977fd6c0f\", \"bkg_041dfe33640e52ef84bd4cc4d95b8427\", \"bkg_ee9254e74cf05c159a3b096cc23b2d9f\")"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_041dfe33640e52ef84bd4cc4d95b8427",
+    "existing_charge_id": "chg_50d74985128054179ec28ab1534baefd"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_3b3ef6f8c6105c01a6284dac2225d2d6",
+    "existing_charge_id": "chg_291f351dffa15239a7e0a80bb97e42dd"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_976b7648b76f5029a7e9f51977fd6c0f",
+    "existing_charge_id": "chg_12b19b58f66857d9aedf08bbfb30d621"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ee9254e74cf05c159a3b096cc23b2d9f",
+    "existing_charge_id": "chg_654ff2576fcd563996ceb2a8c90e4091"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, status FROM bookings WHERE booking_id IN (\"bkg_4ad11dedc98451328cf8728bdff5d1eb\", \"bkg_cba9578df76153d09635dac6f79b6932\")"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_4ad11dedc98451328cf8728bdff5d1eb"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_cba9578df76153d09635dac6f79b6932"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 30
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, booking_id, status, payload FROM outbox LIMIT 30"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_3268f87bd4d35f77b8b57d7b4c783df6"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 30
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000006_bkg_3268f87bd4d35f77b8b57d7b4c783df6"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 5
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000007_bkg_f9b151d670c252f7953a45fe22d2895a"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 30
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 15
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as pending_count FROM charges WHERE state = \"pending\""
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

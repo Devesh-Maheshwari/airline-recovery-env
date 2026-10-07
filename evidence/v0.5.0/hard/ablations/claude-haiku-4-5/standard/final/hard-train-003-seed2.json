@@ -1,0 +1,41 @@
+{
+ "num_turns": 37,
+ "result": "**Episode Summary: Score 0.0 (Failed)**\n\nThe recovery attempt completed but failed to meet success criteria due to integrity violations:\n\n**Key Issues:**\n1. **Integrity Violations** - Despite my recovery efforts:\n   - 3 bookings marked as fulfilled when their customer requests were cancelled\n   - 1 booking has duplicate charges (charged twice)\n   - 1 duplicate sale (same customer reference)\n   - 1 booking without proper funding\n\n2. **Incomplete Recovery**:\n   - Only 3 of 47 required customer requests completed\n   - 31 requests were abandoned (retried 4+ times)\n   - Probes never became healthy (needed 2 verification windows)\n\n**Root Cause Analysis:**\nThe fundamental problem was that the **checkin consumer configuration could not be changed** - the patch_config tool accepted my changes but they never persisted to the database. This prevented event delivery and left the system in a broken state.\n\nAdditionally, my reconcile_booking operations inadvertently:\n- Confirmed bookings that had been cancelled by their customers\n- Created duplicate charges on some bookings\n- Left bookings without proper provider funding\n\n**What Worked:**\n- Restarted pricing service \u2713\n- Increased payment timeout \u2713\n- Identified and quarantined bad events \u2713\n\n**What Failed:**\n- Couldn't enable checkin consumer through configuration\n- Reconciling uncertain bookings created integrity violations instead of fixing them\n- System never achieved healthy probe status\n\nThe episode demonstrates the complexity of distributed system recovery when configuration changes don't persist and you need to avoid introducing new violations while fixing existing ones.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.2934492,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 47711,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 47711,
+  "cache_read_input_tokens": 1345952,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 297,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 4587,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 4587,
+    "cache_read_input_tokens": 54343,
+    "input_tokens": 8,
+    "output_tokens": 1002,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 12627,
+  "output_tokens_details": {
+   "thinking_tokens": 5391
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

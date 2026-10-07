@@ -1,0 +1,41 @@
+{
+ "num_turns": 47,
+ "result": "The episode is finished and scored 0.0, so it failed. The signed receipt should be in `episode.json`, though I didn't open the file to confirm.\n\n**What went wrong**\n- **Duplicate charge:** I reconciled `bkg_2ddb0c4e\u2026` while its original charge was still pending at the provider. That charge was created at step -55, and the idempotency window is 53 steps. The window had expired, so the reconcile captured a second charge.\n- **Unrecoverable:** The result was one booking with two captured charges. I had no tool to refund a confirmed booking, so it couldn't be undone.\n- **Other violations:** The final score also lists nine `accepted_request_changed` violations. I didn't investigate those and don't know their cause.\n- **Missed check:** I should have run `provider_lookup` on that booking's key and checked `charges.created_step` before reconciling.\n\n**What worked**\n- **Payment timeout:** Raising `booking.payment_timeout_ms` from 98 to 3000 stopped the new timeouts. The provider latency is 421 ms, which was above the old limit.\n- **Reconciles:** Ten captured pending bookings were reconciled and confirmed.\n- **Voids:** I voided the duplicate `client_reference` booking, which refunded $250.00. I also voided two declined bookings.\n- **Pricing cache:** I turned the pricing cache off and cleared it to stop stale-quote 409s. I didn't confirm that this was what fixed them.\n\n**Final state**\n\n| Measure | Result |\n|---|---|\n| Availability | 1.0 |\n| Incident recovery | 0.38 |\n| Verified probes | none counted (every probe came back unhealthy) |\n| Cost penalty | 0.215 |",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.38540520000000006,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 31875,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 31875,
+  "cache_read_input_tokens": 856136,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 64,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 1543,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 1543,
+    "cache_read_input_tokens": 36289,
+    "input_tokens": 2,
+    "output_tokens": 578,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 8655,
+  "output_tokens_details": {
+   "thinking_tokens": 1572
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

@@ -1,0 +1,41 @@
+{
+ "num_turns": 47,
+ "result": "The episode is finished and scored 0.0. I caused an integrity violation that I couldn't undo, and no probe ever came back healthy.\n\n**The mistake.** I reconciled five pending bookings against their captured charges without first checking `customer_events`. Two of those bookings, `bkg_84a7\u2026` and `bkg_be43\u2026`, belonged to requests the customer had already cancelled. Confirming them is a `cancelled_request_fulfilled` violation. I only saw the cancel events after the probes kept failing.\n\n**Why I couldn't fix it.** `void_booking` rejects confirmed bookings with a 409, and no other tool can reverse a confirmation. After that, every probe reported `healthy: false` and `verification_windows` stayed at 0.\n\n**What I did before that:**\n- Restarted the pricing worker, which was down.\n- Re-enabled the check-in consumer and set `auto_pause_after_attempts` to 0, because it kept re-pausing on rejected events.\n- Quarantined four malformed events, which were missing a passenger, truncated, or carrying another booking's ID, then replayed the rest.\n- Voided one booking whose payment the provider had declined.\n- Cleared the stale pricing cache.\n\nAfter those steps, the data checks I ran came out clean:\n- Every confirmed booking had a hold, exactly one captured charge and a check-in.\n- There were no orphan charges.\n- The outbox was empty.\n\nI then ended the episode with `finish`.\n\nI should have queried `customer_events` before confirming any pending booking. The cancel events were visible in the database from the start.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.43397280000000005,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 34490,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 34490,
+  "cache_read_input_tokens": 979264,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 70,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 315,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 315,
+    "cache_read_input_tokens": 40132,
+    "input_tokens": 2,
+    "output_tokens": 522,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 10002,
+  "output_tokens_details": {
+   "thinking_tokens": 2378
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

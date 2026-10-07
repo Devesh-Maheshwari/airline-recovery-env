@@ -1,0 +1,41 @@
+{
+ "num_turns": 36,
+ "result": "Episode finished with **reward: 0.0**. The recovery effort had some success but failed due to integrity violations:\n\n**Achievements:**\n- Recovered 427 confirmed bookings (from 360) - 67 additional confirmed\n- Fixed payment timeout (98ms \u2192 600ms) \n- Cleared stale pricing cache\n- Resolved most pending bookings through reconciliation\n\n**Failures causing zero reward:**\n- **27 integrity violations** preventing success:\n  - 25 \"accepted_request_changed\" violations: Reconciling bookings inadvertently changed booking parameters (flight, passenger, amount)\n  - 1 duplicate charge, 1 duplicate sale, 1 unfunded confirmation\n- **Incomplete recovery**: 68/79 incident requests completed (86% vs 100% required)\n- **No verified probes**: System remained unhealthy; couldn't achieve 2 counted verification windows\n\n**Key Lesson:** The `reconcile_booking` tool retried failed payments but caused side effects - the system recorded changed booking details as integrity violations. This prevented the recovery from reaching a fully consistent state despite improving traffic success rates significantly. The payment service degradation (504 errors on /capture) remained unsolved despite timeout adjustments, limiting the ability to fully recover without causing further inconsistencies.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.3224701999999999,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 53168,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 53168,
+  "cache_read_input_tokens": 1472602,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 289,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 4351,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 4351,
+    "cache_read_input_tokens": 60036,
+    "input_tokens": 8,
+    "output_tokens": 761,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 13717,
+  "output_tokens_details": {
+   "thinking_tokens": 6920
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

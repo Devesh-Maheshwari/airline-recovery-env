@@ -1,0 +1,149 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,b.request_id,b.client_reference,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select group_concat(c.charge_id||\":\"||c.idempotency_key) from charges c where c.booking_id=b.booking_id) ch from bookings b"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from charges where booking_id in (select booking_id from bookings where status=\"pending\")"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_db8c4c3d6ce958e1aaeaa813658f7c26"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d560a581c0a35e0c827312f549087257",
+    "existing_charge_id": "chg_6da69a12920e5b2db1aaec1fe87f927d"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_9ecbd28c5b225655b134b0c63aa7c150"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_c063317b6be65be7830051fb7596c272"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_9ecbd28c5b225655b134b0c63aa7c150"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,status,count(*) n,max(message) m from request_logs group by service,status"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select id,service,path,status,duration_ms,message from request_logs where status>=500 order by id desc limit 10"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,b.client_reference,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select count(*) from charges c where c.booking_id=b.booking_id) c,(select group_concat(state) from charges c where c.booking_id=b.booking_id) cs,(select count(*) from checkins k where k.booking_id=b.booking_id) k,(select count(*) from refunds r where r.booking_id=b.booking_id) r from bookings b where b.status!=\"confirmed\" or h!=1 or c!=1 or k!=1 or cs!=\"captured\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from customer_events order by rowid desc limit 8"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select id,service,path,status,message from request_logs where service=\"booking\" order by id desc limit 14"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select name,sql from sqlite_master where name in (\"customer_events\",\"outbox\",\"fare_holds\",\"bookings\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select status,count(*),min(attempts),max(attempts) from outbox group by status"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,status,count(*) n,max(id) last from request_logs where id>300 group by service,status"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select count(*),sum(status=\"confirmed\"),sum(status=\"pending\") from bookings"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_9ecbd28c5b225655b134b0c63aa7c150"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select client_reference,count(*) from bookings where client_reference is not null and status=\"confirmed\" group by 1 having count(*)>1 union all select \"cap \"||flight_id, count(*) from holds group by flight_id union all select \"flt \"||flight_id||\" cap\", capacity from flights"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

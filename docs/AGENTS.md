@@ -264,12 +264,24 @@ python -m airline_recovery.live.external --agent codex --model gpt-6-astra \
 | `--timeout` | Seconds per episode before the agent process is killed (default 1800); a killed agent that never finished scores 0 |
 | `--max-turns` | Turn cap passed to CLIs that support one |
 | `--keep-world` | Keep each episode's sidecar key and log |
+| `--trials` | Attempts per task and seed (default 1). With more than one, `summary.json` adds `repeated_attempts`: pass@k (solved at least once in k tries) and pass^k (solved on all k tries) for every k, overall and by level |
+| `--budget-scale` | Ablation, hard tier: multiply each case's action budget (1 < scale ≤ 4) |
+| `--explicit-instructions` | Ablation, hard tier: append the integrity rules in plain words and a general order of work to the task text |
+
+Runs with `--budget-scale` or `--explicit-instructions` are not comparable to
+the published baselines; every record, `summary.json` and `provenance.json`
+carries `budget_scale` and `instruction_variant`. Results of both ablations are in
+[evidence/v0.5.0/hard/ablations](../evidence/v0.5.0/hard/ablations/README.md).
 
 Output: `episodes.jsonl` (one record per episode with `reward`, `success`,
 `finished`, `steps`, the CLI's token usage and cost where it reports them, and
 the agent's exit code), `summary.json`, `provenance.json`
-(`trust_boundary: external-process`), and `episodes/<task>-seed<n>/agent/` with
-the agent's stdout, stderr and action log.
+(`trust_boundary: external-process`), and per episode
+`episodes/<task>-seed<n>/` with `trace.jsonl` (written by the world process: the
+reset observation, then every action with the full reply the agent saw, or the
+rejection) and `agent/` with the agent's stdout, stderr and action log.
+`python scripts/collect_agent_run.py RUN_DIR DEST` copies a run into the evidence
+layout with gzipped traces and no sidecar keys.
 
 Isolation is weaker than Harbor's. The agent process runs on the same machine as
 the environment source and could read it if it went looking; Claude Code is

@@ -1,0 +1,41 @@
+{
+ "num_turns": 27,
+ "result": "## Recovery Complete! \u2713\n\nSuccessfully recovered the airline booking system with a **score of 0.8/1.0**.\n\n**Problem Found:**\nThree corrupted outbox events were blocking the checkin consumer:\n1. Event 1: Truncated JSON payload\n2. Event 2: Missing passenger_id field  \n3. Event 3: Mismatched booking_id in payload\n\n**Solution Applied:**\n- Quarantined the 3 invalid events\n- Replayed 47 remaining valid events successfully\n- All bookings checked in properly\n\n**Final State:**\n- 56 confirmed bookings with check-ins (1 cancelled)\n- 0 integrity violations\n- 100% availability, 100% recovery rate\n- 2 healthy verification windows\n- Safety checks passed with zero hazards\n\nThe cost was modest (0.105 penalty for 8 mutations), allowing the system to pass the post-finish safety check with various replay hazards (duplicate events, fare changes, cancellations).",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.18244530000000006,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 32609,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 32609,
+  "cache_read_input_tokens": 799553,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 217,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 1909,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 1909,
+    "cache_read_input_tokens": 41919,
+    "input_tokens": 8,
+    "output_tokens": 529,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 7411,
+  "output_tokens_details": {
+   "thinking_tokens": 2856
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

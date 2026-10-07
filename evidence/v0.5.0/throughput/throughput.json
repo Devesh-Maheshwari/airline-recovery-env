@@ -1,0 +1,59 @@
+{
+  "machine": {
+    "platform": "macOS-26.5-arm64-arm-64bit",
+    "python": "3.12.12",
+    "cpu_count": 18,
+    "processor": "arm"
+  },
+  "jobs": 24,
+  "results": [
+    {
+      "concurrency": 1,
+      "episodes": 24,
+      "solved": 24,
+      "wall_seconds": 89.0,
+      "episodes_per_hour": 971,
+      "env_steps_per_second": 5.4,
+      "reset_seconds_p50": 0.783,
+      "step_seconds_p50": 0.123,
+      "step_seconds_p95": 0.252,
+      "peak_rss_mb_per_episode_max": 222.8
+    },
+    {
+      "concurrency": 2,
+      "episodes": 24,
+      "solved": 24,
+      "wall_seconds": 48.9,
+      "episodes_per_hour": 1766,
+      "env_steps_per_second": 9.8,
+      "reset_seconds_p50": 0.829,
+      "step_seconds_p50": 0.136,
+      "step_seconds_p95": 0.283,
+      "peak_rss_mb_per_episode_max": 223.3
+    },
+    {
+      "concurrency": 4,
+      "episodes": 24,
+      "solved": 24,
+      "wall_seconds": 28.2,
+      "episodes_per_hour": 3062,
+      "env_steps_per_second": 16.9,
+      "reset_seconds_p50": 0.947,
+      "step_seconds_p50": 0.158,
+      "step_seconds_p95": 0.318,
+      "peak_rss_mb_per_episode_max": 224.2
+    },
+    {
+      "concurrency": 8,
+      "episodes": 24,
+      "solved": 24,
+      "wall_seconds": 21.0,
+      "episodes_per_hour": 4105,
+      "env_steps_per_second": 22.7,
+      "reset_seconds_p50": 1.275,
+      "step_seconds_p50": 0.213,
+      "step_seconds_p95": 0.438,
+      "peak_rss_mb_per_episode_max": 210.1
+    }
+  ]
+}

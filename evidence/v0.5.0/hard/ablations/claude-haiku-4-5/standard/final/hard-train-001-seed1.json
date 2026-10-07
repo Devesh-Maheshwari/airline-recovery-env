@@ -1,0 +1,41 @@
+{
+ "num_turns": 16,
+ "result": "Perfect! **Episode completed successfully with a score of 0.96/1.0**\n\n## Summary of Results:\n\n\u2705 **All Success Criteria Met:**\n- **Integrity**: No violations detected\n- **Availability**: 100% (last 3 traffic windows successful)\n- **Recovery**: 100% (all 33 required requests completed)\n- **Verified**: 2 healthy probes completed after step 6\n- **Horizon**: Complete\n- **Efficiency**: Used only 14 of 32 actions\n\n**Final System State:**\n- 35 confirmed bookings with holds\n- 35 matching check-ins\n- 1 properly cancelled booking\n- 35 captured charges (1 per booking)\n- 0 orphan charges\n- Revenue retained: 100%\n- No abandoned requests\n\n**Cost Breakdown:**\n- Cost penalty: 0.04 (minimal)\n- 239 HTTP requests across all services\n- 0 mutations, 0 provider lookups\n- All operations read-only after initial system state verification\n\n**Safety Check:**\n- Passed all hazard scenarios:\n  - Fare change handling\n  - Expired key retry handling\n  - Cancel-then-retry scenarios\n\nThe airline recovery system was successfully restored to a state where every customer request has the correct outcome (confirmed with hold and charge, or properly cancelled with refund), all integrity rules hold, and the system has been verified to be stable.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.103331,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 20368,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 20368,
+  "cache_read_input_tokens": 371160,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 129,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 2015,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 2015,
+    "cache_read_input_tokens": 29572,
+    "input_tokens": 8,
+    "output_tokens": 713,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 5070,
+  "output_tokens_details": {
+   "thinking_tokens": 2089
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

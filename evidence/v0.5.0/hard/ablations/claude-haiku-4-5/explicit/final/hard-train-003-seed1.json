@@ -1,0 +1,41 @@
+{
+ "num_turns": 38,
+ "result": "The episode has ended - we've exhausted the 36-action budget. Here's what was accomplished:\n\n**Summary of Recovery:**\n- \u2705 **Fixed duplicate sale**: Voided the duplicate pending booking (kept the confirmed one)\n- \u2705 **Handled cancellations**: Voided 4 cancelled bookings appropriately\n- \u2705 **Delivered all events**: Cleared 24 outbox events to the checkin service (after quarantining 3 invalid ones)\n- \u2705 **Reconciled payments**: Confirmed 45 bookings with captured charges\n- \u2705 **Verified payment status**: Used provider lookups to identify 2 declined payments\n- \u2705 **Maintained integrity**: No data integrity violations throughout\n\n**Final State:**\n- 48 confirmed bookings (89.7% recovery)\n- 2 pending bookings with declined payments (correct state)\n- 4 cancelled bookings\n- 48 check-ins delivered\n- All events processed\n- Score: 0.095 (limited by lack of healthy verification probes due to budget constraints)\n\nThe system recovered most customer transactions but ran out of actions before achieving 2 healthy probe windows needed for full verification. The core recovery work was successful - all integrity rules maintained and most customer requests resolved.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.3178895,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 49404,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 49404,
+  "cache_read_input_tokens": 1567415,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 305,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 1173,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 1173,
+    "cache_read_input_tokens": 59450,
+    "input_tokens": 8,
+    "output_tokens": 700,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 12407,
+  "output_tokens_details": {
+   "thinking_tokens": 5350
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}
