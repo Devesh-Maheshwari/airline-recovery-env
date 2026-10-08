@@ -67,8 +67,9 @@ else h+=`<div class="harm" style="background:var(--warnbg);color:var(--warn)">No
 h+='<ol class="steps">'+e.steps.map((s,n)=>{const args=Object.keys(s.arguments||{}).length?esc(JSON.stringify(s.arguments)):"";
 const st=s.pending!==undefined?`<div class="state">after: ${s.pending} stuck bookings · ${s.outbox} queued events · ${s.verified}/2 checks passed</div>`:"";
 const er=s.ok===false&&s.error?`<div class="err">${esc(s.error)}</div>`:"";
-return `<li><span class="num">${n+1}</span><div><span class="tool">${esc(TOOL[s.tool]||s.tool)}</span> <span style="color:var(--muted);font-size:12px">${esc(s.tool)}</span>${args?`<div class="args">${args}</div>`:""}${st}${er}</div></li>`}).join("")+"</ol>";
-if(e.agent!=="oracle")h+='<p style="color:var(--muted);font-size:13px;margin-bottom:0">Coding-agent episodes record the moves the agent sent; the system\'s replies are not kept.</p>';
+const rp=s.reply?`<div class="args">reply: ${esc(s.reply)}</div>`:"";
+return `<li><span class="num">${n+1}</span><div><span class="tool">${esc(TOOL[s.tool]||s.tool)}</span> <span style="color:var(--muted);font-size:12px">${esc(s.tool)}</span>${args?`<div class="args">${args}</div>`:""}${rp}${st}${er}</div></li>`}).join("")+"</ol>";
+if(e.steps.length&&e.steps[0].pending===undefined)h+='<p style="color:var(--muted);font-size:13px;margin-bottom:0">This episode recorded the moves the agent sent; the system\'s replies were not kept.</p>';
 $("detail").innerHTML=h}
 </script></body></html>"""
 

@@ -24,10 +24,16 @@ class ReplayDataTests(unittest.TestCase):
             by_agent.setdefault(episode["agent"], []).append(episode)
             self.assertTrue(episode["steps"], episode["agent"] + episode["task"])
         for agent, episodes in by_agent.items():
-            records = (ROOT / "evidence/v0.5.0/hard" / ("oracle" if agent == "oracle" else f"agents/{agent}")
-                       / "episodes.jsonl").read_text().splitlines()
+            if agent == "oracle":
+                paths = [ROOT / "evidence/v0.5.0/hard/oracle/episodes.jsonl"]
+            else:
+                paths = sorted((ROOT / "evidence/v0.5.1/hard/agents" / agent).glob("*/episodes.jsonl"))
+            records = [line for path in paths for line in path.read_text().splitlines()]
             self.assertEqual(len(episodes), len(records))
             self.assertEqual(sum(e["success"] for e in episodes), sum(json.loads(r)["success"] for r in records))
+            if agent != "oracle":
+                # Agent episodes replay from the world's trace, so every step carries the system's reply state.
+                self.assertTrue(all("pending" in step for e in episodes for step in e["steps"] if step["tool"] != "(rejected request)"))
 
 
 @unittest.skipUnless(importlib.util.find_spec("fastapi") and importlib.util.find_spec("httpx"), "needs the openenv extra")
