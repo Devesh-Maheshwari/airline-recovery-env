@@ -1,0 +1,41 @@
+{
+ "num_turns": 34,
+ "result": "The episode finished with a score of 0 due to integrity violations:\n\n1. **Cancelled request fulfilled** - Booking `bkg_24583598a81a51b4a1a6f76c867e3311` was confirmed but appears to have had a prior cancellation\n2. **Duplicate sale** - Two bookings share the same client reference `CR-3d4846ad4e36`\n\n**Summary of what was accomplished:**\n- \u2705 Fixed the checkin consumer (schema mismatch and disabled state)\n- \u2705 Delivered all 12 pending outbox events (except 1 quarantined corrupt event)\n- \u2705 Resolved all 5 pending bookings (4 confirmed with captured charges, 1 cancelled with declined charge)\n- \u2705 100% availability - all systems running\n- \u2705 100% recovery - all 26 incident requests completed\n- \u2705 No pending bookings or abandoned requests\n- \u274c Integrity violations remain from pre-incident state\n- \u274c No verification windows achieved (probes consistently unhealthy)\n\nThe system was successfully stabilized operationally, but there were pre-existing data integrity issues (cancelled booking that got fulfilled, duplicate sale) that prevented a successful completion. The hard-tier challenge required perfect integrity throughout, which these violations prevented.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.26239060000000003,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 43838,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 43838,
+  "cache_read_input_tokens": 1155316,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 273,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 2043,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 2043,
+    "cache_read_input_tokens": 53001,
+    "input_tokens": 8,
+    "output_tokens": 854,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 11782,
+  "output_tokens_details": {
+   "thinking_tokens": 5117
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

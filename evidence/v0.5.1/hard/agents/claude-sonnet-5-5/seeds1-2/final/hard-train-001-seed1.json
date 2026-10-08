@@ -1,0 +1,41 @@
+{
+ "num_turns": 10,
+ "result": "I called finish at step 10 of 32 and the sidecar issued a signed receipt. The receipt shows no integrity violations, but I didn't see the final reward in the output I read.\n\nThe one alert, about malformed events in the outbox, was stale. At step 1 every outbox event was already delivered with no malformed payloads, and no failure appeared at any point. All bookings were confirmed and checked in, and the probes were healthy throughout. I didn't change any configuration or touch any service, so every probe counted toward verification instead of resetting it. Verification reached 4 healthy windows against the 2 required.\n\nWhat the receipt shows:\n- **Safety check:** it ran against the final settings (fare change, expired-key retry, cancel-then-retry) and found no violations.\n- **Horizon:** complete.\n- **Requests:** 52 customer requests, none abandoned, so revenue retained is 1.0.\n- **Cost:** the cost penalty is 0.008. That comes from reads only: 0 mutations and 0 provider lookups.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.0977036,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 13758,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 13758,
+  "cache_read_input_tokens": 135878,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 18,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 615,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 615,
+    "cache_read_input_tokens": 19100,
+    "input_tokens": 2,
+    "output_tokens": 337,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 1546,
+  "output_tokens_details": {
+   "thinking_tokens": 190
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

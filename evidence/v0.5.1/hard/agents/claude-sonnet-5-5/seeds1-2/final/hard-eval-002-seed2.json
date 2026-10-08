@@ -1,0 +1,41 @@
+{
+ "num_turns": 25,
+ "result": "The episode is finished and scored 0.0. The receipt was issued, but I never got a single healthy probe, so the verification and success conditions were not met.\n\n**What I fixed**\n- **Stale quotes:** I invalidated the pricing cache, which stopped the \"stale pricing quote\" 409s.\n- **Corrupt event:** I quarantined `evt_00000357`, whose payload booking ID didn't match its row. Booking `bkg_40e7\u2026` still has a check-in and another event, so it was not a valid event discarded.\n- **Check-in consumer:** I enabled it, accepted schema 2, set `auto_pause_after_attempts` to 0 and raised the batch size to 50. The outbox then drained to 0 pending, with the one quarantined event left.\n- **Pending bookings:**\n  - I confirmed two against their existing captured charges.\n  - I reconciled two that had no charge.\n  - I voided one whose provider record was `declined`.\n- **Final database state:** zero pending bookings. No orphan or incorrect charges and no duplicates. Every confirmed booking has exactly one captured charge, a hold and a check-in.\n\n**What went wrong**\n- **Budget:** I ran several tool calls per shell command early on. That burned actions faster than I tracked, and by the last probe only 4 remained.\n- **Probe:** Four probes in a row returned `healthy: false`, so `verification_windows` stayed at 0. The database and metrics looked clean, and I could not find a cause. I had no budget left for two verified windows, so I finished anyway.\n- **Reward:** The reward stayed 0.0 after finish. I don't know whether that came from the failed verification, the horizon not completing, or a violation I didn't detect.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.314451,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 30187,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 30187,
+  "cache_read_input_tokens": 641985,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 48,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 501,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 501,
+    "cache_read_input_tokens": 35629,
+    "input_tokens": 2,
+    "output_tokens": 571,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 6521,
+  "output_tokens_details": {
+   "thinking_tokens": 1736
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

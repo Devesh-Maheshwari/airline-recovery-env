@@ -1,0 +1,41 @@
+{
+ "num_turns": 36,
+ "result": "The episode is over: I used all 32 actions without calling `finish`, and the world rejected a later `finish` with \"Episode already completed\". The run has no clean verification, and the reward is probably low or zero. I haven't seen the final score. `episode.json` is in the directory, but I didn't open it to confirm a receipt was stored.\n\n**What happened**\n- **Cause:** Five bookings were stuck pending because their payment captures timed out. The provider kept answering \"pending\" for about 15 steps.\n- **First steps:** I raised the booking `payment_timeout_ms` from 200 to 2000. I then waited with probes and retried `reconcile_booking` until the provider settled.\n- **Bookings that confirmed:** Three of the five reconciled cleanly. Those are `bkg_8e67\u2026`, `bkg_f3ab\u2026` and `bkg_51d9\u2026`.\n- **My mistake:** The other two, `bkg_780c\u2026` and `bkg_f65a\u2026`, were confirmed even though the provider had declined their charges. I didn't check each charge's state before reconciling, and I should have. That left two confirmed bookings without a captured charge, which the contract counts as an `unfunded_confirmation` violation.\n- **Attempted repair:** I reconciled both with a fresh idempotency key, `booking-v2:<id>`. Both now show a captured charge, with the declined row still alongside it. Confirmed bookings can't be voided, so this was the only repair available. I didn't get to run a probe afterward.\n\n**State at the end**\n- All bookings are confirmed with check-ins, and all outbox events are delivered.\n- Every probe, including the two after the backlog cleared, reported unhealthy. I never got a counted verification window.\n- The two declined charges may still count against the integrity rules.\n\n**What I'd do differently:** Look up each provider charge before reconciling. For a declined charge, pass a fresh idempotency key rather than repeating the default one. I'd also spend fewer actions waiting. I didn't find what made the probes unhealthy.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.29500719999999997,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 27486,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 27486,
+  "cache_read_input_tokens": 599346,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 52,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 181,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 181,
+    "cache_read_input_tokens": 30944,
+    "input_tokens": 2,
+    "output_tokens": 670,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 6509,
+  "output_tokens_details": {
+   "thinking_tokens": 1504
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

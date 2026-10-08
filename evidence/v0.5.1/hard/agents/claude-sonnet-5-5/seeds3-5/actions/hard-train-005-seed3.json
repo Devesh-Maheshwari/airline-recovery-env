@@ -1,0 +1,197 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from bookings where status<>\"confirmed\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from outbox where status<>\"delivered\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select c.*, b.status bs, b.passenger_id from charges c left join bookings b using(booking_id) where b.status<>\"confirmed\" or b.booking_id is null or c.booking_id=\"bkg_73a5bcb5d4dd5ad2941b6af92a04bac2\""
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 2000
+    }
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_0c5f0db03dc950a69f670509939875c1"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_220ab6b79f1e55769692bf2c459e5c04"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ee570c50d9a957ca868435546fe76a38",
+    "existing_charge_id": "chg_37955a33f110574bad2a7f15e0711908"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_e1a7c53ed40951369aa28f72c92e7910"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from customer_events where booking_id in (\"bkg_e1a7c53ed40951369aa28f72c92e7910\",\"bkg_eabe1a1e55b856f1b7605ab03856a9ca\") or 1 limit 10"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from bookings where status=\"pending\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from customer_events order by rowid desc limit 8"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_eabe1a1e55b856f1b7605ab03856a9ca"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e1a7c53ed40951369aa28f72c92e7910"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000356_bkg_73a5bcb5d4dd5ad2941b6af92a04bac2"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,path,status,message,count(*) n from request_logs where status>=400 group by 1,2,3,4 order by n desc limit 15"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select \"f\" t, flight_id a, fare_cents b, version c from flights union all select \"h\", flight_id, fare_cents, booking_id from fare_holds union all select \"c\", key, value, \"\" from cache"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select name, sql from sqlite_master where name in (\"flights\",\"fare_holds\",\"cache\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from cache"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select flight_id,price_cents,version,capacity, (select group_concat(price_cents||\"@\"||until_step) from fare_holds h where h.flight_id=f.flight_id) h from flights f"
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing",
+    "flight_id": "F100"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,path,status,message,count(*) n, max(rowid) r from (select * from request_logs order by rowid desc limit 40) where status>=400 group by 1,2,3,4"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

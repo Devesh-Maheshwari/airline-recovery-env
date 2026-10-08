@@ -1,0 +1,216 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,b.passenger_id,b.amount_cents,b.request_id,b.client_reference,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select group_concat(charge_id||\":\"||idempotency_key) from charges c where c.booking_id=b.booking_id) ch from bookings b"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,booking_id,status,attempts,payload from outbox"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from charges"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_a188ed3fe5dc552fb3f372291fafd12e"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_a188ed3fe5dc552fb3f372291fafd12e"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_a188ed3fe5dc552fb3f372291fafd12e"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b596836a6f055dbdb52bf4f6fb3bf499"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_b596836a6f055dbdb52bf4f6fb3bf499"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_4678f540f90157ed900ba1be608b1396"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000005_bkg_7a261c7f82fd5197970bd7b50972923c"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "accepted_schema": 2
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000007_bkg_7a261c7f82fd5197970bd7b50972923c"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b596836a6f055dbdb52bf4f6fb3bf499"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_061051e75a8553a4b6871bb5704ab1b8"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_66096f7801d055579ac9d8bbe39c1714"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_061051e75a8553a4b6871bb5704ab1b8"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_66096f7801d055579ac9d8bbe39c1714"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,c.state,c.created_step from bookings b join charges c on c.booking_id=b.booking_id where b.status=\"pending\""
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b596836a6f055dbdb52bf4f6fb3bf499"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_6e28c07616965211a26c68e29ba13a08"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8e8055d10089530d84a0124909c1f037"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_fb3ec29c489457ac84eb167fc87a4265"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_677d0d9fe82c5a5fb617fc6ef13c673f"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.status,count(*) n,sum(exists(select 1 from checkins k where k.booking_id=b.booking_id)) ck,sum(exists(select 1 from outbox o where o.booking_id=b.booking_id and o.status=\"delivered\")) ev from bookings b group by 1"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 2000
+    }
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

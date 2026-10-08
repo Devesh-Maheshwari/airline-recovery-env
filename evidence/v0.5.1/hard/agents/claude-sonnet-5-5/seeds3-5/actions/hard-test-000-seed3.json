@@ -1,0 +1,166 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,b.amount_cents,b.request_id,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select group_concat(state||c.charge_id) from charges c where c.booking_id=b.booking_id) c from bookings b"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from charges where booking_id in (select booking_id from bookings where status=\"pending\")"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_9b766f3c25035cb5b5cdaf85c0179fd3",
+    "existing_charge_id": "chg_da4569009bb2509fa26a28baa83702a6"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e822fc222af05ad8a047dd30bb42234f"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,(select count(*) from charges c where c.booking_id=b.booking_id and state=\"captured\") cap,(select count(*) from checkins k where k.booking_id=b.booking_id) ck from bookings b where status!=\"confirmed\" or cap!=1 or ck!=1"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_88e1281216cc585fae9b6371e9c73449"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b9f94998cb5f5351b7343fec6bd21db7"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_42a3af61397c5ccd836a3a9445aa2d41"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ea3b03cfc398533a85abb803d1273b30"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select (select count(*) from charges where state=\"captured\") cap,(select count(*) from charges) ch,(select count(*) from charges where booking_id not in (select booking_id from bookings)) orph,(select count(*) from holds) holds,(select count(*) from customer_events) ce,(select count(*) from refunds) rf,(select count(*) from outbox) ob,(select group_concat(distinct state) from charges) st,(select count(*) from bookings b join charges c using(booking_id) where c.amount_cents!=b.amount_cents) badamt"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select flight_id,capacity,fare_cents from flights"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select c.*,b.status bs from charges c left join bookings b using(booking_id) where c.state!=\"captured\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select booking_id,charge_id,idempotency_key,state,amount_cents from charges where booking_id in (\"bkg_b9f94998cb5f5351b7343fec6bd21db7\",\"bkg_42a3af61397c5ccd836a3a9445aa2d41\",\"bkg_ea3b03cfc398533a85abb803d1273b30\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,path,status,message,count(*) n,max(duration_ms) d from request_logs where status>=400 group by 1,2,3,4"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select flight_id,count(*) n,sum(status=\"confirmed\") conf,count(distinct request_id) rq,(select capacity from flights f where f.flight_id=b.flight_id) cap,(select count(*) from customer_events) ce from bookings b group by 1"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 2000
+    }
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,method,path,status,duration_ms,message from request_logs order by rowid desc limit 24"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_42a3af61397c5ccd836a3a9445aa2d41"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

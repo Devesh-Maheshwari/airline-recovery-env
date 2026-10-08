@@ -1,0 +1,41 @@
+{
+ "num_turns": 21,
+ "result": "The episode is finished and scored 0.776. A signed receipt was issued and stored.\n\n- **Cause:** the booking service's `payment_timeout_ms` was 84 ms, but the payment provider takes about 422 ms to respond. Captures timed out, which left bookings stuck as pending.\n- **Config change:** I raised `payment_timeout_ms` to 3000.\n- **Captured charges:** six pending bookings already had a captured charge. I reconciled each with the default idempotency key, which confirmed them without a second charge.\n- **Declined charges:** two pending bookings had charges the provider declined. I voided both. No refunds were needed because nothing was captured.\n- **Verification:** two probes in a row came back healthy, and the backlog was complete.\n- **Budget:** I used 16 of the 32 actions. I did not use any provider lookups.\n\nI didn't see a score breakdown, so I can't say which parts of the reward fell short of 1.0.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.17095420000000006,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 19966,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 19966,
+  "cache_read_input_tokens": 265181,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 32,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 225,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 225,
+    "cache_read_input_tokens": 21762,
+    "input_tokens": 2,
+    "output_tokens": 315,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 3799,
+  "output_tokens_details": {
+   "thinking_tokens": 317
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

@@ -1,0 +1,41 @@
+{
+ "num_turns": 38,
+ "result": "Episode complete! The airline recovery system achieved partial recovery with a score of **0.372115**.\n\n## Results Summary\n\n**Achievements:**\n- \u2705 **Integrity intact**: No data integrity violations detected\n- \u2705 **High availability**: 100% availability on working requests\n- \u2705 **Good recovery**: 93.5% of customer requests successfully recovered (72/77)\n- \u2705 **Horizon complete**: System reached stability point\n- \u2705 **Outbox cleared**: All 44 valid events delivered to checkin\n\n**Key Actions Taken:**\n1. **Fixed payment timeout** (142ms \u2192 3000ms) - Resolved 504 capture timeout errors\n2. **Disabled pricing cache** - Fixed 409 \"stale pricing\" errors affecting bookings\n3. **Updated checkin schema** - Accepted v2 events for proper delivery\n4. **Quarantined bad events** - Removed 3 malformed events blocking queue\n5. **Reconciled 3 pending bookings** - Confirmed 3 stuck bookings through idempotency\n6. **Restarted services** - Cleared stale payment state\n\n**Shortfalls:**\n- \u274c 6 pending bookings remained (timed out payment captures)\n- \u274c 5 customer requests incomplete (abandoned after 4 retries each)\n- \u274c 0 verification probes (needed 2 for full success)\n- \u274c Safety check didn't run (requires 2 healthy probes)\n\n**Score Breakdown:**\n- Availability: 1.0 \u00d7 20% = 0.20\n- Recovery: 0.935 \u00d7 45% = 0.421\n- Incident Recovery: 0.75 \u00d7 ? = 0.191\n- Verified: 0 \u00d7 15% = 0.0\n- Cost penalty: -0.25\n- **Final**: 0.372\n\nThe system recovered most services successfully, but the remaining pending bookings and action budget constraints prevented full verification and success status.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.30486539999999995,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 46811,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 46811,
+  "cache_read_input_tokens": 1413284,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 305,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 2075,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 2075,
+    "cache_read_input_tokens": 55942,
+    "input_tokens": 8,
+    "output_tokens": 959,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 13922,
+  "output_tokens_details": {
+   "thinking_tokens": 7393
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

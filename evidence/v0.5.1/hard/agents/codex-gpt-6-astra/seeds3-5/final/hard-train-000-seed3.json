@@ -1,0 +1,3 @@
+{
+ "result": "Completed successfully in 8 of 32 actions. Score: **0.988**.\n\nAll required requests completed, both verification probes passed, and the final safety check found no integrity violations. No configuration changes were needed. The signed receipt was saved in `episode.json`."
+}

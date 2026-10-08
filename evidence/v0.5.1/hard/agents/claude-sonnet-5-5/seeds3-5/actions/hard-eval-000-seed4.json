@@ -1,0 +1,47 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,booking_id,status,attempts,payload from outbox"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_4ea939e27dfa596a9ffff6657d46471b"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 20
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

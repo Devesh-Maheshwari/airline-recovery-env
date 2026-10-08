@@ -1,0 +1,170 @@
+{
+ "actions": [
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.customer_request_id, b.status, b.flight_id, b.passenger_id, b.customer_amount_cents, c.charge_id, c.provider_charge_id, c.status as charge_status FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = 'pending'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, b.flight_id, b.passenger_id, b.customer_amount_cents, c.charge_id, c.provider_charge_id, c.status as charge_status FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = 'pending'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM bookings WHERE status = 'pending'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM charges WHERE booking_id IN ('bkg_882d15be91a15efb8638b29abacdc2e6', 'bkg_8df1ff2e8fde588492374418fb78c1db', 'bkg_b9cd587a5f735ff29f86aa62cfd10a72', 'bkg_1c123f824e7858a69c541e7c3cac5e3e')"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_882d15be91a15efb8638b29abacdc2e6"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_1c123f824e7858a69c541e7c3cac5e3e"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_8df1ff2e8fde588492374418fb78c1db"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_882d15be91a15efb8638b29abacdc2e6",
+    "existing_charge_id": "chg_dd8b398eec0e59cbb1504a4edc6d0bb5"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_1c123f824e7858a69c541e7c3cac5e3e",
+    "existing_charge_id": "chg_98ad49594bcf5e9ea716950e9c5d914f"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM holds WHERE booking_id IN ('bkg_8df1ff2e8fde588492374418fb78c1db', 'bkg_b9cd587a5f735ff29f86aa62cfd10a72')"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_8df1ff2e8fde588492374418fb78c1db"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_b9cd587a5f735ff29f86aa62cfd10a72"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM outbox WHERE status = 'pending'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM refunds"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as count FROM customer_events"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

@@ -1,0 +1,210 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 3000
+    }
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,b.client_reference,(select group_concat(charge_id||\":\"||idempotency_key) from charges c where c.booking_id=b.booking_id) ch,(select count(*) from holds h where h.booking_id=b.booking_id) h from bookings b"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_a2eead11bc5d5604a5126ac6d5bbb40c"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_a75166913c975d9cbeda3e709e236021"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_45290af34dac5321a59b9c7087a4b3ee"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_c6fbd08ba689526b894ae90550a5297a"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_45290af34dac5321a59b9c7087a4b3ee"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_9c0a95401c9a58418a5b5fb452b20376"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_7a7da581bdb159bb90c961a4f5a1608e"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d4b7095e287c5f73b39e6d169b69e038"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_c907ed3ba7f15d9dab264fb9786eeb9b"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_4d779a5aafec5ccd9ffd79e7b999af9b"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8cd40c4c214b5498834777e96bec3f5e"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ddc58e252bf259f396efbd68a06e4b3e"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_6230e442b24e5c35a9d3f8d39c2979fd"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,(select count(*) from checkins c where c.booking_id=b.booking_id) ci,(select count(*) from outbox o where o.status<>\"delivered\") ob from bookings b where b.status<>\"confirmed\" or ci=0"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,status,attempts,substr(payload,1,120) p from outbox where status<>\"delivered\" order by event_id limit 6"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000012_bkg_9ec6012928b951bb92cef0bb1f853883"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000014_bkg_9ec6012928b951bb92cef0bb1f853883"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select o.event_id,o.status,o.attempts,json_extract(o.payload,\"$.booking_id\") pb,json_extract(o.payload,\"$.schema_version\") sv,b.status bs,(select count(*) from checkins c where c.booking_id=json_extract(o.payload,\"$.booking_id\")) ci from outbox o left join bookings b on b.booking_id=json_extract(o.payload,\"$.booking_id\") where o.status=\"pending\" order by o.event_id limit 12"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000015_bkg_8ba8431eccc95cf1bfe427b4e249bd0b"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "batch_size": 50
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_45290af34dac5321a59b9c7087a4b3ee"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,path,status,count(*) n,max(message) m from (select * from request_logs order by rowid desc limit 150) group by service,path,status"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,status,attempts,payload from outbox where status<>\"delivered\""
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,method,path,status,duration_ms,message from request_logs where status>=400 or duration_ms>100 order by rowid desc limit 15"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

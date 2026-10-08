@@ -1,0 +1,207 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 3000
+    }
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,b.amount_cents,(select group_concat(c.charge_id||\":\"||c.idempotency_key) from charges c where c.booking_id=b.booking_id) ch from bookings b where b.status<>\"confirmed\""
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_6d44ee2cacdb503fb01bde5af83613ed"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select booking_id,status from bookings where status<>\"confirmed\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,booking_id,type,status,attempts,substr(payload,1,150) p from outbox where status<>\"delivered\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from outbox where status<>\"delivered\""
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000334_bkg_5af128cc397c52ec9480623f11df207e"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000335_bkg_7a16df00a93a50f7adfbf35e35978099"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000336_bkg_aa3fb5c91f555cb9baa9db384db97089"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000339_bkg_5af128cc397c52ec9480623f11df207e"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "batch_size": 50
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_a635f2d13c315418930cbaabae200e51"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d492f58a676f55fd9fa4a5cfa19f12bd"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b9afdff42f9a58658bfebfa22730b7e2"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d176babb175e526aa6fbea3430b9de49"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_aba147cce99d5a41bb004b5f66dc7683"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d550006546255f89bd2038aed00f7917"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_13a8be54335d52018b6868ca0bba119c"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b7190384fad9543d910f1b71a5bad4f8"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

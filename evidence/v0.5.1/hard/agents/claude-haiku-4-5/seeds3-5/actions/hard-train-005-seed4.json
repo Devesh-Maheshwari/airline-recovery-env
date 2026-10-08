@@ -1,0 +1,206 @@
+{
+ "actions": [
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 5000
+    }
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "accepted_schema": 2
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000340_bkg_fd1fc0e64f7f534190e60fa1f4386741"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as total, status FROM bookings GROUP BY status"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, COUNT(c.charge_id) as charges FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = pending GROUP BY b.booking_id LIMIT 15"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT DISTINCT status FROM bookings LIMIT 10"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, COUNT(c.charge_id) as charges FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = \"pending\" GROUP BY b.booking_id LIMIT 12"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id, c.idempotency_key, c.amount_cents, c.status FROM charges c JOIN bookings b ON c.booking_id = b.booking_id WHERE b.status = \"pending\" LIMIT 5"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id, c.idempotency_key, c.amount_cents FROM charges c JOIN bookings b ON c.booking_id = b.booking_id WHERE b.status = \"pending\" LIMIT 5"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ab9bbc9f1e315675a82f7a6cad18543a",
+    "existing_charge_id": "chg_f2c8df3e8d9b5faab15d488c3522ab58"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, accepted_amount_cents, status FROM bookings WHERE booking_id = \"bkg_ab9bbc9f1e315675a82f7a6cad18543a\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM bookings WHERE booking_id = \"bkg_ab9bbc9f1e315675a82f7a6cad18543a\""
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_ab9bbc9f1e315675a82f7a6cad18543a"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_ab9bbc9f1e315675a82f7a6cad18543a"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

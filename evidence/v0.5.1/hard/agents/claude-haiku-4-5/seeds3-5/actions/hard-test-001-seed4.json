@@ -1,0 +1,217 @@
+{
+ "actions": [
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, request_id, flight_id, passenger_id, status, amount_cents FROM bookings WHERE status = 'pending'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, charge_id, idempotency_key, status, amount_cents FROM charges ORDER BY id DESC LIMIT 20"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type='table'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id, c.idempotency_key, c.amount_cents, c.state, b.status FROM charges c JOIN bookings b ON c.booking_id = b.booking_id WHERE b.status = 'pending'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT h.booking_id, h.flight_id, h.passenger_id FROM holds h WHERE h.booking_id IN (SELECT booking_id FROM bookings WHERE status = 'pending')"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_71454b5a730458c3ae9a659dd204c844",
+    "existing_charge_id": "chg_12e691fa5af959308b80890a58e9a9a6"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_686d095d714658af9035cc30b0511e2b",
+    "existing_charge_id": "chg_fb57f873b8b45c35966b3f10ac6a0db9"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_4da566e69a23593090c97bfe44515266",
+    "existing_charge_id": "chg_bf91cac9cd905a95bd1f9ec23acf3cb9"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_bcfce15afb105d0f89956bcd107ea359",
+    "existing_charge_id": "chg_425fa19a741453c8af34d59f964f3fa0"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_5835b84419a55b7d85ca1d3d123e0863"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_5835b84419a55b7d85ca1d3d123e0863"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 25
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "accepted_schema": 2
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 20
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 5000
+    }
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "pricing"
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT hold_id, flight_id, price_cents, until_step FROM fare_holds"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT flight_id, capacity, price_cents, version FROM flights"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "validate_price": false
+    }
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "inventory"
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

@@ -1,0 +1,68 @@
+{
+ "actions": [
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "pricing"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as booking_count, SUM(CASE WHEN status=\"confirmed\" THEN 1 ELSE 0 END) as confirmed, SUM(CASE WHEN status=\"pending\" THEN 1 ELSE 0 END) as pending, SUM(CASE WHEN status=\"cancelled\" THEN 1 ELSE 0 END) as cancelled FROM bookings"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as hold_count FROM holds; SELECT COUNT(*) as charge_count, SUM(CASE WHEN status=\"captured\" THEN 1 ELSE 0 END) as captured FROM charges"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as hold_count FROM holds"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as charge_count, SUM(CASE WHEN status=\"captured\" THEN 1 ELSE 0 END) as captured FROM charges"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as charge_count FROM charges"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

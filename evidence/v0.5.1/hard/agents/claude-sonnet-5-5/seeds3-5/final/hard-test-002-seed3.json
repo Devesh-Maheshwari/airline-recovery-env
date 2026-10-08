@@ -1,0 +1,41 @@
+{
+ "num_turns": 30,
+ "result": "I called `finish` and the episode ended with a signed receipt, but I never got verified. All 5 probes came back unhealthy, so `verification_windows` stayed at 0 and the 0.15 verification reward is lost. I didn't see the final score itself; the output I read was cut off before it.\n\nWhat the receipt did show:\n- **Abandoned requests:** 25, so `revenue_retained` is 0.375.\n- **Cost penalty:** 0.25, the maximum. I used a lot of reads and queries and all 3 provider lookups.\n- **Fare hold:** intact (`fare_hold_broken` is false).\n- **Payment worker:** not restarted while a payment was in flight.\n\nWhat I did:\n- **Booking:** raised `payment_timeout_ms` from 93 to 2000, because the payment provider's latency is 339 ms.\n- **Pricing:** restarted the worker, which was down.\n- **Cache:** evicted only the stale `quote:F100` row. I left F200's cache row alone because it backs the live fare hold.\n- **Outbox:** quarantined the one corrupt event.\n- **Check-in:** re-enabled the consumer and set `auto_pause_after_attempts` to 0.\n- **Pending bookings:** reconciled `bkg_08ba\u2026`, which is now confirmed. The provider showed `bkg_0b0b\u2026` as declined, so I voided it.\n\nI never found why the probes stayed unhealthy. Recent booking, pricing, payment and check-in requests were mostly 200s, with 409s only for the sold-out flight. My SQL check found no unbacked, unfunded or orphaned charges. The payment alert saying a restart is recommended never cleared, and I didn't restart payment.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.31834520000000005,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 26782,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 26782,
+  "cache_read_input_tokens": 704636,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 60,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 143,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 143,
+    "cache_read_input_tokens": 32582,
+    "input_tokens": 2,
+    "output_tokens": 570,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 7017,
+  "output_tokens_details": {
+   "thinking_tokens": 1614
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

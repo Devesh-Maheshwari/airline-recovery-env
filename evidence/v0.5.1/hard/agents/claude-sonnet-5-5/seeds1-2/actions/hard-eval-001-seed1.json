@@ -1,0 +1,128 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,b.amount_cents,b.client_reference,(select count(*) from charges c where c.booking_id=b.booking_id) ch,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select count(*) from checkins k where k.booking_id=b.booking_id) k from bookings b"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from outbox"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from charges"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select \"c\" t,key k,value v,\"\" x from cache union all select \"f\",flight_id,fare_cents||\" cap \"||capacity,* from flights union all select \"h\",* ,\"\",\"\" from fare_holds"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select name,sql from sqlite_master where name in (\"flights\",\"cache\",\"fare_holds\",\"customer_events\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select \"c\" t,key a,value b,\"\" c from cache union all select \"f\",flight_id,price_cents,capacity||\" v\"||version from flights union all select \"h\",flight_id,price_cents,until_step from fare_holds union all select \"e\",request_id,kind,step from customer_events"
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing",
+    "flight_id": "F100"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 2000
+    }
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_478f4cf4364d519bbd26ddaedd88a376"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_74e76f75eae454a3b0c6d0c7c67de2bf"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e16d7496e08956f095ae7cbd260b94fe",
+    "existing_charge_id": "chg_544a1c9086265cb6982663a7bd274b24"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ecc75300201a505990305428909a3deb",
+    "existing_charge_id": "chg_97a743c0d38f5ee8b15ed5434a18018c"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_583fbe5dca9f5b64aaff61b0250f3797",
+    "idempotency_key": "booking-v2:bkg_583fbe5dca9f5b64aaff61b0250f3797"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_85f975878c785c8a97be9a01bbf96aba",
+    "existing_charge_id": "chg_a0757699710b5bdd91dd86bb32e368d9"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_a948f3945b075ae8b821daedc2f4811f"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.request_id,(select count(*) from charges c where c.booking_id=b.booking_id and state=\"captured\") ch,(select count(*) from refunds r where r.booking_id=b.booking_id) rf from bookings b where b.request_id in (select request_id from customer_events)"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_ecc75300201a505990305428909a3deb"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

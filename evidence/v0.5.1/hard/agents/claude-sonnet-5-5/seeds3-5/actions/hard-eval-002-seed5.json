@@ -1,0 +1,202 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,b.amount_cents,c.charge_id,c.idempotency_key,c.state from bookings b left join charges c on c.booking_id=b.booking_id where b.status!=\"confirmed\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,booking_id,status,attempts,schema_version,substr(payload,1,150) p from outbox where status!=\"delivered\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from outbox where status!=\"delivered\""
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_2d0382d1c13b5ad190c43f8143b92875",
+    "existing_charge_id": "chg_8378f37dc894538aa62a775a07fce9b6"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_94af994eb33958d1ab0134994211b1e6",
+    "existing_charge_id": "chg_d8fad64c424b580899bc862f12f1f9b1"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_18e1ee8d84215b5294b65bc42d30f25a",
+    "existing_charge_id": "chg_bea84189550a5cda9f7891bec4d095ff"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_39908f75776a59ad8e7328b4e9c3a662"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_c7a8600fb17d52e5ba172c10a80504a8"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_39908f75776a59ad8e7328b4e9c3a662"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_c7a8600fb17d52e5ba172c10a80504a8"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,status,attempts,length(payload) l,payload from outbox where status!=\"delivered\" and (length(payload)<100 or payload not like \"%passenger_id%\" or payload not like \"%schema_version\\\": 1%\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,status,attempts,payload from outbox where status<>\"delivered\" and payload not like \"%passenger_id%\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select booking_id,status,flight_id,passenger_id,client_reference from bookings where booking_id in (\"bkg_4559855641ee54daa1e73f47523764df\",\"bkg_a711ed50622e52d19f39725ed76d2ee3\")"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000328_bkg_4559855641ee54daa1e73f47523764df"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000336_bkg_4559855641ee54daa1e73f47523764df"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "auto_pause_after_attempts": 0,
+     "batch_size": 50
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select o.event_id,o.booking_id,o.status,o.payload,b.flight_id,b.passenger_id,b.status bs from outbox o left join bookings b on b.booking_id=o.booking_id where o.event_id like \"evt_0000033%\" or o.event_id like \"evt_0000034%\" "
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000337_bkg_a66163eabb655294b8ca978d764d25d9"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000338_bkg_a711ed50622e52d19f39725ed76d2ee3"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from flights"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from cache"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,path,status,message,count(*) n from request_logs where rowid>(select max(rowid)-60 from request_logs) group by 1,2,3,4"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

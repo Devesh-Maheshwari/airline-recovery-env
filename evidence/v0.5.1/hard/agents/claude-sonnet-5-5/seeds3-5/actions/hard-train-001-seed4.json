@@ -1,0 +1,50 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.*, h.flight_id hf, c.charge_id, c.state from bookings b left join holds h on h.booking_id=b.booking_id left join charges c on c.booking_id=b.booking_id"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_e3abd686cd85564287bb29476bd34d76"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_c2d05dfabdb958b1b46c9d891ef321a7"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_fd0ccf22b0b45f898a2501d2fd18d084"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select (select count(*) from outbox where status!=\"delivered\") o,(select count(*) from refunds) r,(select count(*) from checkins) c,(select count(*) from bookings where status=\"confirmed\") b"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

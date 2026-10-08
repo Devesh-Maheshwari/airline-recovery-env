@@ -1,0 +1,180 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as total, status FROM bookings GROUP BY status"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, COUNT(DISTINCT h.hold_id) as hold_count, COUNT(DISTINCT c.charge_id) as charge_count FROM bookings b LEFT JOIN holds h ON b.booking_id = h.booking_id LEFT JOIN charges c ON b.booking_id = c.booking_id GROUP BY b.booking_id ORDER BY b.status, b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" ORDER BY name"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, h.booking_id as has_hold, c.charge_id as has_charge FROM bookings b LEFT JOIN holds h ON b.booking_id = h.booking_id LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = \"pending\" ORDER BY b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id, c.state, b.status FROM charges c JOIN bookings b ON c.booking_id = b.booking_id WHERE b.status = \"pending\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT idempotency_key, booking_id, state, final_state FROM provider_ledger WHERE booking_id IN (SELECT booking_id FROM bookings WHERE status = \"pending\") ORDER BY idempotency_key"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id, c.idempotency_key, c.state FROM charges c JOIN bookings b ON c.booking_id = b.booking_id WHERE b.status = \"pending\" AND c.state = \"submitted\" LIMIT 3"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_e71accdc68145ce69f5fc7b19bd028b1"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e71accdc68145ce69f5fc7b19bd028b1",
+    "existing_charge_id": "chg_669ec51c86b95cd695bfb19dea224a11"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_83b14d84b9765ef0aa1d4b882dc7a7aa",
+    "idempotency_key": "booking:bkg_83b14d84b9765ef0aa1d4b882dc7a7aa"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d63199dfe0b5507db4c015163efb9766",
+    "idempotency_key": "booking:bkg_d63199dfe0b5507db4c015163efb9766"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d8be2067a072567b8e24e8f9732f94ea",
+    "idempotency_key": "booking:bkg_d8be2067a072567b8e24e8f9732f94ea"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_f1fb18cd7d55502c8dfa70a2ac5d8110",
+    "idempotency_key": "booking:bkg_f1fb18cd7d55502c8dfa70a2ac5d8110"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_fbd6b824857c5f89ad2dc2d78f5c3183",
+    "idempotency_key": "booking:bkg_fbd6b824857c5f89ad2dc2d78f5c3183"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e71accdc68145ce69f5fc7b19bd028b1",
+    "idempotency_key": "booking:bkg_e71accdc68145ce69f5fc7b19bd028b1"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, c.state FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = \"pending\" ORDER BY b.booking_id"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_a347e4ada69d5d4a918e1eb7ad99cbb8",
+    "idempotency_key": "booking:bkg_a347e4ada69d5d4a918e1eb7ad99cbb8"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_f1fb18cd7d55502c8dfa70a2ac5d8110",
+    "idempotency_key": "booking:bkg_f1fb18cd7d55502c8dfa70a2ac5d8110"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_fbd6b824857c5f89ad2dc2d78f5c3183"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, c.state, o.event_id FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id LEFT JOIN outbox o ON b.booking_id = o.booking_id WHERE b.status = \"pending\""
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_fbd6b824857c5f89ad2dc2d78f5c3183",
+    "idempotency_key": "booking:bkg_fbd6b824857c5f89ad2dc2d78f5c3183"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

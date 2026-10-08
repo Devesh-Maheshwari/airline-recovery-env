@@ -1,0 +1,41 @@
+{
+ "num_turns": 38,
+ "result": "The recovery operation has completed with a **reward of 0.0** due to integrity violations and incomplete recovery. Here's the summary:\n\n## What Was Accomplished:\n- **68 confirmed bookings** out of 77 required (88% recovery rate)\n- **68 check-ins** completed\n- **46 events delivered** to the checkin consumer (was completely blocked)\n- **Payment service** restarted and stabilized (from 504 errors to 67% success)\n- **Checkin service** brought online and consumer enabled\n- **Booking timeout** increased from 139ms to 500ms\n- **Pricing cache** invalidated to fix stale quotes\n- **Full 36-step action budget** consumed\n\n## Why the Mission Failed:\n\n1. **28 Integrity Violations:**\n   - 27 \"accepted_request_changed\" violations - bookings that were accepted, then their flight/passenger/amount was modified (likely from the cache invalidation)\n   - 1 \"cancelled_request_fulfilled\" violation - a booking was confirmed after its customer had cancelled\n\n2. **Incomplete Recovery:**\n   - 9 incomplete customer requests (12% of required)\n   - 10 pending bookings still unresolved at the end\n   - Never achieved 2 required verification windows\n\n3. **Critical Trade-offs Made:**\n   - Invalidating the pricing cache helped recover many bookings but triggered the \"accepted_request_changed\" violations\n   - Reconciling a booking to a charge succeeded but violated the \"cancelled_request_fulfilled\" rule\n\nThe system recovered from near-total failure (payment degraded, checkin offline, events blocked) to 88% operational, but the path taken violated the integrity rules that determine success.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.31912960000000007,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 53344,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 53344,
+  "cache_read_input_tokens": 1542116,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 305,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 4239,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 4239,
+    "cache_read_input_tokens": 60311,
+    "input_tokens": 8,
+    "output_tokens": 895,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 11585,
+  "output_tokens_details": {
+   "thinking_tokens": 4519
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

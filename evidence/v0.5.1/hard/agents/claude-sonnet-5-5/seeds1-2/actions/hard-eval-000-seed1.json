@@ -1,0 +1,181 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.*, (select count(*) from charges c where c.booking_id=b.booking_id) nch from bookings b"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select c.*, (select count(*) from holds h where h.booking_id=c.booking_id) hh from charges c"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8e671212890d5ee0b1963bd1ae29db53"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,c.state,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select count(*) from checkins k where k.booking_id=b.booking_id) k from bookings b left join charges c on c.booking_id=b.booking_id where b.status<>\"confirmed\" or c.state<>\"captured\""
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 2000
+    }
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8e671212890d5ee0b1963bd1ae29db53"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_8e671212890d5ee0b1963bd1ae29db53"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8e671212890d5ee0b1963bd1ae29db53"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_780c2d95514b5d90a3d270ccebd59c71"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8e671212890d5ee0b1963bd1ae29db53"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_780c2d95514b5d90a3d270ccebd59c71"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_f65a223c1fad5264abd20dd125e57801"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_f3ab9885d3cd5767b6368b1e12ccaf55"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_51d9371293df528a90a734fc1ae09acf"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_780c2d95514b5d90a3d270ccebd59c71"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select (select group_concat(distinct status) from outbox) o, (select count(*) from outbox where status<>\"delivered\") onot, (select count(*) from bookings b where status=\"confirmed\" and not exists(select 1 from checkins k where k.booking_id=b.booking_id)) nock, (select count(*) from bookings where status<>\"confirmed\") nonconf, (select count(*) from charges where state<>\"captured\") nc"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select c.charge_id,c.booking_id,c.state,c.idempotency_key,b.status,b.flight_id from charges c join bookings b using(booking_id) where c.state<>\"captured\""
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_f65a223c1fad5264abd20dd125e57801",
+    "idempotency_key": "booking-v2:bkg_f65a223c1fad5264abd20dd125e57801"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_780c2d95514b5d90a3d270ccebd59c71",
+    "idempotency_key": "booking-v2:bkg_780c2d95514b5d90a3d270ccebd59c71"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select booking_id,state,idempotency_key from charges where booking_id in (\"bkg_780c2d95514b5d90a3d270ccebd59c71\",\"bkg_f65a223c1fad5264abd20dd125e57801\")"
+   }
+  }
+ ]
+}

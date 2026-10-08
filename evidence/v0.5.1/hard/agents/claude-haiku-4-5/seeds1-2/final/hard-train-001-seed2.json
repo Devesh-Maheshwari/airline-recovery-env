@@ -1,0 +1,41 @@
+{
+ "num_turns": 20,
+ "result": "Perfect! **Episode completed successfully!** \ud83c\udf89\n\n## Final Score: **0.952 / 1.0**\n\n**Key Results:**\n- \u2705 **Success**: True - All integrity rules maintained\n- \u2705 **Availability**: 1.0 (perfect last 3 traffic windows)\n- \u2705 **Recovery**: 1.0 (100% incident recovery - 41/41 requests completed)\n- \u2705 **Verification**: 2 healthy probes confirmed\n- \u2705 **Revenue Retained**: 1.0 (100% - no abandoned transactions)\n- \u2705 **Safety Check**: Passed all hazard tests (fare_change, lost_ack_retry, expired_key_retry)\n\n**Efficiency:**\n- Used only **18 out of 32 actions** (44% of budget)\n- Cost penalty: 0.048\n- No integrity violations\n- 0 duplicate charges, 0 orphan charges, 0 abandoned requests\n\n**Recovery Summary:**\nThe system was already in a healthy state with all 43 customer bookings confirmed and processing correctly. The alert about \"malformed events\" was stale/outdated - actual investigation revealed:\n- All outbox events were properly delivered\n- No pending or quarantined events  \n- All services running healthy with 0 errors\n- Complete traceability: bookings \u2192 holds \u2192 charges \u2192 check-ins \u2192 events\n\nThe recovery was instantaneous as the system was fundamentally sound - only verification probes and integrity checks were needed to validate the stable state before completion.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.15448830000000002,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 28639,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 28639,
+  "cache_read_input_tokens": 559243,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 161,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 2160,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 2160,
+    "cache_read_input_tokens": 37685,
+    "input_tokens": 8,
+    "output_tokens": 806,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 8225,
+  "output_tokens_details": {
+   "thinking_tokens": 4181
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

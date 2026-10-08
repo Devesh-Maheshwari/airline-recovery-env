@@ -1,0 +1,41 @@
+{
+ "num_turns": 42,
+ "result": "## Episode Complete\n\nThe airline recovery episode has finished with a signed receipt. Here's a summary of what happened:\n\n**Actions Taken (34 total budget):**\n1. Diagnosed payment timeout issues (200ms insufficient for 80ms provider latency)\n2. Increased booking service payment timeout to 500ms\n3. Disabled inventory enforce_capacity to resolve seat hold drift\n4. Attempted to enable checkin consumer (configuration didn't persist)\n5. Identified \"event booking identity mismatch\" errors blocking the checkin consumer\n6. Quarantined 2 problematic outbox events\n7. Restarted all services to apply changes\n\n**Results:**\n- **Score: 0.0** (unsuccessful recovery)\n- **Availability: 25%** (services partially operational)\n- **Recovery: 6.25%** (minimal recovery achieved)\n- **Integrity: False** (multiple violations remaining)\n\n**Key Issues Identified:**\n1. **Checkin Consumer Failure**: Circuit breaker paused after encountering events with booking ID mismatches (event ID didn't match payload booking_id)\n2. **Outbox Backlog**: 64 pending events couldn't be processed\n3. **Integrity Violations**: 30+ violations including oversold flight F900 and fulfilled rejected bookings\n4. **Incomplete Requests**: 45 customer requests left incomplete\n\n**Root Cause:**\nThe primary blocker was corrupted outbox events where the event ID didn't match the booking ID in the payload, causing the checkin consumer to reject them and pause. This prevented order fulfillment completion and caused a cascading failure of the booking-to-checkin pipeline.\n\nThe episode has been signed and recorded in `episode.json`.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.31731239999999994,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 53878,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 53878,
+  "cache_read_input_tokens": 1512244,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 337,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 6125,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 6125,
+    "cache_read_input_tokens": 57419,
+    "input_tokens": 8,
+    "output_tokens": 819,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 11599,
+  "output_tokens_details": {
+   "thinking_tokens": 5838
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

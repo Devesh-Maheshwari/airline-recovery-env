@@ -1,0 +1,41 @@
+{
+ "num_turns": 9,
+ "result": "The episode is finished and scored 0.932, with `success: true` in the receipt.\n\n**What was wrong:** the check-in consumer was disabled (`consumer_enabled: false`), so events piled up in the outbox. One event, `evt_00000004_\u2026`, was malformed: it had no `passenger_id` and had already failed 4 delivery attempts.\n\n**What I did (5 mutating actions):**\n1. **Quarantine:** I quarantined the malformed event so it wouldn't be delivered.\n2. **Re-enable consumer:** I set `checkin.consumer_enabled` back to `true`.\n3. **Replay:** I replayed the backlog. Check-ins caught up to 17 of 17 bookings, with no pending events.\n4. **Probes:** Two healthy probes counted, at steps 6 and 7.\n5. **Finish:** I called `finish`, which issued the receipt.\n\nI also made two read-only calls (an outbox query and a config read). I never used the provider lookups, because I saw no payment problems.\n\nI didn't read the final integrity breakdown, so I can't say exactly what the remaining 0.068 was lost to. The cost penalty was small.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.0991216,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 15245,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 15245,
+  "cache_read_input_tokens": 110948,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 16,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 190,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 190,
+    "cache_read_input_tokens": 18694,
+    "input_tokens": 2,
+    "output_tokens": 385,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 1592,
+  "output_tokens_details": {
+   "thinking_tokens": 282
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

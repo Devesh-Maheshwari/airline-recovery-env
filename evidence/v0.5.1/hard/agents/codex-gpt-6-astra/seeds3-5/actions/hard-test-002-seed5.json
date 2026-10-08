@@ -1,0 +1,138 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type = \"table\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'booking' AS kind,json_object('booking_id',b.booking_id,'request_id',b.request_id,'flight_id',b.flight_id,'passenger_id',b.passenger_id,'amount_cents',b.amount_cents,'status',b.status,'client_reference',b.client_reference,'charges',(SELECT json_group_array(json_object('charge_id',c.charge_id,'key',c.idempotency_key,'amount',c.amount_cents,'state',c.state,'step',c.created_step)) FROM charges c WHERE c.booking_id=b.booking_id),'hold',(SELECT count(*) FROM holds h WHERE h.booking_id=b.booking_id)) AS data FROM bookings b WHERE b.status='pending' UNION ALL SELECT 'event',json_object('event_id',event_id,'booking_id',booking_id,'payload',payload,'status',status,'attempts',attempts) FROM outbox WHERE status='pending' UNION ALL SELECT 'cache',json_object('key',key,'value',value) FROM cache UNION ALL SELECT 'flight',json_object('flight_id',flight_id,'capacity',capacity,'price',price_cents,'version',version) FROM flights UNION ALL SELECT 'cancel',json_object('event_id',event_id,'request_id',request_id,'step',step) FROM customer_events UNION ALL SELECT 'fare_hold',json_object('hold_id',hold_id,'flight_id',flight_id,'price',price_cents,'until_step',until_step) FROM fare_holds"
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing",
+    "flight_id": "F200"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000340_bkg_12e1e26b84bf5bbcad18c7801348688b"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'config' AS kind,json_object('service',service,'value',value) AS data FROM service_config UNION ALL SELECT 'event',json_object('event_id',o.event_id,'booking_id',o.booking_id,'payload',o.payload,'attempts',o.attempts,'booking_status',b.status,'flight_id',b.flight_id,'passenger_id',b.passenger_id) FROM outbox o LEFT JOIN bookings b ON b.booking_id=o.booking_id WHERE o.status='pending' UNION ALL SELECT 'cancel',json_object('event_id',event_id,'request_id',request_id,'step',step) FROM customer_events UNION ALL SELECT 'fare_hold',json_object('hold_id',hold_id,'flight_id',flight_id,'price',price_cents,'until_step',until_step) FROM fare_holds UNION ALL SELECT 'pricing',json_object('flight_id',f.flight_id,'price',f.price_cents,'version',f.version,'cache',c.value) FROM flights f LEFT JOIN cache c ON c.key='quote:'||f.flight_id"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000345_bkg_12e1e26b84bf5bbcad18c7801348688b"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000347_bkg_710f2120bb8a5c999f9274c2af07dd66"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000348_bkg_12e1e26b84bf5bbcad18c7801348688b"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "batch_size": 50,
+     "accepted_schema": 1,
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_0a2788401a5d51da9c9630106323b5c4"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_71ff4906a29f5d2bbd32398b39faeab7"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_2d1fe8286369593798b5753b786c275f",
+    "existing_charge_id": "chg_e62e5184d19b5dffbdf46940f29a52af"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'pending' AS kind,json_object('booking_id',b.booking_id,'request_id',b.request_id,'status',b.status,'client_reference',b.client_reference,'amount',b.amount_cents,'charges',(SELECT json_group_array(json_object('charge_id',c.charge_id,'key',c.idempotency_key,'state',c.state,'step',c.created_step)) FROM charges c WHERE c.booking_id=b.booking_id),'cancels',(SELECT json_group_array(json_object('event_id',e.event_id,'step',e.step)) FROM customer_events e WHERE e.request_id=b.request_id)) AS data FROM bookings b WHERE b.status='pending' UNION ALL SELECT 'cancel',json_object('event_id',event_id,'request_id',request_id,'step',step) FROM customer_events UNION ALL SELECT 'refund',json_object('charge_id',charge_id,'booking_id',booking_id,'amount',amount_cents) FROM refunds UNION ALL SELECT 'config',json_object('service',service,'value',value) FROM service_config"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_cb8f8f735f84501f8356d164724d71c0"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_cb8f8f735f84501f8356d164724d71c0",
+    "idempotency_key": "booking:bkg_cb8f8f735f84501f8356d164724d71c0"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_d2f61de183ea57729a393b56f2e55005"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d2f61de183ea57729a393b56f2e55005",
+    "existing_charge_id": "chg_1357bbd5eaee56c5942cec571b71cea0"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_bc84f9176210518fb3fc8ea9fc453dac"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

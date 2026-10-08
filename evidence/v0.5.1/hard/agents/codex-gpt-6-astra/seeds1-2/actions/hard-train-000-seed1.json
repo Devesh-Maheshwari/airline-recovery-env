@@ -1,0 +1,72 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type = 'table'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'config' AS kind, service AS id, value AS data FROM service_config UNION ALL SELECT 'booking', b.booking_id,json_object('request',b.request_id,'flight',b.flight_id,'passenger',b.passenger_id,'amount',b.amount_cents,'status',b.status,'client',b.client_reference,'charges',(SELECT json_group_array(json_object('id',c.charge_id,'key',c.idempotency_key,'amount',c.amount_cents,'state',c.state,'step',c.created_step)) FROM charges c WHERE c.booking_id=b.booking_id)) FROM bookings b WHERE b.status!='confirmed' UNION ALL SELECT 'customer_event',event_id,json_object('request',request_id,'kind',kind,'step',step) FROM customer_events UNION ALL SELECT 'flight',flight_id,json_object('capacity',capacity,'price',price_cents,'version',version) FROM flights UNION ALL SELECT 'cache',key,value FROM cache UNION ALL SELECT 'outbox',event_id,json_object('booking',booking_id,'payload',payload,'status',status,'attempts',attempts) FROM outbox WHERE status='pending' UNION ALL SELECT 'fare_hold',hold_id,json_object('flight',flight_id,'price',price_cents,'until',until_step) FROM fare_holds"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_0aee1be7a1a45ace97d5f16409bc5326"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'booking' AS kind,b.booking_id AS id,json_object('request',b.request_id,'flight',b.flight_id,'passenger',b.passenger_id,'amount',b.amount_cents,'status',b.status,'client',b.client_reference,'charges',(SELECT json_group_array(json_object('id',c.charge_id,'key',c.idempotency_key,'state',c.state,'step',c.created_step)) FROM charges c WHERE c.booking_id=b.booking_id)) AS data FROM bookings b WHERE b.status!='confirmed' OR b.client_reference IS NOT NULL UNION ALL SELECT 'customer_event',event_id,json_object('request',request_id,'kind',kind,'step',step) FROM customer_events UNION ALL SELECT 'outbox',event_id,json_object('booking',booking_id,'payload',payload,'status',status,'attempts',attempts) FROM outbox WHERE status='pending' UNION ALL SELECT 'fare_hold',hold_id,json_object('flight',flight_id,'price',price_cents,'until',until_step) FROM fare_holds UNION ALL SELECT 'config',service,value FROM service_config"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_51dde73d20905429b97b91584a83c44a",
+    "existing_charge_id": "chg_6d96f4eb0a9756beb89d519394d19692"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_0aee1be7a1a45ace97d5f16409bc5326",
+    "idempotency_key": "booking:bkg_0aee1be7a1a45ace97d5f16409bc5326"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'pending_booking' AS kind,b.booking_id AS id,json_object('request',b.request_id,'status',b.status,'client',b.client_reference,'charges',(SELECT json_group_array(json_object('id',c.charge_id,'key',c.idempotency_key,'state',c.state,'amount',c.amount_cents)) FROM charges c WHERE c.booking_id=b.booking_id),'hold',(SELECT COUNT(*) FROM holds h WHERE h.booking_id=b.booking_id)) AS data FROM bookings b WHERE b.status='pending' UNION ALL SELECT 'customer_event',event_id,json_object('request',request_id,'kind',kind,'step',step) FROM customer_events UNION ALL SELECT 'outbox',event_id,json_object('booking',booking_id,'payload',payload,'status',status) FROM outbox WHERE status='pending' UNION ALL SELECT 'fare_hold',hold_id,json_object('flight',flight_id,'price',price_cents,'until',until_step) FROM fare_holds"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e603b00475265e7e8e4603877a573326"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_fd3fcc1778e55b1288bab7e498513efa"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

@@ -1,0 +1,171 @@
+{
+ "actions": [
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT id, client_reference, status, amount_cents, captured_at FROM bookings WHERE status = 'pending'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type='table'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, request_id, flight_id, passenger_id, amount_cents, status FROM bookings WHERE status = 'pending'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, charge_id, idempotency_key, amount_cents, state FROM charges WHERE booking_id IN ('bkg_32278dc0496d53309d99d8a8dcfa5591', 'bkg_af6acafc36d75f3faa23a2756a01e705', 'bkg_c4dd49b4a3af516385d999454b47d8cb', 'bkg_2658de52d36a5e06a6ee79b56f4eef64')"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_af6acafc36d75f3faa23a2756a01e705"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_2658de52d36a5e06a6ee79b56f4eef64"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_32278dc0496d53309d99d8a8dcfa5591",
+    "existing_charge_id": "chg_4dc5d60d5423553798b6030017768277"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_c4dd49b4a3af516385d999454b47d8cb",
+    "existing_charge_id": "chg_d7f86ef496185641916d1a94d1f8aad9"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_af6acafc36d75f3faa23a2756a01e705"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_2658de52d36a5e06a6ee79b56f4eef64"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM fare_holds"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT status, COUNT(*) FROM bookings GROUP BY status"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*), COUNT(DISTINCT booking_id), SUM(amount_cents) FROM charges WHERE state = 'captured'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = 'confirmed' AND c.charge_id IS NULL"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 5000
+    }
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

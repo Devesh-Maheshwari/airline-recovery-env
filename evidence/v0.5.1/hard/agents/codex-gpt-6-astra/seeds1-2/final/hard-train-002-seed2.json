@@ -1,0 +1,3 @@
+{
+ "result": "Recovered successfully and finished in **22/36 actions**.\n\n- All 56 required requests completed.\n- Two healthy probes passed; no integrity violations.\n- No pending bookings or event backlog.\n- Reward: **0.728846**; one request was abandoned during the incident.\n\nSigned receipt verified in `episode.json`."
+}

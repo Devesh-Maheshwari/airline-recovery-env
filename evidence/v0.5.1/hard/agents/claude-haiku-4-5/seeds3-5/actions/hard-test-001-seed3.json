@@ -1,0 +1,213 @@
+{
+ "actions": [
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 1000
+    }
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000006_bkg_8831bdd3c4905d3c9e83fe8258a543f9"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000008_bkg_8831bdd3c4905d3c9e83fe8258a543f9"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT status, COUNT(*) FROM bookings GROUP BY status"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000009_bkg_da61d17356e953fba4686e2a672246cc"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, status, flight_id, passenger_id, accepted_amount_cents FROM bookings WHERE status = \"pending\" LIMIT 5"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name=\"bookings\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, status, flight_id, passenger_id, amount_cents FROM bookings WHERE status = \"pending\" LIMIT 10"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ce01d9c2ffbf57b9ad4fa1f4664c607e"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ea119ff4faab542db54e158673653cf7"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b88d2f2ebc6e5f36b5246ccbaa99c413"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT request_id FROM bookings WHERE booking_id = \"bkg_b88d2f2ebc6e5f36b5246ccbaa99c413\""
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_b88d2f2ebc6e5f36b5246ccbaa99c413"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_20ed88b18616572a85d2fba0b899064b"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_f0388e7f8f085980bcf9d3bb56639dc5"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_a23e7e7599c559a28ea8396a23288ac0"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8c2a2f98c0b052ac97e9e0aa61fd6fb5"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_29e9ab7c9e7e547b84b12521f5e0513b"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_1c8ede4d20eb5d0ba14c6eacd301cc7c"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id FROM bookings WHERE status = \"pending\""
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e55a0cc0a1195551b25196fc5762698e"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e818d6aa561d5c849a264d770e26fb32"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

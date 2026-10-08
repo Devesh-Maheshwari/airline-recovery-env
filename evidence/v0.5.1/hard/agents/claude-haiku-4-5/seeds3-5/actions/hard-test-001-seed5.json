@@ -1,0 +1,204 @@
+{
+ "actions": [
+  {
+   "tool": "get_config"
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 5000
+    }
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT id, status, customer_request_id, flight_id, passenger_id, amount_cents FROM bookings WHERE status=\"pending\" LIMIT 20"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM sqlite_master WHERE type=\"table\" AND name=\"bookings\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, request_id, flight_id, passenger_id, amount_cents, status FROM bookings WHERE status=\"pending\" LIMIT 20"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.booking_id, c.charge_id, c.amount_cents, c.status FROM charges c JOIN bookings b ON c.booking_id = b.booking_id WHERE b.status = \"pending\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name=\"charges\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.booking_id, c.charge_id, c.amount_cents, c.state FROM charges c JOIN bookings b ON c.booking_id = b.booking_id WHERE b.status = \"pending\" LIMIT 10"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name=\"outbox\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, booking_id, payload FROM outbox WHERE status=\"pending\" LIMIT 1"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, booking_id, payload FROM outbox WHERE status=\"delivered\" LIMIT 3"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id FROM outbox WHERE status=\"pending\" AND payload NOT LIKE \"%passenger_id%\" LIMIT 30"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_fca11f5b386b54dda95af3a541f155c2"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000007_bkg_2fce4fc0917756d28bfca78ee0b4cb2d"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, booking_id, payload FROM outbox WHERE event_id = \"evt_00000005_bkg_2fce4fc0917756d28bfca78ee0b4cb2d\""
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000005_bkg_2fce4fc0917756d28bfca78ee0b4cb2d"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, charge_id, state FROM charges c JOIN bookings b ON c.booking_id = b.booking_id WHERE b.status = \"pending\" LIMIT 10"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.booking_id, c.charge_id, c.state FROM charges c JOIN bookings b ON c.booking_id = b.booking_id WHERE b.status = \"pending\" LIMIT 10"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d737fe68e092568db91b5e9a690aea91",
+    "existing_charge_id": "chg_1dd73b9eb2f75dfdb2305be94cb6ed20"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT charge_id, idempotency_key FROM charges WHERE booking_id IN (\"bkg_11429ab5564351f9ae7051e3ecf78195\", \"bkg_82cb14b6e8a156bca88f9f034cebf1e5\", \"bkg_ec5412925f8c5ed8858481d0c968cd08\") LIMIT 10"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_11429ab5564351f9ae7051e3ecf78195"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_11429ab5564351f9ae7051e3ecf78195",
+    "existing_charge_id": "chg_cf9b12d6130154efb26f7251ec079612"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_82cb14b6e8a156bca88f9f034cebf1e5"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

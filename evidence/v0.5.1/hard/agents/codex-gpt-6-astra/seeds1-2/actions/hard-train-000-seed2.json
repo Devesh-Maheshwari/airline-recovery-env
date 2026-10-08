@@ -1,0 +1,59 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type = 'table' ORDER BY name"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'config' AS kind, service AS id, value AS data FROM service_config UNION ALL SELECT 'booking', booking_id, json_object('request_id',request_id,'flight_id',flight_id,'passenger_id',passenger_id,'amount',amount_cents,'status',status,'client_reference',client_reference) FROM bookings WHERE status <> 'confirmed' UNION ALL SELECT 'charge',charge_id,json_object('booking_id',booking_id,'key',idempotency_key,'amount',amount_cents,'state',state,'created_step',created_step) FROM charges WHERE booking_id IN (SELECT booking_id FROM bookings WHERE status <> 'confirmed') UNION ALL SELECT 'customer_event',event_id,json_object('request_id',request_id,'kind',kind,'step',step) FROM customer_events UNION ALL SELECT 'outbox',event_id,json_object('booking_id',booking_id,'payload',payload,'status',status,'attempts',attempts) FROM outbox WHERE status <> 'delivered' UNION ALL SELECT 'cache',key,value FROM cache UNION ALL SELECT 'flight',flight_id,json_object('capacity',capacity,'price',price_cents,'version',version) FROM flights UNION ALL SELECT 'fare_hold',hold_id,json_object('flight',flight_id,'price',price_cents,'until',until_step) FROM fare_holds"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_50aa36b00de65017bcb4bae03fbd94a7"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_4b788614461d5722bf66723257cc1b0c"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_4b788614461d5722bf66723257cc1b0c"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b2b4dace39a8593c90478f17f6bf9e1f",
+    "existing_charge_id": "chg_ca4aaf3031b0571fbda129f75b41d407"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_1a082e4171d95cfcb72c0797f9e9fd61"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

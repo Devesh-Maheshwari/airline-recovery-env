@@ -1,0 +1,46 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "pricing"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type = \"table\""
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'config' AS kind, service AS id, value AS details FROM service_config UNION ALL SELECT 'flight', flight_id, json_object('capacity',capacity,'price_cents',price_cents,'holds',(SELECT count(*) FROM holds h WHERE h.flight_id=f.flight_id)) FROM flights f UNION ALL SELECT 'booking', b.booking_id, json_object('status',b.status,'amount_cents',b.amount_cents,'holds',(SELECT count(*) FROM holds h WHERE h.booking_id=b.booking_id AND h.flight_id=b.flight_id AND h.passenger_id=b.passenger_id),'charges',(SELECT json_group_array(json_object('state',c.state,'amount_cents',c.amount_cents)) FROM charges c WHERE c.booking_id=b.booking_id),'checkins',(SELECT count(*) FROM checkins k WHERE k.booking_id=b.booking_id AND k.flight_id=b.flight_id AND k.passenger_id=b.passenger_id),'delivered_events',(SELECT count(*) FROM outbox o WHERE o.booking_id=b.booking_id AND o.status='delivered')) FROM bookings b UNION ALL SELECT 'pending_event',event_id,payload FROM outbox WHERE status='pending' UNION ALL SELECT 'cancellation',request_id,json_object('step',step) FROM customer_events UNION ALL SELECT 'fare_hold',hold_id,json_object('flight_id',flight_id,'price_cents',price_cents,'until_step',until_step) FROM fare_holds"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

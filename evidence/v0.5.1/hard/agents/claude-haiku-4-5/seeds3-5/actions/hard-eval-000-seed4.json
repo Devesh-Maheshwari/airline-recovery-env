@@ -1,0 +1,164 @@
+{
+ "actions": [
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT id, status, attempts, payload FROM outbox LIMIT 10"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM outbox LIMIT 1"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 15
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 20
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM service_config WHERE service = 'checkin'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, status, attempts, payload FROM outbox WHERE status = 'pending'"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, status, attempts, LENGTH(payload) as payload_len FROM outbox WHERE event_id = 'evt_00000004_bkg_b8d3448c36de557593bc36127655275a'"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_b8d3448c36de557593bc36127655275a"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 20
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 4
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as booking_count, COUNT(DISTINCT booking_id) as distinct_bookings FROM bookings"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as charge_count FROM charges WHERE state = 'captured'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, COUNT(*) as charge_count FROM charges WHERE state = 'captured' GROUP BY booking_id HAVING COUNT(*) > 1"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id FROM charges c WHERE state = 'captured' AND c.booking_id NOT IN (SELECT booking_id FROM bookings)"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT status, COUNT(*) as count FROM bookings GROUP BY status"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(DISTINCT c.booking_id) as bookings_with_charges FROM charges c WHERE state = 'captured'"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

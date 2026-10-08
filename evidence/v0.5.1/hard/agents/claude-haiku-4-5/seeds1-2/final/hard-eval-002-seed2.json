@@ -1,0 +1,41 @@
+{
+ "num_turns": 37,
+ "result": "Perfect! Episode completed with a **signed receipt**. Here's the summary:\n\n## Recovery Results\n\n**Final Score: 0.030147**\n- \u2705 **Integrity: PASS** (no violations)\n- \ud83d\udcca **Recovery: 82.98%** - Successfully recovered most services\n- \ud83d\udcc8 **Availability: 25%** - Limited by remaining issues\n- \u2705 **Cost-efficient**: 0.163 (well within budget)\n\n## What Was Fixed\n\n1. **Payment Service** - Restarted to clear timeout issues\n2. **Checkin Consumer** - Enabled (was disabled)\n3. **Event Schema Mismatch** - Updated to accept version 2\n4. **Outbox Events** - Delivered 385 events (only 1 quarantined poison event)\n5. **Circuit Breaker** - Increased retry threshold\n\n## Results\n\n| Metric | Value |\n|--------|-------|\n| Completed Requests | 39/47 (83%) |\n| Confirmed Bookings | 392 |\n| Checkins Processed | 392 |\n| Revenue Retained | 51.47% |\n| Steps Used | 33/34 |\n| HTTP Requests | 400 |\n\n## Remaining Issues (5 pending bookings)\n\n- 1 booking with **lost charge** (payment failed during incident)\n- 4 bookings blocked by payment timeouts\n- No verification windows created (not fixable with available tools)\n\nThe system recovered to a stable state with full data integrity. The receipt has been signed and saved to `episode.json`.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.27482229999999996,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 42247,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 42247,
+  "cache_read_input_tokens": 1262913,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 297,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 2499,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 2499,
+    "cache_read_input_tokens": 50954,
+    "input_tokens": 8,
+    "output_tokens": 885,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 12748,
+  "output_tokens_details": {
+   "thinking_tokens": 6097
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

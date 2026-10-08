@@ -1,0 +1,161 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 1000
+    }
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type='table'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'booking' kind,json_object('booking_id',b.booking_id,'request_id',b.request_id,'flight_id',b.flight_id,'passenger_id',b.passenger_id,'amount',b.amount_cents,'status',b.status,'client_reference',b.client_reference,'hold',(SELECT json_object('flight',h.flight_id,'passenger',h.passenger_id) FROM holds h WHERE h.booking_id=b.booking_id),'charges',(SELECT json_group_array(json_object('id',c.charge_id,'key',c.idempotency_key,'amount',c.amount_cents,'state',c.state,'step',c.created_step)) FROM charges c WHERE c.booking_id=b.booking_id),'siblings',(SELECT json_group_array(json_object('id',s.booking_id,'status',s.status)) FROM bookings s WHERE s.client_reference=b.client_reference AND s.booking_id<>b.booking_id)) data FROM bookings b WHERE b.status='pending' UNION ALL SELECT 'event',json_object('id',event_id,'booking_id',booking_id,'payload',payload,'status',status,'attempts',attempts) FROM outbox WHERE status='pending' UNION ALL SELECT 'cancel',json_object('id',event_id,'request_id',request_id,'step',step) FROM customer_events UNION ALL SELECT 'flight',json_object('id',flight_id,'capacity',capacity,'price',price_cents,'version',version) FROM flights UNION ALL SELECT 'cache',json_object('key',key,'value',value) FROM cache UNION ALL SELECT 'fare_hold',json_object('id',hold_id,'flight',flight_id,'price',price_cents,'until',until_step) FROM fare_holds"
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing",
+    "flight_id": "F100"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000312_bkg_556621c6d253526691165094aa5af393"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "batch_size": 50,
+     "accepted_schema": 2
+    }
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_5f85793f4fb0577d850dc28a2c952622"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_39fbb6604eef5aaa95006641fddad039"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_7196e7a467365b179f19ef79e3f5a283"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d7ea04a51daf5e28ab3b6a6c3e545105",
+    "existing_charge_id": "chg_64355e48352f5729b28d1c43a210bcb5"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b7409f8830a65324adcc6182d01cbcec",
+    "existing_charge_id": "chg_bfbbdb9df44d5057b5ca4c8d60fb3c00"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_3368f41bbb8c5e6b882821def546bce8"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_1827e067381154168fd3fa02ba487924"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_4321b110da54574cacc62d5a0e3e6651"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_5f85793f4fb0577d850dc28a2c952622"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_5f85793f4fb0577d850dc28a2c952622"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_39fbb6604eef5aaa95006641fddad039"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id,b.status,c.charge_id,c.idempotency_key,c.state,c.created_step,(SELECT json_group_array(json_object('kind',e.kind,'step',e.step)) FROM customer_events e WHERE e.request_id=b.request_id) events FROM bookings b LEFT JOIN charges c ON c.booking_id=b.booking_id WHERE b.status<>'confirmed'"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_7196e7a467365b179f19ef79e3f5a283"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'config' kind,service id,value data FROM service_config UNION ALL SELECT 'unconfirmed',b.booking_id,json_object('status',b.status,'charges',(SELECT json_group_array(json_object('id',c.charge_id,'state',c.state,'amount',c.amount_cents,'key',c.idempotency_key)) FROM charges c WHERE c.booking_id=b.booking_id),'refunds',(SELECT json_group_array(json_object('charge',r.charge_id,'amount',r.amount_cents)) FROM refunds r WHERE r.booking_id=b.booking_id),'holds',(SELECT count(*) FROM holds h WHERE h.booking_id=b.booking_id)) FROM bookings b WHERE b.status<>'confirmed' UNION ALL SELECT 'violation','confirmed_backing',json_object('count',count(*)) FROM bookings b WHERE b.status='confirmed' AND ((SELECT count(*) FROM holds h WHERE h.booking_id=b.booking_id AND h.flight_id=b.flight_id AND h.passenger_id=b.passenger_id)<>1 OR (SELECT count(*) FROM charges c WHERE c.booking_id=b.booking_id AND c.state='captured' AND c.amount_cents=b.amount_cents)<>1 OR (SELECT count(*) FROM checkins k WHERE k.booking_id=b.booking_id AND k.flight_id=b.flight_id AND k.passenger_id=b.passenger_id)<>1) UNION ALL SELECT 'violation','oversold',json_object('count',count(*)) FROM flights f WHERE (SELECT count(*) FROM holds h WHERE h.flight_id=f.flight_id)>f.capacity UNION ALL SELECT 'violation','charge_orphan_or_duplicate',json_object('count',count(*)) FROM charges c WHERE NOT EXISTS (SELECT 1 FROM bookings b WHERE b.booking_id=c.booking_id) OR (c.state='captured' AND EXISTS(SELECT 1 FROM charges d WHERE d.booking_id=c.booking_id AND d.state='captured' AND d.charge_id<>c.charge_id))"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_39fbb6604eef5aaa95006641fddad039"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

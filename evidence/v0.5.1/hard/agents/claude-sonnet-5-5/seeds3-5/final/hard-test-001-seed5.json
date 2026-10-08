@@ -1,0 +1,41 @@
+{
+ "num_turns": 40,
+ "result": "The episode ended with a reward of 0.0. It ran out of budget before I called `finish`, and the receipt records integrity violations.\n\n**What went wrong**\n- **Cancelled requests fulfilled:** I confirmed three pending bookings (`bkg_9352\u2026`, `bkg_5490\u2026`, `bkg_c937\u2026`) with `reconcile_booking`. Their customers had cancelled the request, and those bookings should have been voided with a refund. I didn't check the customer cancel events before reconciling, and I didn't use `void_booking` at all.\n- **Duplicate sale:** one booking (`CR-3ffd42f36e8a`) was a second confirmed booking for a client reference that already had one. I didn't look at `client_reference` before confirming, and it should have been voided too.\n- **Action budget:** I ran out of actions before verification. The first run of the probe failed, and the failed bash calls each used an action. Several of my queries and probes also cost actions without moving recovery forward, so I never got two healthy probes or reached `finish`.\n\n**What did work**\n- I raised the booking `payment_timeout_ms` from 200 to 2000.\n- I reconciled all the pending bookings, and none are pending now.\n- I quarantined the three malformed outbox events. The quarantine call wasn't an error, and the receipt shows no valid events quarantined.\n- I replayed the rest of the outbox.\n- I evicted only the stale `quote:F200` cache row and left F100's cached quote alone, so the fare hold wasn't broken.\n\nThe score details give availability 1.0, but incident recovery only 0.56, with 24 requests abandoned. With integrity failed, the terminal reward is 0.\n\nThe episode can't be redone.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.4096509999999999,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 36863,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 36863,
+  "cache_read_input_tokens": 858825,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 62,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 2391,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 2391,
+    "cache_read_input_tokens": 40415,
+    "input_tokens": 2,
+    "output_tokens": 567,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 9031,
+  "output_tokens_details": {
+   "thinking_tokens": 1804
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

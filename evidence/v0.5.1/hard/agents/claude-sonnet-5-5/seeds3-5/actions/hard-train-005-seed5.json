@@ -1,0 +1,178 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select booking_id,status,flight_id,passenger_id,amount_cents,request_id,client_reference from bookings where status!=\"confirmed\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select c.charge_id,c.booking_id,c.idempotency_key,c.amount_cents,c.state,b.status from charges c left join bookings b on b.booking_id=c.booking_id where b.status is null or b.status!=\"confirmed\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from outbox where status!=\"delivered\""
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "accepted_schema": 2
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from fare_holds"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select key,value from cache"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from flights"
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing",
+    "flight_id": "F200"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_91e57cb8e03e5f749815e2ea898a992e",
+    "existing_charge_id": "chg_14f7cd7e56fe53d3a124ad27b16b8b2d"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_9a0d60c394f25cdb9419885c222aacb4",
+    "existing_charge_id": "chg_d463802c59a05694bf99559b6c761aaa"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_d959bbd47fe55d52875ad3ede720551a"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8fbb43fc91545601bab0dcaf2465256a"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_4e57807ffc785af7a4d93e32a9d552b5"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_72547fd549f45d5c92349adc5aad3249"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_3bed187a20a05fdf8f46732b095589e1"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,path,status,message,count(*) n,max(rowid) r from request_logs where status>=400 or status is null group by 1,2,3,4 order by r desc limit 15"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select \"nohold\" k,booking_id,flight_id from bookings b where status=\"confirmed\" and not exists(select 1 from holds h where h.booking_id=b.booking_id) union all select \"nocheckin\",booking_id,flight_id from bookings b where status=\"confirmed\" and not exists(select 1 from checkins h where h.booking_id=b.booking_id) union all select \"charges\",booking_id,count(*) from charges where state=\"captured\" group by booking_id having count(*)>1 union all select \"holds\",flight_id,count(*) from holds group by flight_id union all select \"nonconf\",booking_id,status from bookings where status!=\"confirmed\" union all select \"outbox\",status,count(*) from outbox group by status"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select rowid,service,method,path,status,duration_ms,message from request_logs order by rowid desc limit 30"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select \"duprq\" k,request_id a,count(*) n from bookings group by request_id having n>1 union all select \"orphan\",charge_id,state from charges where booking_id not in (select booking_id from bookings) union all select \"chgstate\",state,count(*) from charges group by state union all select \"badamt\",c.booking_id,c.amount_cents||\"/\"||b.amount_cents from charges c join bookings b using(booking_id) where c.amount_cents!=b.amount_cents and c.state=\"captured\" union all select \"nochg\",booking_id,status from bookings b where status=\"confirmed\" and not exists(select 1 from charges c where c.booking_id=b.booking_id and c.state=\"captured\") union all select \"dupcr\",client_reference,count(*) from bookings where status=\"confirmed\" and client_reference is not null group by 2 having count(*)>1"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from customer_events order by rowid desc limit 12"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

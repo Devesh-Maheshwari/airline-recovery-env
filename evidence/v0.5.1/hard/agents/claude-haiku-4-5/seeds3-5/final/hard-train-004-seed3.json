@@ -1,0 +1,41 @@
+{
+ "num_turns": 28,
+ "result": "**Episode Complete - Score: 0.0 (Failed)**\n\nThe system encountered multiple critical integrity violations that prevented success:\n\n**Key Issues:**\n1. **Accepted requests changed** (32 violations): Bookings were confirmed but their details changed, likely due to pricing cache invalidation affecting fare holds\n2. **Cancelled requests fulfilled** (3 violations): 3 customers cancelled but were still charged/confirmed\n3. **Incomplete recovery**: Only 3 of 81 incident requests completed successfully (3.7% recovery rate)\n4. **Undelivered events**: 79 outbox events still pending when finished - the checkin consumer couldn't keep pace\n5. **No verification**: Got 0 of 2 required healthy probes\n\n**What Happened:**\n- Correctly identified payment timeout (89ms) was too low \u2192 increased to 5000ms\n- Reconciled 12 pending bookings successfully \n- But invalidating the entire pricing cache caused cascading failures with fare holds\n- Checkin consumer remained unable to deliver events despite being enabled\n- Each action generated more customer traffic, creating more events to process\n- Ran out of action budget before clearing the backlog and achieving verification\n\n**Learning:** The pricing cache invalidation was too aggressive and broke the fare hold system. A more surgical approach to just clearing specific flight caches or monitoring the issue further would have been better than a full invalidation.\n\nThe signed receipt is stored in `episode.json`.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.2315376,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 45578,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 45578,
+  "cache_read_input_tokens": 900016,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 225,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 8556,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 8556,
+    "cache_read_input_tokens": 48228,
+    "input_tokens": 8,
+    "output_tokens": 802,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 10031,
+  "output_tokens_details": {
+   "thinking_tokens": 3947
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

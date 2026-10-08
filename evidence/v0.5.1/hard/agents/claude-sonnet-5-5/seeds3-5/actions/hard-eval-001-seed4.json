@@ -1,0 +1,196 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from outbox"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select sql from sqlite_master where type=\"table\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.flight_id,b.amount_cents,b.client_reference,(select group_concat(state||\":\"||idempotency_key) from charges c where c.booking_id=b.booking_id) ch,(select count(*) from holds h where h.booking_id=b.booking_id) h from bookings b where status=\"pending\""
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 2000
+    }
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_107b67d17fed5ae19915a9a1c8e9782a"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b7cdb382b1d25c69abec007911e7b4b5"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_845fa8f4a19d5ea2b3328ef675b5dd87"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_f141bc324c7f579ba761b64e1b878671"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b6d5bc2707c7536a855bb563fff49a47"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_528bd3f3a9c958bc87bd24a46b95ffea"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_f32a117f7ba759948392ade9878558d7"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_3b5be109fd305524a19f3483aa3969a9"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select status,count(*) from outbox group by 1"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select flight_id,capacity,price_cents,version,(select group_concat(key||\"=\"||value) from cache) c,(select group_concat(flight_id||\":\"||price_cents||\":\"||until_step) from fare_holds) fh,(select step from episode_clock) st from flights"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select flight_id,capacity,price_cents,version,(select group_concat(key||\"=\"||value) from cache) c,(select group_concat(flight_id||\":\"||price_cents||\":\"||until_step) from fare_holds) fh from flights"
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing",
+    "flight_id": "F100"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select key,value from cache union all select flight_id,price_cents||\":\"||until_step from fare_holds union all select id||\" \"||path,status||\" \"||message from request_logs where service=\"pricing\" and id>(select max(id)-8 from request_logs)"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select id,status,substr(message,1,40) m,trace_id from request_logs where service=\"booking\" and id>(select max(id)-14 from request_logs) order by id"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select id,service,path,status,substr(message,1,60) m from request_logs where id>(select max(id)-22 from request_logs) order by id"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

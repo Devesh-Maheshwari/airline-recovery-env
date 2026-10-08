@@ -1,0 +1,203 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,booking_id,status,attempts,payload from outbox where status!=\"delivered\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.*, (select group_concat(charge_id||\":\"||state) from charges c where c.booking_id=b.booking_id) ch from bookings b where status!=\"confirmed\""
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000308_bkg_ef0d343be2255012bb27ed2a73d1d81e"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 20
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.amount_cents,(select group_concat(charge_id||\":\"||state) from charges c where c.booking_id=b.booking_id) ch,(select count(*) from holds h where h.booking_id=b.booking_id) h from bookings b where status!=\"confirmed\" or booking_id in (select booking_id from outbox where status!=\"delivered\")"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_a56ef0be3fcc541eb24a41c1c79c2a11"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_25088e94fd5452f89ddb1a5e0c102378",
+    "existing_charge_id": "chg_16a9d95ecbae5453bb713791af6b924b"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_842b19e3a4f4568ab442aee74405d0ab",
+    "existing_charge_id": "chg_f957fcae733c5c3489881a20f09d7d5e"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d9cc288c95d15db8a83646afc42637c6",
+    "existing_charge_id": "chg_57a31f111d225e289fb895a50b9af160"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_06e79eb8218859d69bafd1adfe24c108"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_a8cabdbd1fe7588d8b83ea7a3d906396"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_a56ef0be3fcc541eb24a41c1c79c2a11"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select o.event_id,o.status,o.attempts,o.payload from outbox o where status!=\"delivered\" union all select booking_id,status,0,\"\" from bookings where status=\"pending\""
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,status,path,message,count(*) n from request_logs where status>=400 group by 1,2,3,4 order by n desc limit 20"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select key,value from cache union all select flight_id,\"flight fare=\"||fare_cents||\" \"||coalesce(version,\"\") from flights union all select flight_id,\"hold \"||fare_cents from fare_holds"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select name,sql from sqlite_master where name in (\"cache\",\"flights\",\"fare_holds\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from cache"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select flight_id,capacity,price_cents,version,(select group_concat(price_cents||\"/\"||until_step) from fare_holds f where f.flight_id=flights.flight_id) fh from flights"
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing",
+    "flight_id": "F100"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,status,path,message,count(*) n,max(rowid) r from (select * from request_logs order by rowid desc limit 60) where status>=400 group by 1,2,3,4"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select status,count(*) from bookings group by 1"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select key,value from cache"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "pricing"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.flight_id,b.status,(select count(*) from checkins c where c.booking_id=b.booking_id) ci,(select group_concat(status) from outbox o where o.booking_id=b.booking_id) ob,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select count(*) from charges c where c.booking_id=b.booking_id and state=\"captured\") ch from bookings b where b.status=\"confirmed\" and (ci!=1 or ob is null or ob!=\"delivered\" or h!=1 or ch!=1)"
+   }
+  }
+ ]
+}

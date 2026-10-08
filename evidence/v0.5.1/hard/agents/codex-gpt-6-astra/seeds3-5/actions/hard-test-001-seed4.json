@@ -1,0 +1,102 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type = 'table'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'config' AS kind, service AS id, value AS data FROM service_config UNION ALL SELECT 'booking', booking_id, json_object('request_id', request_id, 'flight_id', flight_id, 'passenger_id', passenger_id, 'amount_cents', amount_cents, 'status',status,'client_reference', client_reference) FROM bookings WHERE status != 'confirmed' UNION ALL SELECT 'charge',charge_id,json_object('booking_id',booking_id,'idempotency_key',idempotency_key,'amount_cents',amount_cents,'state',state,'created_step',created_step) FROM charges WHERE booking_id IN (SELECT booking_id FROM bookings WHERE status != 'confirmed') UNION ALL SELECT 'event',event_id,json_object('booking_id',booking_id,'payload',payload,'status',status,'attempts',attempts) FROM outbox WHERE status = 'pending' UNION ALL SELECT 'cancel',event_id,json_object('request_id',request_id,'step',step) FROM customer_events UNION ALL SELECT 'fare_hold',hold_id,json_object('flight_id',flight_id,'price_cents',price_cents,'until_step',until_step) FROM fare_holds UNION ALL SELECT 'cache',key,value FROM cache UNION ALL SELECT 'flight',flight_id,json_object('capacity',capacity,'price_cents',price_cents,'version',version) FROM flights"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "batch_size": 50,
+     "accepted_schema": 2,
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_f3cd194e814e59fb97d71cfb6c80f47e"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'flight' AS kind,flight_id AS id,json_object('capacity',capacity,'price_cents',price_cents,'version',version) AS data FROM flights UNION ALL SELECT 'fare_hold',hold_id,json_object('flight_id',flight_id,'price_cents',price_cents,'until_step',until_step) FROM fare_holds UNION ALL SELECT 'cache',key,value FROM cache UNION ALL SELECT 'cancel',event_id,json_object('request_id',request_id,'step',step) FROM customer_events UNION ALL SELECT 'booking',booking_id,json_object('request_id',request_id,'flight_id',flight_id,'passenger_id',passenger_id,'amount_cents',amount_cents,'status',status,'client_reference',client_reference) FROM bookings WHERE status = 'pending' UNION ALL SELECT 'config',service,value FROM service_config"
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing",
+    "flight_id": "F100"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_da7538e6b8de5ec498ec6caa93405d71"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_eb41708bd2da5b9dbb54485efbe9736c"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_d179edb289cf52f78977a6c77eed612e"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'cancel' AS kind,event_id AS id,json_object('request_id',request_id,'step',step) AS data FROM customer_events UNION ALL SELECT 'booking',booking_id,json_object('request_id',request_id,'flight_id',flight_id,'passenger_id',passenger_id,'amount_cents',amount_cents,'status',status,'client_reference',client_reference,'confirmed_at',confirmed_at) FROM bookings WHERE client_reference IS NOT NULL OR status='pending' UNION ALL SELECT 'charge',charge_id,json_object('booking_id',booking_id,'idempotency_key',idempotency_key,'state',state,'amount_cents',amount_cents,'created_step',created_step) FROM charges WHERE booking_id IN (SELECT booking_id FROM bookings WHERE status='pending') UNION ALL SELECT 'hold',booking_id,json_object('flight_id',flight_id,'passenger_id',passenger_id) FROM holds WHERE booking_id IN (SELECT booking_id FROM bookings WHERE status='pending') UNION ALL SELECT 'refund',refund_id,json_object('booking_id',booking_id,'amount_cents',amount_cents,'charge_id',charge_id) FROM refunds"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_2e097ce873e95d359727871faa80e0af"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_2e097ce873e95d359727871faa80e0af"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d179edb289cf52f78977a6c77eed612e",
+    "existing_charge_id": "chg_c9e0b976706a51e8a20da0410c79458a"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

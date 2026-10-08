@@ -1,0 +1,3 @@
+{
+ "result": "Recovered successfully in 28 of 36 actions.\n\n- All 70 required requests resolved; none abandoned.\n- No integrity violations or pending backlog.\n- Both verification windows and final safety checks passed.\n- Score: **0.75**, after the action-cost penalty.\n- Signed receipt saved in `episode.json`."
+}

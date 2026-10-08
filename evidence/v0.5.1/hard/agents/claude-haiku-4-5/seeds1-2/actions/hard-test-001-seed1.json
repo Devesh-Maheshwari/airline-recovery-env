@@ -1,0 +1,229 @@
+{
+ "actions": [
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 8000
+    }
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT id, booking_id, event_type, status, attempts FROM outbox WHERE status = \"pending\" ORDER BY id LIMIT 20"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name=\"outbox\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, booking_id, status, attempts FROM outbox WHERE status = \"pending\" ORDER BY event_id LIMIT 20"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true
+    }
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, payload FROM outbox WHERE status = \"pending\" ORDER BY event_id LIMIT 5"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_ed922801da655775907a39a9d04b1756"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000005_bkg_6c5f17e93a495858bc9622c7ef7a5c29"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 15
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 15
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, booking_id, payload FROM outbox WHERE event_id = \"evt_00000007_bkg_6c5f17e93a495858bc9622c7ef7a5c29\""
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000007_bkg_6c5f17e93a495858bc9622c7ef7a5c29"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 15
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000011_bkg_ed922801da655775907a39a9d04b1756"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 10
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, flight_id, passenger_id, amount_cents, status FROM bookings WHERE status = \"pending\" LIMIT 10"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id, c.amount_cents, c.status, c.idempotency_key FROM charges c WHERE c.booking_id IN (SELECT booking_id FROM bookings WHERE status = \"pending\") ORDER BY booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name=\"charges\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id, c.amount_cents, c.state, c.idempotency_key FROM charges c WHERE c.booking_id IN (SELECT booking_id FROM bookings WHERE status = \"pending\")"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_2aed3eab899656af9c442a70c5d17a7f"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_2aed3eab899656af9c442a70c5d17a7f",
+    "existing_charge_id": "chg_23af089c78005b6fb1e316b66a949e0d"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_5eebcd85d7eb5017aa180c02bed7934d"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_5eebcd85d7eb5017aa180c02bed7934d",
+    "existing_charge_id": "chg_769fdf75f7f85912a9bd8b9011ae848b"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_09694006e05d5874809dea645f85d015"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_cbeefceaa7f557a59d5487e1bfd82f8e"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, c.charge_id, c.state, c.idempotency_key FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = \"pending\" ORDER BY b.booking_id"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

@@ -1,0 +1,211 @@
+{
+ "actions": [
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, b.amount_cents, c.charge_id, c.captured_at FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status IN (\"pending\", \"confirmed\") ORDER BY b.created_at DESC LIMIT 20"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE name IN (\"bookings\", \"charges\", \"holds\") ORDER BY name"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, b.amount_cents, COUNT(c.charge_id) as charge_count FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = \"pending\" GROUP BY b.booking_id ORDER BY b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, booking_id, status, attempts FROM outbox WHERE status = \"pending\" ORDER BY event_id"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id, c.idempotency_key, c.state, b.status FROM charges c JOIN bookings b ON c.booking_id = b.booking_id WHERE b.status = \"pending\" ORDER BY c.charge_id"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_2235753e721c50179e909c0ea1d8984a",
+    "existing_charge_id": "chg_2c56202e22ac5517a5b08e11038a4da0"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_75cca6cdfc185fc982739a55b70b8593",
+    "existing_charge_id": "chg_3081d0d186d45a6a98b93a3f107dd00b"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_3151dbaa873c5b06991215cd495f057b",
+    "existing_charge_id": "chg_35e1e41c9db25406b78b29c3ab33d6c3"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d306da59487555ae868bde17fbf0ad7c",
+    "existing_charge_id": "chg_496bd11530465181a5da9c05fe58f662"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_021064165ac4575ba5f60a939dbfb5a1",
+    "existing_charge_id": "chg_695b6d3ba67a53359b1b8077a24bf6b8"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_669ea26a7bbe55049b92802dac2465f2",
+    "existing_charge_id": "chg_896f0ff69fb0518f96ca70dad2a0cbb0"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_2bb646844bfe590aa530a6527817238f",
+    "existing_charge_id": "chg_90b4d5757e035306a1a5d48466ba76de"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_73538347fe5d583f883e911e3ca98347",
+    "existing_charge_id": "chg_9521274dc5005c9f89f728521a46cf22"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_965e14dbd17a598eb83406c68aecde1c",
+    "existing_charge_id": "chg_b4db8680b2d15f90b88a3570caa2da41"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_56bd24fc3c405f20939feee5010da7c2",
+    "existing_charge_id": "chg_c01de35595855646b0089b83597f96d6"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, booking_id, payload FROM outbox WHERE event_id = \"evt_00000392_bkg_efbeba3e421056ea82420026bbd3a028\""
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000392_bkg_efbeba3e421056ea82420026bbd3a028"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, booking_id, payload FROM outbox WHERE event_id = \"evt_00000394_bkg_399ff522185e57e0a8f09b05435898f0\""
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000394_bkg_399ff522185e57e0a8f09b05435898f0"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 5000
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000395_bkg_efbeba3e421056ea82420026bbd3a028"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

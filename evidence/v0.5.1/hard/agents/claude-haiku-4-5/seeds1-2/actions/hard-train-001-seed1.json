@@ -1,0 +1,132 @@
+{
+ "actions": [
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, status, attempts, payload FROM outbox ORDER BY event_id;"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, status, attempts, payload FROM outbox WHERE status IN (pending, quarantined) ORDER BY event_id;"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, status, attempts, payload FROM outbox WHERE status = \"pending\" OR status = \"quarantined\" ORDER BY event_id;"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as total, COUNT(DISTINCT client_reference) as unique_refs FROM bookings WHERE status = \"confirmed\";"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, client_reference, status FROM bookings WHERE status = \"confirmed\" LIMIT 5;"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, COUNT(c.charge_id) as charge_count FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = \"confirmed\" GROUP BY b.booking_id HAVING charge_count > 0 LIMIT 5;"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT f.flight_id, f.capacity, COUNT(h.hold_id) as hold_count FROM flights f LEFT JOIN holds h ON f.flight_id = h.flight_id GROUP BY f.flight_id HAVING hold_count > f.capacity;"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name=\"holds\";"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT f.flight_id, f.capacity, COUNT(h.booking_id) as hold_count FROM flights f LEFT JOIN holds h ON f.flight_id = h.flight_id GROUP BY f.flight_id HAVING hold_count > f.capacity;"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT charge_id FROM charges WHERE booking_id NOT IN (SELECT booking_id FROM bookings);"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, COUNT(*) as charge_count FROM charges WHERE status = \"captured\" GROUP BY booking_id HAVING charge_count > 1;"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name=\"charges\";"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, COUNT(*) as charge_count FROM charges WHERE state = \"captured\" GROUP BY booking_id HAVING charge_count > 1;"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = \"confirmed\" AND (c.booking_id IS NULL OR c.state != \"captured\");"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id FROM bookings b LEFT JOIN holds h ON b.booking_id = h.booking_id LEFT JOIN checkins ck ON b.booking_id = ck.booking_id WHERE b.status = \"confirmed\" AND (h.booking_id IS NULL OR ck.booking_id IS NULL);"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

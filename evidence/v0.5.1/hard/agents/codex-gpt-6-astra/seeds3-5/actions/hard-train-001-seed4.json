@@ -1,0 +1,56 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type = \"table\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.*, (SELECT json_group_array(json_object('charge_id',c.charge_id,'key',c.idempotency_key,'amount',c.amount_cents,'state',c.state,'step',c.created_step)) FROM charges c WHERE c.booking_id=b.booking_id) charges, (SELECT json_group_array(json_object('kind',e.kind,'step',e.step)) FROM customer_events e WHERE e.request_id=b.request_id) customer_events, (SELECT json_group_array(json_object('event_id',o.event_id,'payload',o.payload,'status',o.status,'attempts',o.attempts)) FROM outbox o WHERE o.booking_id=b.booking_id) outbox, (SELECT json_group_array(json_object('booking_id',b2.booking_id,'request_id',b2.request_id,'status',b2.status)) FROM bookings b2 WHERE b2.client_reference=b.client_reference AND b2.booking_id<>b.booking_id) related_bookings FROM bookings b WHERE b.status<>'confirmed'"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e0a5a1592ec158468cab363678e98b27"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_716600e68c535a38a0f490a2a0a342e7"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'customer_event' kind, json_object('event_id',event_id,'request_id',request_id,'kind',kind,'step',step) data FROM customer_events UNION ALL SELECT 'config',json_object('service',service,'value',json(value)) FROM service_config UNION ALL SELECT 'duplicate_booking',json_object('booking_id',b.booking_id,'request_id',b.request_id,'status',b.status,'flight_id',b.flight_id,'passenger_id',b.passenger_id,'client_reference',b.client_reference,'amount_cents',b.amount_cents,'charge_id',c.charge_id,'charge_state',c.state,'charge_key',c.idempotency_key) FROM bookings b LEFT JOIN charges c ON c.booking_id=b.booking_id WHERE b.client_reference IS NOT NULL UNION ALL SELECT 'pending_outbox',json_object('event_id',event_id,'booking_id',booking_id,'payload',payload,'attempts',attempts) FROM outbox WHERE status='pending'"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_6817a1631a56506aa49e442d7bbb7e6f"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

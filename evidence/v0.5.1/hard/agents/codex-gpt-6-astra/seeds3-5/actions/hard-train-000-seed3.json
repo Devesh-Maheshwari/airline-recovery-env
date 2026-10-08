@@ -1,0 +1,42 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type = 'table'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT service AS kind, value AS data FROM service_config UNION ALL SELECT key, value FROM cache UNION ALL SELECT flight_id, json_object('capacity',capacity,'price',price_cents,'version',version) FROM flights UNION ALL SELECT 'fare_hold',json_object('id',hold_id,'flight',flight_id,'price',price_cents,'until',until_step) FROM fare_holds UNION ALL SELECT 'pending_booking',json_object('id',booking_id,'request',request_id,'flight',flight_id,'amount',amount_cents) FROM bookings WHERE status='pending' UNION ALL SELECT 'pending_event',json_object('id',event_id,'payload',payload,'attempts',attempts) FROM outbox WHERE status='pending'"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT service AS kind, value AS data FROM service_config UNION ALL SELECT key, value FROM cache UNION ALL SELECT flight_id, json_object('capacity',capacity,'price',price_cents,'version',version) FROM flights UNION ALL SELECT 'fare_hold',json_object('id',hold_id,'flight',flight_id,'price',price_cents,'until',until_step) FROM fare_holds UNION ALL SELECT 'pending_booking',json_object('id',booking_id,'request',request_id,'flight',flight_id,'amount',amount_cents) FROM bookings WHERE status='pending' UNION ALL SELECT 'pending_event',json_object('id',event_id,'payload',payload,'attempts',attempts) FROM outbox WHERE status='pending'"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

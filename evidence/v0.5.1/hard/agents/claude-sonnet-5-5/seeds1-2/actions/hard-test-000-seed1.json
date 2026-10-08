@@ -1,0 +1,113 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.*, (select group_concat(charge_id||\":\"||idempotency_key||\":\"||amount_cents) from charges c where c.booking_id=b.booking_id) ch from bookings b"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 3000
+    }
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_96f08129fcb0564cb9d6c7a611a13861"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select group_concat(status) from charges c where c.booking_id=b.booking_id) ch from bookings b"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select sql from sqlite_master where name in (\"charges\",\"outbox\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,c.charge_id,c.state,c.idempotency_key,c.created_step from bookings b left join charges c on c.booking_id=b.booking_id where b.status<>\"confirmed\" or c.state<>\"captured\""
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_fcdabde2df6d52c8a742183684ff8417"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_f0195d778ea85293b8b8bbe88502edd2"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_7bbd5110f15c5267a7d4a0b60b54df2c"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_1c46c92507cf5c5bab01cefe1de07a99"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8290697b0011526eb5cce7959bf29c83"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_6fec1976d0aa5a3e8af14fa602730702"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,c.state,c.created_step,(select count(*) from outbox where status=\"pending\") op from bookings b left join charges c on c.booking_id=b.booking_id where b.status<>\"confirmed\" or c.state<>\"captured\""
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_96f08129fcb0564cb9d6c7a611a13861"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_d66c8978e5365ebeb57e26da9520011a"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

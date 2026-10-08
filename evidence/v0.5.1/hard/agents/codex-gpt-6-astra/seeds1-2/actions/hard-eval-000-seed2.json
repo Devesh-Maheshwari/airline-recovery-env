@@ -1,0 +1,46 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type = 'table'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'config' AS kind, service AS id, value AS data FROM service_config\nUNION ALL SELECT 'outbox', event_id, json_object('booking',booking_id,'payload',payload,'status',status,'attempts',attempts) FROM outbox\nUNION ALL SELECT 'booking', booking_id, json_object('request',request_id,'flight',flight_id,'passenger',passenger_id,'amount',amount_cents,'status',status,'reference',client_reference) FROM bookings\nUNION ALL SELECT 'charge',charge_id,json_object('booking',booking_id,'key',idempotency_key,'amount',amount_cents,'state',state,'step',created_step) FROM charges\nUNION ALL SELECT 'cache',key,value FROM cache\nUNION ALL SELECT 'fare_hold',hold_id,json_object('flight',flight_id,'price',price_cents,'until',until_step) FROM fare_holds\nUNION ALL SELECT 'customer_event',event_id,json_object('request',request_id,'kind',kind,'step',step) FROM customer_events\nUNION ALL SELECT 'flight',flight_id,json_object('capacity',capacity,'price',price_cents,'version',version) FROM flights"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_520e55500dad556b854fa6c223a7d86f"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000005_bkg_f9729980bf955edbbfd0204415d2dda1"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000006_bkg_520e55500dad556b854fa6c223a7d86f"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

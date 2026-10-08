@@ -1,0 +1,200 @@
+{
+ "actions": [
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "inventory",
+    "values": {
+     "enforce_capacity": false
+    }
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, request_id, flight_id, passenger_id, status, amount_cents, idempotency_key FROM bookings WHERE status = 'pending'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, request_id, flight_id, passenger_id, status, amount_cents FROM bookings WHERE status = 'pending'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT charge_id, booking_id, amount_cents, status FROM charges"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT charge_id, booking_id, amount_cents FROM charges"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT charge_id, booking_id FROM charges WHERE booking_id IN ('bkg_704248b0b9a9572e9609c2f0b6d03f92', 'bkg_5bfc27c255df58909ebfa1132a24492a', 'bkg_4eca5f37d55e571ca69ba40f43626ca5', 'bkg_321642807c1e5e699079193a1d033c92', 'bkg_14412b8043585e739db1f31bbc3f2190', 'bkg_3ef11f204a045c3dade9280dd61766b6', 'bkg_3468ec36e7e858bab9ba81b4b3862e71')"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_14412b8043585e739db1f31bbc3f2190",
+    "existing_charge_id": "chg_dc2b888deee55fc6b67150f501c1ecbf"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_3468ec36e7e858bab9ba81b4b3862e71",
+    "existing_charge_id": "chg_ce744a284f4150e98ec75b142b733122"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_3ef11f204a045c3dade9280dd61766b6",
+    "existing_charge_id": "chg_919bf6a7b6775059922488b646d9b19a"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_5bfc27c255df58909ebfa1132a24492a",
+    "existing_charge_id": "chg_ad53e2d2bec65b399f8d397f9d4af7ea"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT charge_id, booking_id, amount_cents FROM charges WHERE charge_id = 'chg_ad53e2d2bec65b399f8d397f9d4af7ea'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*), booking_id FROM charges WHERE booking_id = 'bkg_5bfc27c255df58909ebfa1132a24492a' GROUP BY booking_id"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_5bfc27c255df58909ebfa1132a24492a"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_704248b0b9a9572e9609c2f0b6d03f92"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_4eca5f37d55e571ca69ba40f43626ca5"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_321642807c1e5e699079193a1d033c92"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "accepted_schema": 2
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT hold_id, booking_id, flight_id, fare_cents, status FROM fare_holds"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT hold_id, flight_id, fare_cents FROM fare_holds"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM fare_holds LIMIT 1"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

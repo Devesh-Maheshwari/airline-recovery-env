@@ -1,0 +1,41 @@
+{
+ "num_turns": 14,
+ "result": "Perfect! The airline recovery was successful! \ud83c\udf89\n\n**Final Score: 0.952 / 1.0**\n\n**Recovery Summary:**\n- **Root Cause**: Pricing service HTTP worker was unavailable, causing booking requests to fail with 503 errors\n- **Solution**: Restarted the pricing service, which allowed all queued bookings to process successfully\n- **Result**: All customer requests recovered with correct outcomes\n\n**Key Metrics:**\n- \u2705 **100% Availability** in final traffic windows\n- \u2705 **Zero Integrity Violations** - all graded invariants passed\n- \u2705 **100% Incident Recovery** - all 29 required customer requests completed correctly\n- \u2705 **Verified** - 2 healthy probes confirmed system stability\n- \u2705 **Full Revenue Retention** - no refunds needed\n- \u2705 **31 Confirmed Bookings** with matching holds and charges\n\n**Efficiency:**\n- **Actions Used**: 12 / 32 budget\n- **Mutations**: 1 (pricing service restart)\n- **Cost**: 0.022 (minimal cost penalty of 0.048)\n- **Safety Check**: Passed all hazard tests\n\nThe fix was straightforward: restarting the pricing service cleared the cascade failure that was preventing new bookings. The system then automatically recovered all pending requests during the traffic generation cycles.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.09520590000000001,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 19303,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 19303,
+  "cache_read_input_tokens": 317569,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 113,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 1965,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 1965,
+    "cache_read_input_tokens": 28544,
+    "input_tokens": 8,
+    "output_tokens": 817,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 4946,
+  "output_tokens_details": {
+   "thinking_tokens": 2449
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

@@ -1,0 +1,41 @@
+{
+ "num_turns": 21,
+ "result": "The episode is over and the signed receipt is stored, but the final reward is 0.0 because I caused an integrity violation.\n\n**What I got wrong:** `bkg_c7065a3bb48d51919be46f8d860e5626` now has two captured charges, which breaks the duplicate-charge rule. It already had a captured `booking-v2:` charge from step -48. That was older than the 47-step idempotency window. When I reconciled it with the default key, the provider treated the key as new and captured a second time. I should have used `existing_charge_id` for that booking, or checked the provider first with `provider_lookup`. I never used a lookup, and I had 4 available.\n\n**What went right:** I reconciled all four pending bookings, so all of them ended up confirmed with a hold and a check-in. The outbox was clear and no requests were abandoned.\n\n**Why the probes failed:** All three probes came back unhealthy with the backlog incomplete, so no verification windows counted. Booking logs showed traffic succeeding after the reconciles. The duplicate charge is my best guess for the cause, but I didn't confirm it.\n\n**What I couldn't fix:** There is no tool to refund a confirmed booking, and `void_booking` rejects confirmed ones, so I couldn't undo the duplicate. I chose to finish rather than spend more actions on it.\n\nThe episode used 17 of 32 steps and 4 mutations.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.20210419999999998,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 19994,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 19994,
+  "cache_read_input_tokens": 392891,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 40,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 188,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 188,
+    "cache_read_input_tokens": 25763,
+    "input_tokens": 2,
+    "output_tokens": 459,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 4347,
+  "output_tokens_details": {
+   "thinking_tokens": 969
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

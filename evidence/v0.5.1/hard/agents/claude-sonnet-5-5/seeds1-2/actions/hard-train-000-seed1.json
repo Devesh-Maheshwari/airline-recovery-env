@@ -1,0 +1,169 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from bookings"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select sql from sqlite_master where name in (\"charges\",\"holds\",\"flights\",\"outbox\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id, b.status, b.flight_id, (select group_concat(state||\":\"||idempotency_key||\":\"||charge_id) from charges c where c.booking_id=b.booking_id) ch, (select count(*) from holds h where h.booking_id=b.booking_id) h from bookings b where status=\"pending\" union all select flight_id, capacity, price_cents, (select count(*) from holds h where h.flight_id=f.flight_id),0 from flights f"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_402581582e6553d98798fa5ca0fc9bbb"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_dbfcddd03e9051879d78735fedb76642",
+    "existing_charge_id": "chg_3e2dce91e1d85e8faa96afe87d271eed"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_7ec6bb2a6b2f5be8a60e57f50b602950"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_a78f046a71445bd191937c473400de0f"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_402581582e6553d98798fa5ca0fc9bbb"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select count(*) from checkins k where k.booking_id=b.booking_id) k,(select group_concat(status) from outbox o where o.booking_id=b.booking_id) o,(select group_concat(state) from charges c where c.booking_id=b.booking_id) c from bookings b where b.confirmed_at is null or b.status<>\"confirmed\" or h=0 or k=0 or o is null"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from customer_events"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,path,status,duration_ms,message from request_logs where status>=400 order by rowid desc limit 12"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,path,status,round(duration_ms) d,message from request_logs where status>=500 or (status>=400 and message not like \"%sold out%\") order by rowid desc limit 10"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select o.status,o.attempts,o.payload from outbox o order by rowid desc limit 3"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select state,count(*) from charges group by state"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.flight_id,b.status,b.client_reference,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select count(*) from checkins k where k.booking_id=b.booking_id) k,(select group_concat(state) from charges c where c.booking_id=b.booking_id) c,(select group_concat(status) from outbox o where o.booking_id=b.booking_id) o from bookings b order by rowid desc limit 12"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from customer_events"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,method,path,status,message from request_logs order by rowid desc limit 14"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select \"orphan\" k, charge_id x, booking_id y from charges where booking_id not in (select booking_id from bookings) union all select \"dup\", booking_id, count(*) from charges where state=\"captured\" group by booking_id having count(*)>1 union all select \"amt\", c.booking_id, c.amount_cents||\"/\"||b.amount_cents from charges c join bookings b using(booking_id) where c.amount_cents<>b.amount_cents union all select \"refund\", booking_id, amount_cents from refunds union all select \"holdsF\", flight_id, count(*) from holds group by flight_id union all select \"unfunded\", booking_id, status from bookings b where status=\"confirmed\" and (select count(*) from charges c where c.booking_id=b.booking_id and state=\"captured\")<>1 union all select \"pend\", event_id, status from outbox where status<>\"delivered\""
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

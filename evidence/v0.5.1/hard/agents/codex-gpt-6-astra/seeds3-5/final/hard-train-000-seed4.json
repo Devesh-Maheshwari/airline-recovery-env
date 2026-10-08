@@ -1,0 +1,3 @@
+{
+ "result": "Recovered successfully in 9 of 32 actions. Score: **0.912**.\n\nAll 27 required requests reached their correct outcomes. Both verification probes and the final safety check passed, with zero integrity violations or abandoned requests.\n\nSigned receipt saved in `episode.json`."
+}

@@ -1,0 +1,69 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_idempotency_enabled": false
+    }
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as booking_count, SUM(CASE WHEN status='confirmed' THEN 1 ELSE 0 END) as confirmed FROM bookings;"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, COUNT(c.charge_id) as charge_count, COUNT(h.hold_id) as hold_count FROM bookings b LEFT JOIN charges c ON b.booking_id=c.booking_id LEFT JOIN holds h ON b.booking_id=h.booking_id GROUP BY b.booking_id;"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type='table';"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, COUNT(DISTINCT c.charge_id) as charge_count, CASE WHEN h.booking_id IS NOT NULL THEN 1 ELSE 0 END as has_hold FROM bookings b LEFT JOIN charges c ON b.booking_id=c.booking_id LEFT JOIN holds h ON b.booking_id=h.booking_id GROUP BY b.booking_id, h.booking_id ORDER BY b.booking_id;"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as pending_count FROM provider_ledger WHERE state = 'pending';"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT state, COUNT(*) as count FROM charges GROUP BY state;"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

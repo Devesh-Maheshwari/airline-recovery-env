@@ -1,0 +1,41 @@
+{
+ "num_turns": 32,
+ "result": "The episode ended with a reward of 0. The receipt reports an integrity violation: `duplicate_sale:CR-4ee4a4cb34dd`. That means two confirmed bookings shared one `client_reference`.\n\nI didn't check for it, and I handled one of the six pending bookings wrongly. The receipt's `trap_outcomes` lists `duplicate_completed: 1` and `duplicate_voided: 0`. One of the six pending bookings was almost certainly a duplicate of an existing confirmed sale. I should have voided it. Instead I reconciled all six, which confirmed it. I never queried `client_reference`, so I didn't catch it.\n\nWhat went well:\n- **Recovery:** all 71 required requests completed, with no pending bookings and no abandoned requests. Availability, recovery and revenue retained were all 1.0.\n- **The six pending bookings:** these were accepted bookings with uncertain payments after 504 timeouts. I reconciled them with their stored keys, or with `existing_charge_id` for the one already captured.\n- **Charges:** there were no duplicate captures, no orphan charges and no excess captures.\n\nWhat went wrong besides the duplicate:\n- **Probes:** every probe came back unhealthy, so `verified` is false and the post-finish safety check never ran. I couldn't see why they failed. The duplicate sale is the most likely cause, but I didn't confirm that.\n- **Wasted actions:** I burned several actions on broken multi-command bash calls and on diagnostic reads. Each `control.py` call counted as an action, so I had little budget left to react.\n- **Config change:** I raised `booking.payment_timeout_ms` from 200 to 2000 on a guess. It didn't help, and it counted as a mutation.\n- **Cost penalty:** 0.222.\n\nThe episode is finished and can't be reopened, so none of this can be undone.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.3220906,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 29507,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 29507,
+  "cache_read_input_tokens": 673103,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 56,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 2610,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 2610,
+    "cache_read_input_tokens": 32840,
+    "input_tokens": 2,
+    "output_tokens": 622,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 6933,
+  "output_tokens_details": {
+   "thinking_tokens": 1801
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

@@ -1,0 +1,41 @@
+{
+ "num_turns": 40,
+ "result": "The episode is finished and the receipt is stored, but the run was only a partial recovery. I never got a healthy probe, so I got none of the 0.15 verification credit. The cost penalty also hit its 0.25 cap, and 24 requests were abandoned, so revenue retained was 0.586. I didn't capture the final score, and my follow-up check printed a reward of 0.0, which I can't interpret.\n\n**What I fixed**\n- **Payment timeouts:**\n  - I raised the booking `payment_timeout_ms` from 200 to 2000.\n  - Reconciling the five bookings with stuck \"submitted\" charges then confirmed all of them. One returned a 504 (payment still pending at the provider) and succeeded on retry.\n- **Duplicate sale:** two pending bookings shared one `client_reference`. I voided one (refunded 20,000 cents) and confirmed the other against its existing captured charge.\n- **Event backlog:**\n  - I quarantined four malformed events: one with a truncated payload, one missing a passenger, and two whose payload booking ID didn't match the event's booking.\n  - I then enabled the check-in consumer, set `auto_pause_after_attempts` to 0, and replayed the rest, including one valid event in a legacy format.\n  - Afterwards there were 0 pending bookings and 0 pending events.\n- **Stale quotes:** I invalidated the pricing cache. The cache then matched the flights table.\n- **Deliberately left alone:** the inventory alert told me to disable `enforce_capacity`. I kept it on, since turning it off would risk overselling.\n\n**What went wrong**\n- All four probes reported unhealthy.\n- My last two probes came after the cache invalidation and were still unhealthy. I didn't find out why before the budget ran out.\n- The last booking logs I read still showed stale-quote 409s, plus the expected sold-out rejection.\n- I used about 24 of the 34 actions on recovery before the first probe, which left too little room to diagnose and then get two verification windows.\n\nThe receipt is in `episode.json`.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.3030294,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 26794,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 26794,
+  "cache_read_input_tokens": 634227,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 54,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 192,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 192,
+    "cache_read_input_tokens": 32545,
+    "input_tokens": 2,
+    "output_tokens": 684,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 6890,
+  "output_tokens_details": {
+   "thinking_tokens": 1370
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

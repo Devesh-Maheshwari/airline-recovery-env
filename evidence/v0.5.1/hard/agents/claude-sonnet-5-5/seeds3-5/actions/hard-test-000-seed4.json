@@ -1,0 +1,139 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,b.client_reference,b.request_id,(select group_concat(charge_id||\":\"||idempotency_key) from charges c where c.booking_id=b.booking_id) ch from bookings b"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select c.booking_id,c.status,c.amount_cents,c.idempotency_key,b.status bs,b.amount_cents ba,(select count(*) from holds h where h.booking_id=c.booking_id) hold from charges c left join bookings b using(booking_id) where b.status=\"pending\" or b.client_reference is not null"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select name,sql from sqlite_master where name in (\"charges\",\"holds\",\"bookings\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select substr(c.booking_id,5,6) b,c.state,c.amount_cents,b.status bs,b.amount_cents ba,b.client_reference cr,(select count(*) from holds h where h.booking_id=c.booking_id) hold from charges c left join bookings b using(booking_id) where b.status<>\"confirmed\" or b.client_reference is not null"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_01326f553f4756a6891221dcc7cb0637"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_096ec6887b395f58b8c96f5d7c53f3b1"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_59ea1ff4adfa50fba9fb6b5d447d290d"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_b46940847428560da646dd96594988ae"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_737557d991e45ae0a771641dce059901"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_0d3bfc963fd65dc9b61a13a085e98cee"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_4bec69c4513b5acdac443c58c8ec46a3"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select substr(b.booking_id,5,6) b,b.status,c.state,(select count(*) from outbox where status=\"pending\") op from bookings b join charges c using(booking_id) where b.status<>\"confirmed\""
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_737557d991e45ae0a771641dce059901"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_4bec69c4513b5acdac443c58c8ec46a3"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_737557d991e45ae0a771641dce059901"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select charge_id from charges where booking_id=\"bkg_737557d991e45ae0a771641dce059901\""
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_737557d991e45ae0a771641dce059901",
+    "existing_charge_id": "chg_8ad651b64cd3566a8e723de716769b19"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_4bec69c4513b5acdac443c58c8ec46a3"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_4bec69c4513b5acdac443c58c8ec46a3"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

@@ -1,0 +1,167 @@
+{
+ "actions": [
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.id, b.status, b.flight_id, b.passenger_id, b.amount_cents, COUNT(DISTINCT c.id) as charge_count FROM bookings b LEFT JOIN charges c ON b.id = c.booking_id GROUP BY b.id ORDER BY b.id DESC LIMIT 20"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, COUNT(c.charge_id) as charge_count FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = \"pending\" GROUP BY b.booking_id ORDER BY b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, c.charge_id, c.state, pl.state as provider_state FROM bookings b JOIN charges c ON b.booking_id = c.booking_id LEFT JOIN provider_ledger pl ON c.idempotency_key = pl.idempotency_key WHERE b.status = \"pending\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, c.charge_id, c.state, c.idempotency_key FROM bookings b JOIN charges c ON b.booking_id = c.booking_id WHERE b.status = \"pending\""
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_cc940512059c5a42ac9cce487f14153f"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_f340763b7ab15de98336f5c4708e1321"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 1000
+    }
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_cc940512059c5a42ac9cce487f14153f"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM provider_plan WHERE idempotency_key IN (\"booking:bkg_cc940512059c5a42ac9cce487f14153f\", \"booking:bkg_f340763b7ab15de98336f5c4708e1321\", \"booking:bkg_ee670a97e272514fadcdd6b38a600aea\", \"booking:bkg_b12c8083bbde53b285955de472bcf3f7\", \"booking:bkg_ce57efa328c85db6be94267d8af126ff\")"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, charge_id, state, idempotency_key FROM charges WHERE booking_id IN (\"bkg_cc940512059c5a42ac9cce487f14153f\", \"bkg_f340763b7ab15de98336f5c4708e1321\", \"bkg_ee670a97e272514fadcdd6b38a600aea\", \"bkg_b12c8083bbde53b285955de472bcf3f7\", \"bkg_ce57efa328c85db6be94267d8af126ff\")"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_cc940512059c5a42ac9cce487f14153f"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_f340763b7ab15de98336f5c4708e1321"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_ee670a97e272514fadcdd6b38a600aea"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_b12c8083bbde53b285955de472bcf3f7"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_ce57efa328c85db6be94267d8af126ff"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_f340763b7ab15de98336f5c4708e1321"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

@@ -1,0 +1,41 @@
+{
+ "num_turns": 38,
+ "result": "The episode is complete. Here's the summary:\n\n**Final Score: 0.183 (18.3% of maximum)**\n\n**What succeeded:**\n- \u2713 Integrity: No integrity violations\n- \u2713 Availability: All traffic windows successful\n- \u2713 Revenue: 100% retained (no abandoned requests)\n- \u2713 Horizon complete with all incidents injected\n\n**What failed:**\n- \u2717 Recovery: Only 12/72 required requests completed (16.7%)\n- \u2717 Verification: Failed to establish 2 healthy verification windows\n- \u2717 7 pending bookings remained unresolved\n- \u2717 60 customer requests left incomplete\n\n**Critical mistakes made:**\n1. **Payment service restart** (step 10) - Generated massive traffic instead of fixing the underlying timeout issue\n2. **Schema mismatch** - Didn't catch that checkin service was rejecting schema_version 2 events until too late\n3. **Traffic amplification** - Each action generated 2 traffic cycles, so recovery attempts made things worse\n4. **Reconcile/void attempts** - Tools didn't work on pending bookings as expected, wasting actions\n\n**Better approach would have been:**\n1. Diagnose payment service timeout carefully before restarting\n2. Fix the checkin schema configuration immediately upon detecting the mismatch in logs\n3. Systematically deliver outbox events once the schema was fixed\n4. Minimize actions that generate customer traffic when in recovery mode\n5. Establish verification windows by taking read-only probes after stabilizing\n\nThe episode has been signed and recorded. The low recovery rate was due to the cascade of failures from the initial payment timeout and poor recovery decisions.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.2500666,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 34491,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 34491,
+  "cache_read_input_tokens": 1074346,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 305,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 5153,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 5153,
+    "cache_read_input_tokens": 40544,
+    "input_tokens": 8,
+    "output_tokens": 906,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 14669,
+  "output_tokens_details": {
+   "thinking_tokens": 6742
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

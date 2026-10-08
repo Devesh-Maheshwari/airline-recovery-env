@@ -1,0 +1,41 @@
+{
+ "num_turns": 38,
+ "result": "## Recovery Summary\n\nThe episode has completed with a **final score of 0.0**, which indicates failure despite significant progress in system recovery. Here's the analysis:\n\n### What Succeeded:\n- **Availability: 1.0** - System was fully available in the last three traffic windows\n- **Recovery Rate: 89%** - Most customer requests were recovered (65/73 completed)\n- **Event Delivery: 100%** - All outbox events successfully delivered to checkin\n- **Booking Confirmations: 66** confirmed + 1 cancelled\n\n### Root Causes of Failure:\n1. **Integrity Violation**: Duplicate sale detected (`duplicate_sale:CR-7a3349c0ccc1`) - two bookings share the same client reference, violating the episode contract\n2. **Failed Verification**: Could not achieve 2 healthy verification probes at step 6+, despite the system being functionally recovered\n3. **Incomplete Recovery**: 8 customer requests remain incomplete, 7 bookings stuck in pending state\n\n### Key Actions Taken:\n1. Increased booking `payment_timeout_ms` from 200ms to 5000ms (fixed payment capture timeouts)\n2. Enabled checkin consumer service\n3. Updated checkin `accepted_schema` to version 2\n4. Cleared stale pricing cache (recovered 8 additional confirmed bookings)\n5. Reconciled 5 pending bookings with captured charges\n6. Quarantined 1 problematic outbox event\n7. Voided 1 booking with declined payment\n\n### Lessons Learned:\n- The duplicate sale violation might have been introduced during booking reconciliation or was a pre-existing data integrity issue\n- With the 36-action budget and complex pending booking states, full verification wasn't achievable\n- The system's health checks were stricter than just functional recovery\n\nThe recovery effort successfully restored core system functionality (89% request recovery, 100% availability), but the integrity violation and lack of verification resulted in a zero score per the episode contract.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.2965747000000001,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 49740,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 49740,
+  "cache_read_input_tokens": 1423347,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 305,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 2298,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 2298,
+    "cache_read_input_tokens": 57108,
+    "input_tokens": 8,
+    "output_tokens": 1022,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 10891,
+  "output_tokens_details": {
+   "thinking_tokens": 4278
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

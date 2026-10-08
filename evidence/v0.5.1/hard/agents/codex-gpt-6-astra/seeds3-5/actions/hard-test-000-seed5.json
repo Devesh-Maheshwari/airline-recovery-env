@@ -1,0 +1,50 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type = 'table'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'config' AS kind, service AS id, value AS data FROM service_config UNION ALL SELECT 'outbox',o.event_id,json_object('booking_id',o.booking_id,'payload',json(o.payload),'status',o.status,'attempts',o.attempts,'booking_status',b.status,'flight',b.flight_id,'passenger',b.passenger_id) FROM outbox o LEFT JOIN bookings b ON b.booking_id=o.booking_id WHERE o.status='pending' UNION ALL SELECT 'flight',flight_id,json_object('capacity',capacity,'price',price_cents,'version',version) FROM flights UNION ALL SELECT 'cache',key,value FROM cache UNION ALL SELECT 'pending',booking_id,json_object('request_id',request_id,'flight',flight_id,'passenger',passenger_id,'amount',amount_cents,'status',status,'client_reference',client_reference) FROM bookings WHERE status<>'confirmed' UNION ALL SELECT 'cancel',event_id,json_object('request_id',request_id,'step',step) FROM customer_events UNION ALL SELECT 'fare_hold',hold_id,json_object('flight',flight_id,'price',price_cents,'until',until_step) FROM fare_holds"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_8da497f02b76578f9a778ede8166a125"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "batch_size": 50,
+     "accepted_schema": 2,
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

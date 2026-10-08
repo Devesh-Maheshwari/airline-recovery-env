@@ -1,0 +1,41 @@
+{
+ "num_turns": 7,
+ "result": "The episode is finished and the sidecar issued a signed receipt. The output I saw was cut off, so I didn't see the final reward number. It did show 0 abandoned requests, revenue retained at 1.0, a cost penalty of 0.068 and the horizon complete.\n\n**What was wrong:** the check-in consumer was disabled, and outbox event 4 had a truncated, corrupt payload. That event was a duplicate of booking `bkg_4ea939\u2026`, which already had a delivered event and a check-in.\n\n**What I did:**\n1. Queried the outbox and the config (2 reads).\n2. Quarantined the corrupt event.\n3. Turned the check-in consumer back on. It then delivered the rest of the backlog on its own, so the follow-up replay found nothing left to do.\n4. Ran two probes, both healthy, so verification reached 2 windows.\n5. Called finish.\n\nAt the last summary I saw (before the probes), all 15 bookings were confirmed with 15 check-ins and no pending events. I made no payment, pricing or booking config changes and used no provider lookups.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.08687900000000001,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 13088,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 13088,
+  "cache_read_input_tokens": 99545,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 14,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 538,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 538,
+    "cache_read_input_tokens": 18493,
+    "input_tokens": 2,
+    "output_tokens": 357,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 1459,
+  "output_tokens_details": {
+   "thinking_tokens": 232
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

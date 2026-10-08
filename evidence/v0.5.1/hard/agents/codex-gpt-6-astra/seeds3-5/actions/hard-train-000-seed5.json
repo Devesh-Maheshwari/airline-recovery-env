@@ -1,0 +1,165 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type = \"table\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT json_object(\"config\",(SELECT json_group_array(json_object(\"service\",service,\"value\",json(value))) FROM service_config),\"bookings\",(SELECT json_group_array(json_object(\"id\",booking_id,\"req\",request_id,\"flight\",flight_id,\"pax\",passenger_id,\"amount\",amount_cents,\"status\",status,\"ref\",client_reference)) FROM bookings),\"charges\",(SELECT json_group_array(json_object(\"id\",charge_id,\"booking\",booking_id,\"key\",idempotency_key,\"amount\",amount_cents,\"state\",state,\"step\",created_step)) FROM charges),\"events\",(SELECT json_group_array(json_object(\"request\",request_id,\"kind\",kind,\"step\",step)) FROM customer_events),\"outbox\",(SELECT json_group_array(json_object(\"id\",event_id,\"booking\",booking_id,\"payload\",payload,\"status\",status)) FROM outbox),\"fares\",(SELECT json_group_array(json_object(\"flight\",flight_id,\"price\",price_cents,\"version\",version,\"capacity\",capacity)) FROM flights),\"cache\",(SELECT json_group_array(json_object(\"key\",key,\"value\",value)) FROM cache),\"fare_holds\",(SELECT json_group_array(json_object(\"flight\",flight_id,\"price\",price_cents,\"until\",until_step)) FROM fare_holds)) AS state"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT json_object('config',(SELECT json_group_array(json_object('service',service,'value',json(value))) FROM service_config),'bookings',(SELECT json_group_array(json_object('id',booking_id,'req',request_id,'flight',flight_id,'pax',passenger_id,'amount',amount_cents,'status',status,'ref',client_reference)) FROM bookings),'charges',(SELECT json_group_array(json_object('id',charge_id,'booking',booking_id,'key',idempotency_key,'amount',amount_cents,'state',state,'step',created_step)) FROM charges),'events',(SELECT json_group_array(json_object('request',request_id,'kind',kind,'step',step)) FROM customer_events),'outbox',(SELECT json_group_array(json_object('id',event_id,'booking',booking_id,'payload',payload,'status',status)) FROM outbox),'fares',(SELECT json_group_array(json_object('flight',flight_id,'price',price_cents,'version',version,'capacity',capacity)) FROM flights),'cache',(SELECT json_group_array(json_object('key',key,'value',value)) FROM cache),'fare_holds',(SELECT json_group_array(json_object('flight',flight_id,'price',price_cents,'until',until_step)) FROM fare_holds)) AS state"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 2000,
+     "payment_idempotency_enabled": true,
+     "payment_key_version": 1,
+     "validate_price": true
+    }
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_c2032853918b5af6bcc8469520e335e5"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_a78c03c2d81b5af78cd8fd93fd2f28e9"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_e535736dbef351abb45f00e6b0a6e5f2"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_ca1a5938eaef53b6bf8b54360c578987"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id,b.request_id,b.status,b.flight_id,b.amount_cents,b.client_reference,c.charge_id,c.idempotency_key,c.state,c.created_step,e.kind,e.step AS cancel_step FROM bookings b LEFT JOIN charges c ON c.booking_id=b.booking_id LEFT JOIN customer_events e ON e.request_id=b.request_id WHERE b.status='pending' ORDER BY c.created_step,b.booking_id"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_a78c03c2d81b5af78cd8fd93fd2f28e9",
+    "idempotency_key": "recovery:bkg_a78c03c2d81b5af78cd8fd93fd2f28e9"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8b01c78347365955ae6fce549f9233dd",
+    "existing_charge_id": "chg_a2d1fc45aa345afead927d84f71ccf82"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8fc950b1686a50368cf87dac7f3a78ac",
+    "existing_charge_id": "chg_256f47ac841c588eb1745c270a7868ee"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_0c8fd5b853ad583a96c7a01bc17d1679",
+    "existing_charge_id": "chg_dada75fc185c5387960efc901d2e1b5e"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_278306fdb85e5a14b9bf5a409ffd520e",
+    "existing_charge_id": "chg_f975da50551b51c29b3618daf4dfc57c"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_7f6f4a69c7445a069684445e28a4599a",
+    "existing_charge_id": "chg_d3b68f4af5fd5a5f95af8b0d807cbd48"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e70d9dd878705f7aabfa9bf69e06cca5",
+    "existing_charge_id": "chg_a363c8d470435cd5994ba32a8420820a"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_17ef3e48300d54779edc9850007f4063",
+    "existing_charge_id": "chg_690243ecb83252d2930cdce5ca2bb225"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_28c81c0fc4975368940f244103cb42f5",
+    "existing_charge_id": "chg_051f7c04733b59118e6884bad7c69bda"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id,b.request_id,b.status,b.amount_cents,c.charge_id,c.idempotency_key,c.state,e.kind,e.step AS cancel_step FROM bookings b LEFT JOIN charges c ON c.booking_id=b.booking_id LEFT JOIN customer_events e ON e.request_id=b.request_id WHERE b.status='pending'"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_ca1a5938eaef53b6bf8b54360c578987"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_c2032853918b5af6bcc8469520e335e5",
+    "existing_charge_id": "chg_cb1a53384d615d2aad2524f04b2cca5a"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e535736dbef351abb45f00e6b0a6e5f2",
+    "existing_charge_id": "chg_ab9311ed67405809b4720f687e8e0741"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

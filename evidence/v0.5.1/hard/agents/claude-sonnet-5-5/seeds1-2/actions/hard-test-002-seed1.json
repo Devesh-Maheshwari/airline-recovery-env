@@ -1,0 +1,171 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from outbox where status!=\"delivered\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.*,c.charge_id,c.idempotency_key,c.status cs from bookings b left join charges c on c.booking_id=b.booking_id where b.status!=\"confirmed\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.*,c.* from bookings b left join charges c on c.booking_id=b.booking_id where b.status!=\"confirmed\""
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000350_bkg_a05fdc469c3953cd87cabfff20174823"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "auto_pause_after_attempts": 0,
+     "batch_size": 50
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "accepted_schema": 2
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_54b5622b0d165deca09c4f969be9633f"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_feb4fe95792f593ba4d89be1b08423f6",
+    "existing_charge_id": "chg_8a17f32f71c255e6840666128b88331e"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_5751e7d3a6885ca0acc907f54591caa1",
+    "existing_charge_id": "chg_0b54a70677d9545a8d7938b11adaece1"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_6eb227ccdaa15cfa8d00ab0c65a5785f"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_56ce10fd54e65ef48fc742de695fe0fd"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_56ce10fd54e65ef48fc742de695fe0fd"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select status,count(*) n from bookings group by 1 union all select \"outbox_\"||status,count(*) from outbox group by 1"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 2000
+    }
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select id,service,path,status,message from request_logs where status>=400 order by id desc limit 20"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select \"multi_charge\" k,booking_id v from charges group by booking_id having count(*)>1 union all select \"nohold\",booking_id from bookings b where status=\"confirmed\" and not exists(select 1 from holds h where h.booking_id=b.booking_id) union all select \"nocheckin\",booking_id from bookings b where status=\"confirmed\" and not exists(select 1 from checkins c where c.booking_id=b.booking_id) union all select \"charge_state_\"||state,count(*) from charges group by state union all select \"cust_ev_\"||event_type,count(*) from customer_events group by 1 union all select \"cancelled_ck\",booking_id from checkins where booking_id in (select booking_id from bookings where status=\"cancelled\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from customer_events order by rowid desc limit 8"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

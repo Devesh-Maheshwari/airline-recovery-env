@@ -1,0 +1,41 @@
+{
+ "num_turns": 8,
+ "result": "I finished the episode in 9 of 32 actions and the sidecar issued a signed receipt. The score line wasn't in the output I kept. What I did see: no abandoned requests, revenue retained 1.0, the horizon complete, and a cost penalty of 0.072.\n\nThree bookings were stuck pending:\n\n- **Duplicate booking:** `bkg_e3abd686\u2026` was a second booking with the same client reference as an already confirmed one, and it already had a captured charge. I voided it, which wrote the refund. The receipt counts this as one duplicate voided.\n- **Two bookings with no charge:** `bkg_c2d05dfa\u2026` (F100) and `bkg_fd0ccf22\u2026` (F200) were legitimate requests that never got paid. I reconciled each with a plain call, and both came back 200 and confirmed.\n- **Final state:** every booking is confirmed or cancelled, with check-ins matching confirmed bookings (18 of 18). No outbox events are pending. I made no configuration changes and used no provider lookups.\n\nTwo consecutive probes were healthy, giving two verification windows, and I then called finish.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.09792100000000001,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 14084,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 14084,
+  "cache_read_input_tokens": 122515,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 16,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 472,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 472,
+    "cache_read_input_tokens": 19569,
+    "input_tokens": 2,
+    "output_tokens": 373,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 1705,
+  "output_tokens_details": {
+   "thinking_tokens": 256
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

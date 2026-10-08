@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "airline-recovery-env"
-version = "0.5.0"
+version = "0.5.1"
 description = "Stateful airline transaction recovery benchmark for tool-using agents"
 readme = "README.md"
 license = "MIT"

@@ -1,0 +1,104 @@
+{
+ "actions": [
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, status, payload FROM outbox ORDER BY event_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, b.flight_id, b.passenger_id, COUNT(c.charge_id) as charge_count, GROUP_CONCAT(c.status) as charge_statuses FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id GROUP BY b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, COUNT(c.charge_id) as charge_count FROM bookings b LEFT JOIN charges c ON b.booking_id = c.booking_id GROUP BY b.booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, status FROM bookings ORDER BY booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT charge_id, booking_id, amount_cents FROM charges ORDER BY booking_id"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as total, status FROM bookings GROUP BY status"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, COALESCE(h.hold_id, NO_HOLD) as hold_id, COUNT(c.charge_id) as charge_count FROM bookings b LEFT JOIN holds h ON b.booking_id = h.booking_id LEFT JOIN charges c ON b.booking_id = c.booking_id GROUP BY b.booking_id HAVING charge_count = 0"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(DISTINCT booking_id) as booking_count_with_holds FROM holds"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(DISTINCT booking_id) as booking_count_with_charges FROM charges"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as checkin_count FROM checkins"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT event_id, status, payload FROM outbox WHERE status IN (pending, quarantined) LIMIT 10"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as problematic_count FROM outbox WHERE status != \"delivered\""
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

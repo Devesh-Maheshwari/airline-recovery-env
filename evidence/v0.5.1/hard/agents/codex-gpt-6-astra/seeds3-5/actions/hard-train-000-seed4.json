@@ -1,0 +1,52 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type = 'table'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'config' AS kind, service AS id, value AS data FROM service_config\nUNION ALL SELECT 'booking',booking_id,json_object('request_id',request_id,'flight_id',flight_id,'passenger_id',passenger_id,'amount_cents',amount_cents,'status',status,'client_reference',client_reference) FROM bookings WHERE status <> 'confirmed'\nUNION ALL SELECT 'charge',charge_id,json_object('booking_id',booking_id,'key',idempotency_key,'amount',amount_cents,'state',state,'created_step',created_step) FROM charges WHERE booking_id IN (SELECT booking_id FROM bookings WHERE status <> 'confirmed')\nUNION ALL SELECT 'customer_event',event_id,json_object('request_id',request_id,'kind',kind,'step',step) FROM customer_events\nUNION ALL SELECT 'outbox',event_id,json_object('booking_id',booking_id,'payload',payload,'status',status,'attempts',attempts) FROM outbox WHERE status <> 'delivered'\nUNION ALL SELECT 'fare_hold',hold_id,json_object('flight_id',flight_id,'price',price_cents,'until_step',until_step) FROM fare_holds\nUNION ALL SELECT 'cache',key,value FROM cache\nUNION ALL SELECT 'flight',flight_id,json_object('capacity',capacity,'price',price_cents,'version',version) FROM flights"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_a9bbb2bd9b3e556a9b66540ebe2d080b"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_f8ff8eb05a4751cdaa1c52894111c062"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_04ab70e1ddce5880ac943c1be5c96d20"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_296e3e72816358aeb521815756793d57"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

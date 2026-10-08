@@ -1,0 +1,3 @@
+{
+ "result": "Recovered successfully by restarting pricing. Finished in 9 of 32 actions with a score of **0.968**.\n\nAll required requests completed, both verification probes passed, and the post-finish safety check found no integrity violations. Signed receipt saved in `episode.json`."
+}

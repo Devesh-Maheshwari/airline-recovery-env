@@ -1,0 +1,52 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type = 'table'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'config' AS kind, service AS id, value AS data FROM service_config UNION ALL SELECT 'outbox',event_id,json_object('booking_id',booking_id,'payload',payload,'status',status,'attempts',attempts) FROM outbox WHERE status != 'delivered' UNION ALL SELECT 'booking',booking_id,json_object('request_id',request_id,'flight_id',flight_id,'passenger_id',passenger_id,'amount_cents',amount_cents,'status',status,'client_reference',client_reference) FROM bookings WHERE status != 'confirmed' UNION ALL SELECT 'fare_hold',hold_id,json_object('flight_id',flight_id,'price_cents',price_cents,'until_step',until_step) FROM fare_holds UNION ALL SELECT 'cache',key,value FROM cache UNION ALL SELECT 'flight',flight_id,json_object('capacity',capacity,'price_cents',price_cents,'version',version) FROM flights"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_439942943fde580cbe981117ee2a82a1"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "batch_size": 50,
+     "accepted_schema": 2,
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'integrity_summary' AS kind, json_object('bookings',(SELECT count(*) FROM bookings),'pending_bookings',(SELECT count(*) FROM bookings WHERE status='pending'),'missing_backing',(SELECT count(*) FROM bookings b WHERE b.status='confirmed' AND ((SELECT count(*) FROM holds h WHERE h.booking_id=b.booking_id AND h.flight_id=b.flight_id AND h.passenger_id=b.passenger_id)!=1 OR (SELECT count(*) FROM charges c WHERE c.booking_id=b.booking_id AND c.state='captured' AND c.amount_cents=b.amount_cents)!=1 OR (SELECT count(*) FROM checkins i WHERE i.booking_id=b.booking_id AND i.flight_id=b.flight_id AND i.passenger_id=b.passenger_id)!=1 OR NOT EXISTS (SELECT 1 FROM outbox o WHERE o.booking_id=b.booking_id AND o.status='delivered'))),'excess_charges',(SELECT count(*) FROM (SELECT booking_id FROM charges WHERE state='captured' GROUP BY booking_id HAVING count(*)>1)),'oversold',(SELECT count(*) FROM flights f WHERE (SELECT count(*) FROM holds h WHERE h.flight_id=f.flight_id)>f.capacity),'pending_outbox',(SELECT count(*) FROM outbox WHERE status='pending'),'cancel_events',(SELECT count(*) FROM customer_events),'fare_holds',(SELECT count(*) FROM fare_holds)) AS data UNION ALL SELECT 'quarantined_event',json_object('event_id',event_id,'booking_id',booking_id,'payload',payload) FROM outbox WHERE status='quarantined' UNION ALL SELECT service,value FROM service_config"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

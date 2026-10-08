@@ -1,0 +1,41 @@
+{
+ "num_turns": 40,
+ "result": "The episode ended with a reward of 0.0, though the system itself is mostly recovered. I ran out of actions before I could get the two healthy probes the score needs.\n\nEvery booking was confirmed with a check-in. No bookings were pending and no outbox events were left, but the probes were still failing. A receipt was issued on finish. I didn't pull the score breakdown, so I can't say exactly why it is 0.0. The two missing probes and the unfixed F200 stale quote are the likely causes, not the only possible ones.\n\n**What I fixed:**\n- **Payment timeout:** the booking `payment_timeout_ms` was 148 ms against a provider latency of 630 ms, so captures kept timing out. I raised it to 3000 ms.\n- **Check-in consumer:** it was disabled and kept auto-pausing. I re-enabled it, set `auto_pause_after_attempts` to 0, and set `accepted_schema` to 2.\n- **Poison event:** one outbox event had no `passenger_id` and its booking already had a check-in, so I quarantined it. I judged it invalid, and that judgment is what the \"valid event discarded\" integrity rule would check. The other events then delivered.\n- **Pending bookings:** I reconciled all of them. One returned a 504 because its charge was still pending at the provider, and it confirmed on retry.\n\n**What went wrong:**\n- **Action budget:** my count of the 34 actions was off by several, and I only saw the real number late. I spent too many on reads and one no-op replay. Each mutation also resets the verification count.\n- **Stale F200 quote:** the probe was failing because the cached F200 quote was stale (version 1 against current version 2). I found this late and evicted only that quote, leaving F100 alone because a live fare hold depends on it. That left one action, so I called finish with no verification windows.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.2785406,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 22993,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 22993,
+  "cache_read_input_tokens": 580753,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 54,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 345,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 345,
+    "cache_read_input_tokens": 28591,
+    "input_tokens": 2,
+    "output_tokens": 604,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 7031,
+  "output_tokens_details": {
+   "thinking_tokens": 1388
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

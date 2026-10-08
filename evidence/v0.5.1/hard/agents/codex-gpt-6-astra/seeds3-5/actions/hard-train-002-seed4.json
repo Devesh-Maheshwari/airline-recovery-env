@@ -1,0 +1,151 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type = 'table'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'booking' AS kind, json_object('id',b.booking_id,'request',b.request_id,'flight',b.flight_id,'passenger',b.passenger_id,'amount',b.amount_cents,'status',b.status,'client_reference',b.client_reference,'hold',h.booking_id,'checkin',c.booking_id) AS data FROM bookings b LEFT JOIN holds h USING(booking_id) LEFT JOIN checkins c USING(booking_id)\nUNION ALL SELECT 'charge',json_object('id',charge_id,'booking',booking_id,'key',idempotency_key,'amount',amount_cents,'state',state,'step',created_step) FROM charges\nUNION ALL SELECT 'outbox',json_object('id',event_id,'booking',booking_id,'payload',payload,'status',status,'attempts',attempts) FROM outbox WHERE status != 'delivered'\nUNION ALL SELECT 'cancel',json_object('id',event_id,'request',request_id,'step',step) FROM customer_events\nUNION ALL SELECT 'fare_hold',json_object('id',hold_id,'flight',flight_id,'price',price_cents,'until',until_step) FROM fare_holds\nUNION ALL SELECT 'cache',json_object('key',key,'value',value) FROM cache\nUNION ALL SELECT 'flight',json_object('id',flight_id,'price',price_cents,'version',version,'capacity',capacity) FROM flights"
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing",
+    "flight_id": "F200"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_6950d85517de5d57b824d604ca4c38f9"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000005_bkg_2fd3e823a38c56f388559156ec67a627"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000006_bkg_6950d85517de5d57b824d604ca4c38f9"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'config' AS kind, json_object('service',service,'value',value) AS data FROM service_config\nUNION ALL SELECT 'cancel',json_object('id',e.event_id,'request',e.request_id,'step',e.step,'booking',b.booking_id,'status',b.status) FROM customer_events e LEFT JOIN bookings b USING(request_id)\nUNION ALL SELECT 'outbox',json_object('id',event_id,'booking',booking_id,'payload',payload,'attempts',attempts) FROM outbox WHERE status='pending' ORDER BY kind, data"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000019_bkg_6950d85517de5d57b824d604ca4c38f9"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "batch_size": 50,
+     "accepted_schema": 1,
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_4375a612780757418aa3aa5f19c2376f"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_06343611c29553ac886d7aa12c343c67"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_c052fbf452bd5088b3e44d3bd480f740"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_531e5d8f1a8651c79cd9037ff435c70a"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_531e5d8f1a8651c79cd9037ff435c70a",
+    "idempotency_key": "booking-v2:bkg_531e5d8f1a8651c79cd9037ff435c70a"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_ff09173fc9005aa38ae230bb9b738449"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ff09173fc9005aa38ae230bb9b738449",
+    "existing_charge_id": "chg_6f65d8fa5a4259a494fd68ff1a3a7bc4"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_7796a118a3915fe08bb3a77c35389c8a"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_7796a118a3915fe08bb3a77c35389c8a",
+    "existing_charge_id": "chg_9ac8cbac93c75615a390addf857966c5"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_74a74ecde1ef5417a292f01ff3898112",
+    "idempotency_key": "booking:bkg_74a74ecde1ef5417a292f01ff3898112"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_06343611c29553ac886d7aa12c343c67"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

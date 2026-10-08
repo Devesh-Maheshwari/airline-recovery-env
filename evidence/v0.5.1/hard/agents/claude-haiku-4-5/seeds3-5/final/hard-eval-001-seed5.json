@@ -1,0 +1,41 @@
+{
+ "num_turns": 38,
+ "result": "The episode has completed. Here's a summary of the recovery effort:\n\n**Final Results:**\n- **Score: 0.0** (integrity violations prevented success)\n- **Recovery: 97.6%** - Recovered 82 out of 84 requests\n- **Availability: 100%** - Perfect in last three traffic windows\n- **Revenue Retained: 100%** - No abandoned requests\n\n**What Was Accomplished:**\n1. \u2705 Recovered 5 pending bookings by reconciling with payment captures\n2. \u2705 Enabled checkin consumer (was disabled with circuit breaker)\n3. \u2705 Fixed event schema compatibility (upgraded from v1 to v2)\n4. \u2705 Replayed outbox events to checkin service (delivered 83 total checkins)\n5. \u2705 Cleared most backlog (2 events remaining)\n\n**Integrity Violations (caused failure):**\n1. **Cancelled request fulfilled** - One booking we confirmed should have been a cancelled request\n2. **Duplicate sale** - Two bookings shared the same client reference\n\n**Key Issues:**\n- We reconciled bookings without verifying whether they had been cancelled by customers\n- The circuit breaker on the checkin consumer prevented event delivery initially\n- Event schema mismatch (v2 events vs v1 consumer config) blocked processing\n- Not enough actions remaining to clear final backlog and run 2 verification probes\n\n**Why Reward = 0:**\nThe success conditions require \"No integrity violation at any point.\" The two violations we introduced meant we couldn't pass, even though recovery and availability were excellent. The episode captured a realistic recovery scenario where hasty reconciliation created compliance issues.\n\nThe signed receipt has been stored in `episode.json`.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.30341999999999997,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 49240,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 49240,
+  "cache_read_input_tokens": 1404250,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 305,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 2124,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 2124,
+    "cache_read_input_tokens": 56792,
+    "input_tokens": 8,
+    "output_tokens": 1029,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 12842,
+  "output_tokens_details": {
+   "thinking_tokens": 6523
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

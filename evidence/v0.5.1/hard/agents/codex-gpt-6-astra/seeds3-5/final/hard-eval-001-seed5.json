@@ -1,0 +1,3 @@
+{
+ "result": "Recovery succeeded in 18 of 36 actions.\n\n- All 48 required requests completed correctly.\n- No integrity violations or abandoned requests.\n- Both verification probes and the post-finish safety check passed.\n- Final reward: **0.75**, after action costs.\n- Signed receipt saved in `episode.json`."
+}

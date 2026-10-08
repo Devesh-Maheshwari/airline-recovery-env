@@ -1,0 +1,41 @@
+{
+ "num_turns": 37,
+ "result": "The episode is over, and I didn't reach verification. The action budget ran out before I got two healthy probes. I never called `finish`. The CLI says the episode is already completed, so I can't add more actions.\n\n**What I did**\n- **Diagnosis:** The booking worker's payment timeout was 136 ms and the provider takes about 615 ms. Captures timed out, which left bookings pending. I raised `booking.payment_timeout_ms` to 3000.\n- **Recovery:** I reconciled all 10 pending bookings. Each one came back `confirmed`.\n- **State when I last checked** (about 20 actions in, before the last few probes and the payment restart):\n  - Every booking was confirmed, with 0 pending, 0 pending outbox events and a check-in for each.\n  - The four bookings with two charge rows each had one declined and one captured charge, so each has exactly one captured charge.\n  - There were no orphan charges, and no charge amount differed from its booking.\n- **Final steps:** Probes kept returning `healthy: false` and I couldn't find a cause. The logs showed only expected 200s and sold-out 409s. I restarted the payment worker as a last attempt, and the next probe was still unhealthy.\n\n**Likely outcome**\n- With 0 verification windows and no explicit finish, the terminal reward will probably lose the verification and success components.\n- The availability component also depends on the last three traffic windows, which the unhealthy probes put in doubt.\n- The recovery work should still count toward incident recovery. I can't see the final score.\n\n**Mistakes on my part**\n- I didn't realize each command, including reads, was spending budget and advancing traffic. I used several reads on diagnostics after the reconciles, when I should have probed earlier.\n- I never called `finish`, because I assumed I had actions left.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.3018362,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 24990,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 24990,
+  "cache_read_input_tokens": 637441,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 64,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 289,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 289,
+    "cache_read_input_tokens": 28339,
+    "input_tokens": 2,
+    "output_tokens": 616,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 7426,
+  "output_tokens_details": {
+   "thinking_tokens": 1603
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

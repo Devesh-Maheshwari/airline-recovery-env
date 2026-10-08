@@ -1,0 +1,40 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type = 'table'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'outbox' AS source, json_object('event_id',o.event_id,'booking_id',o.booking_id,'payload',o.payload,'status',o.status,'attempts',o.attempts,'booking_status',b.status,'flight_id',b.flight_id,'passenger_id',b.passenger_id) AS data FROM outbox o LEFT JOIN bookings b USING(booking_id) WHERE o.status <> 'delivered' UNION ALL SELECT 'config', json_object('service',service,'value',value) FROM service_config UNION ALL SELECT 'pending_booking',json_object('booking_id',booking_id,'request_id',request_id,'status',status) FROM bookings WHERE status <> 'confirmed' UNION ALL SELECT 'customer_event',json_object('request_id',request_id,'kind',kind) FROM customer_events"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

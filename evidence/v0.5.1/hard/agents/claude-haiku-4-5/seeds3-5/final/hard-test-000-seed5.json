@@ -1,0 +1,41 @@
+{
+ "num_turns": 26,
+ "result": "Perfect! The airline booking-to-checkin system has been successfully recovered. Here's a summary of what was accomplished:\n\n## Recovery Summary\n\n**Final Score: 0.792** \u2713\n\n### Issues Fixed:\n1. **Disabled Checkin Consumer** - The checkin service had its consumer disabled (returning 503 errors), preventing event delivery\n2. **Invalid Event Blocking** - One event (evt_00000004) was missing the required passenger_id field, causing validation errors and circuit breaker pauses\n3. **Event Backlog** - 17+ pending outbox events were stuck in the queue\n\n### Recovery Actions:\n1. Enabled the checkin consumer configuration\n2. Quarantined the invalid event that was blocking delivery\n3. Replayed all valid outbox events (10 per batch)\n4. Verified system health with 2 healthy probe windows\n\n### Final State:\n- **59 total bookings**: 58 confirmed, 1 cancelled\n- **58 checkins**: All confirmed bookings have matching checkins\n- **0 outbox pending**: All events successfully delivered\n- **113 total requests processed**: 55 from incident period fully recovered\n- **Perfect integrity**: No violations, no orphan charges, no duplicates\n- **100% revenue retained**: No abandoned requests\n- **Safety verified**: System passed post-finish safety check with no violations\n\nThe system is now fully operational with all customer requests correctly fulfilled (confirmed with holds, captured charges, completed checkins, and delivered events).",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.1708547,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 27660,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 27660,
+  "cache_read_input_tokens": 726957,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 209,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 2018,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 2018,
+    "cache_read_input_tokens": 36848,
+    "input_tokens": 8,
+    "output_tokens": 700,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 8526,
+  "output_tokens_details": {
+   "thinking_tokens": 3755
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

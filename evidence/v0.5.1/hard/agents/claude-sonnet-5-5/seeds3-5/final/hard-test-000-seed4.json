@@ -1,0 +1,41 @@
+{
+ "num_turns": 19,
+ "result": "I finished the episode and it scored 0.75 with `success: true` and no integrity violations. I didn't open the full score breakdown, so I can't say where the other 0.25 was lost.\n\n- **Duplicate sale:** two bookings shared client reference `CR-d38fcce2dee6`. I voided the pending one, `bkg_01326f\u2026`, which refunded its 25,000-cent captured charge.\n- **Stuck bookings:** six pending bookings had charges stuck in `submitted`. I used `reconcile_booking` to confirm them. Three needed retries because the provider still showed the capture as pending.\n- **Provider lookups:** for `bkg_737557\u2026`, a provider lookup showed the charge was already captured, so I confirmed it against its existing charge. For `bkg_4bec69\u2026`, the lookup still showed pending. A later plain reconcile worked once the capture had settled.\n- **Verification:** the first probe was unhealthy while one booking was still pending. After it cleared, two consecutive probes were healthy, and then I called `finish`.\n\nI changed no configuration.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.19462619999999997,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 19327,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 19327,
+  "cache_read_input_tokens": 384511,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 38,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 205,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 205,
+    "cache_read_input_tokens": 25065,
+    "input_tokens": 2,
+    "output_tokens": 357,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 4034,
+  "output_tokens_details": {
+   "thinking_tokens": 345
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

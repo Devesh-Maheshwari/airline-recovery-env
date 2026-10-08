@@ -1,0 +1,205 @@
+{
+ "actions": [
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 5000
+    }
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.flight_id, b.passenger_id, b.status, b.request_id, b.amount_cents FROM bookings b WHERE b.status = 'pending' LIMIT 20"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8591bef427a95a8cb54cadd40fa6f626"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_8591bef427a95a8cb54cadd40fa6f626"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8591bef427a95a8cb54cadd40fa6f626",
+    "idempotency_key": "booking:bkg_8591bef427a95a8cb54cadd40fa6f626"
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.booking_id, c.charge_id, c.status, c.amount_cents FROM charges c WHERE c.booking_id IN (SELECT booking_id FROM bookings WHERE status = 'pending' LIMIT 16)"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT * FROM charges WHERE booking_id IN (SELECT booking_id FROM bookings WHERE status = 'pending' LIMIT 1) LIMIT 5"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8591bef427a95a8cb54cadd40fa6f626",
+    "existing_charge_id": "chg_aef602c075ac5908882844cc88cc22bd"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT c.charge_id, c.booking_id, c.amount_cents, c.state FROM charges c WHERE c.booking_id IN (SELECT booking_id FROM bookings WHERE status = 'pending') LIMIT 20"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_079dded0a1fe524a908a4b75b77c6b84",
+    "existing_charge_id": "chg_a03dc5c8a0f55386bc356accebe5a512"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_1d40fd5b98295e6798466c7983e8af7e",
+    "existing_charge_id": "chg_d38fb1ee7b1b59d685b6e11832ddaa37"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_2df3cf5eaddd5327aab1a4cf15b4f2cc",
+    "existing_charge_id": "chg_768acf73904b591c9222f110c1205746"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_4ad8743287f5564292e283cfd333a1e5",
+    "existing_charge_id": "chg_f5fefc7c62f55e43b47ca1d92cf59c1e"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_5384a4c3a68a5a3db785b535ec92e202",
+    "existing_charge_id": "chg_2c50a5644b9f505b9c262cf469b43ea4"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_5a33b863fee459aeae7ae7d2ffccdb3e",
+    "existing_charge_id": "chg_26da396782db59b3930f3ee52036cc14"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_6c9fa7fdec7d5d01b98e7d4f9dab2439",
+    "existing_charge_id": "chg_6f4d24c149c85e7e937405a7ca404831"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_80387b4124645102a436ee851e657106",
+    "existing_charge_id": "chg_2c690decc09f5c988cfdeadd813ae4ab"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8417740342975fc495b8822a189df75c",
+    "existing_charge_id": "chg_0fa3bd1580b151edb2026d793f55c5f2"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_9838551bed8752398a2558097120924a",
+    "existing_charge_id": "chg_b01b416a369155d8ad8062029fc1202b"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e09cd1902b155858a2fdb531f43721e7",
+    "existing_charge_id": "chg_833884fc289a517197986b1fcd4b22a2"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_f11c0054a96553e180a4d75c551659cb",
+    "existing_charge_id": "chg_5f299602628b5d3a9ced4aff236379cb"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

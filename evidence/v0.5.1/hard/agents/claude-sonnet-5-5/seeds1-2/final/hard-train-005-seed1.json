@@ -1,0 +1,41 @@
+{
+ "num_turns": 31,
+ "result": "The episode is over and scored 0.0. I ended it with no healthy probes, so I didn't verify the recovery. The receipt is stored in `episode.json`.\n\nEvery probe I ran after the repairs came back unhealthy, and I never found out why. Reward needs two healthy probes, so the 0.15 verification share was lost. I can't say which other conditions failed, because the output I looked at only showed the 0.0 reward.\n\nI used my reads and mutations in the wrong order, so I only had 5 actions left when I started diagnosing the probe failures. Several greps ran after the repairs and each counted as an action.\n\n**Repairs (all accepted):**\n- **Booking with a declined payment:** the provider showed `bkg_f8f9\u2026` as declined, so I voided it.\n- **Duplicate sale:** `bkg_3cb5\u2026` and `bkg_fc62\u2026` shared a client reference, so I voided `bkg_3cb5\u2026`. I confirmed `bkg_fc62\u2026` against its captured charge.\n- **Other stuck bookings:** `bkg_2367\u2026` was confirmed against its existing captured charge. `bkg_620b\u2026` had no charge, so I reconciled it normally.\n- **Check-in consumer:** it was disabled. I enabled it, raised `batch_size` to 50 and set `auto_pause_after_attempts` to 0.\n- **Bad outbox events:** I quarantined four malformed events, one at a time as they surfaced. They had a payload for the wrong booking, a missing passenger, or a truncated payload.\n\n**State before finishing:** a final query showed no pending bookings. Every confirmed booking had a check-in and a delivered event, and the outbox had nothing pending.\n\n**What I didn't resolve:** probe health stayed false even though the data looked consistent and the config looked sane. The 409s in the booking and inventory logs match the sold-out flight, which the probe sends on purpose. I don't know what the probe was objecting to.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.31544779999999994,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 28874,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 28874,
+  "cache_read_input_tokens": 641889,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 52,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 190,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 190,
+    "cache_read_input_tokens": 34627,
+    "input_tokens": 2,
+    "output_tokens": 645,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 7147,
+  "output_tokens_details": {
+   "thinking_tokens": 1585
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

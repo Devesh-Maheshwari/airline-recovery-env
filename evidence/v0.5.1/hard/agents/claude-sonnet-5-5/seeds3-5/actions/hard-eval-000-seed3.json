@@ -1,0 +1,183 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from bookings"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 3000
+    }
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select booking_id,status,(select count(*) from charges c where c.booking_id=b.booking_id) n,(select count(*) from holds h where h.booking_id=b.booking_id) h from bookings b"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select c.*, b.status bs, b.flight_id from charges c left join bookings b using(booking_id)"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from flights"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select booking_id from bookings where status=\"pending\""
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_05dc405d3f575bf58f40f55e6b1c54d0"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_2d01bc48decf5f048a0942bfb2e69e5e"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_4961c690ed6758db9eae196644421ab2"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_4a60a9caa87659999f0558dd7d73341a"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_6dfeee92667f5474b1bd46b81bdc1bf3"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_88d6dc1be998544fb410e36302fc9ffc"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_acf3b8e669da5e5ebb810e0e52a2903b"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_bebe430acfdd5c1aafba795177e469bc"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_c204deba633b5aa38e4921241f15243c"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_f564e911e0f0577b87964297233a4b34"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,booking_id,status,attempts,payload from outbox where status!=\"delivered\""
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select path,status,message,count(*) n,max(id) last from request_logs where service=\"booking\" and id>300 group by 1,2,3"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select (select count(*) from charges where state=\"captured\") cap,(select count(*) from (select booking_id from charges group by 1 having count(*)>1)) dup,(select count(*) from charges where booking_id not in (select booking_id from bookings)) orphan,(select count(*) from holds) holds,(select count(*) from bookings where status=\"confirmed\") conf,(select count(*) from charges c join bookings b using(booking_id) where c.amount_cents!=b.amount_cents) badamt,(select count(*) from bookings where booking_id not in (select booking_id from checkins)) nochk,(select count(*) from charges where state!=\"captured\") notcap"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select charge_id,booking_id,idempotency_key,state,created_step from charges where booking_id in (select booking_id from charges group by 1 having count(*)>1) order by booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,path,status,message,count(*) n from request_logs where id>380 group by 1,2,3,4"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  }
+ ]
+}

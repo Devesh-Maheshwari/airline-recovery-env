@@ -1,0 +1,105 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.*, (select group_concat(charge_id||\":\"||idempotency_key) from charges c where c.booking_id=b.booking_id) ch from bookings b"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from outbox"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from charges"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "accepted_schema": 2,
+     "auto_pause_after_attempts": 0,
+     "batch_size": 50
+    }
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_e496ea9842215eccbf596408b1af6021"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_1477e3d8f72252d7ad68acad1f3ada54",
+    "existing_charge_id": "chg_7c7dfd6151965ee0a69f21f9b68c06c8"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_02703ce422825082a69e028b40f0d25b",
+    "existing_charge_id": "chg_58cd95e579855c45ba45be7825e0c9d4"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e95d861c53f15213bc821512404ae7d7",
+    "existing_charge_id": "chg_e479e53b34cd56fba022ad85cb42d029"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_3a935bf7148359bda8904ebfb17ee0b7"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_7f938d9a6ee55df5b508896145d6b4f7"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_7f938d9a6ee55df5b508896145d6b4f7"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.client_reference,(select count(*) from checkins c where c.booking_id=b.booking_id) ci,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select group_concat(state) from charges c where c.booking_id=b.booking_id) ch,(select group_concat(status) from outbox o where o.booking_id=b.booking_id) ob from bookings b"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from customer_events"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_02703ce422825082a69e028b40f0d25b"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

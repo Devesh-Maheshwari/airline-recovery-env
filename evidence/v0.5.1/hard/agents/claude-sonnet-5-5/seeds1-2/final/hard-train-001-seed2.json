@@ -1,0 +1,41 @@
+{
+ "num_turns": 9,
+ "result": "The episode is finished and the sidecar issued a signed receipt, which the CLI stores in `episode.json`. I haven't checked that file, and the output I read didn't include the final reward number.\n\nI made no changes to the system. The \"malformed outbox events\" alert was stale: the outbox held five events, all delivered, and the config looked correct. No incident turned up while I watched, so there was nothing to fix. I used 8 of the 32 actions: three reads (SQL, config and one more), four probes and the finish call. Two of those probes landed at steps 6 and 7, so the two required healthy verification windows both counted.\n\n- **Integrity:** The post-finish safety check ran the fare-change, lost-ack-retry and expired-key-retry hazards and found no violations.\n- **Customer requests:** 44 requests, none abandoned, so revenue retained is 1.0.\n- **Horizon:** It completed.\n- **Cost:** The cost penalty was 0.008.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.0916412,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 12787,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 12787,
+  "cache_read_input_tokens": 131186,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 18,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 647,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 647,
+    "cache_read_input_tokens": 18097,
+    "input_tokens": 2,
+    "output_tokens": 315,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 1422,
+  "output_tokens_details": {
+   "thinking_tokens": 262
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

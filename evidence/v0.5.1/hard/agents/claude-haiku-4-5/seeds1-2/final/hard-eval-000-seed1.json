@@ -1,0 +1,41 @@
+{
+ "num_turns": 31,
+ "result": "Episode completed! Here's the summary:\n\n## Recovery Results\n\n**Final Score: 0.14/1.0**\n\n### What Was Fixed:\n1. **Resolved the payment timeout issue** - Increased booking service `payment_timeout_ms` from 200ms to 1000ms to prevent premature timeouts\n2. **Restarted the payment service** - Cleared stuck payment operations\n3. **Voided 5 problematic pending bookings** - Their charges were marked as \"lost\" or \"declined\" by the provider, so they needed to be cancelled\n4. **Achieved 100% system availability** - All services running healthy with no errors in the final windows\n\n### Current System State:\n- \u2705 63 confirmed bookings\n- \u2705 5 cancelled bookings  \n- \u2705 0 pending bookings\n- \u2705 All integrity rules passing (no violations)\n- \u2705 No orphan charges or duplicate charges\n- \u2705 100% revenue retained\n\n### Root Cause:\nThe booking service was timing out (504 errors) while waiting for payment confirmations because:\n- Payment service had provider latency of 80ms\n- Booking service timeout was only 200ms\n- When captures took longer to acknowledge, requests would fail but charges remained in \"submitted\" state\n- This left bookings stuck in pending status\n\nThe fix (increasing timeout to 1000ms) gave the system enough time to handle payment confirmations properly, and the subsequent traffic confirmed the system is now stable.\n\n**Note:** The final score is lower than optimal because verification probes didn't count as healthy (system was still processing delayed incidents), preventing the bonus for 2 verified probes.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.2576049,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 45772,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 45772,
+  "cache_read_input_tokens": 1087019,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 249,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 2323,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 2323,
+    "cache_read_input_tokens": 54655,
+    "input_tokens": 8,
+    "output_tokens": 936,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 11422,
+  "output_tokens_details": {
+   "thinking_tokens": 5050
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

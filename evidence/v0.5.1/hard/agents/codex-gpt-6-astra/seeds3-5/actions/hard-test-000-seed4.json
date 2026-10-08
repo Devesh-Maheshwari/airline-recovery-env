@@ -1,0 +1,146 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name,sql FROM sqlite_master WHERE type=\"table\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT json_object('bookings',(SELECT json_group_array(json_object('booking_id',booking_id,'request_id',request_id,'flight_id',flight_id,'passenger_id',passenger_id,'amount',amount_cents,'status',status,'client_reference',client_reference)) FROM bookings),'charges',(SELECT json_group_array(json_object('charge_id',charge_id,'booking_id',booking_id,'key',idempotency_key,'amount',amount_cents,'state',state,'created',created_step)) FROM charges),'config',(SELECT json_group_object(service,json(value)) FROM service_config),'cancels',(SELECT json_group_array(json_object('request_id',request_id,'step',step)) FROM customer_events),'fares',(SELECT json_group_array(json_object('flight',flight_id,'price',price_cents,'until',until_step)) FROM fare_holds),'cache',(SELECT json_group_object(key,json(value)) FROM cache)) AS state"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.*,c.charge_id,c.idempotency_key,c.state,c.created_step,e.kind,e.step AS cancel_step FROM bookings b LEFT JOIN charges c USING(booking_id) LEFT JOIN customer_events e USING(request_id) WHERE b.status='pending' OR e.kind IS NOT NULL"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_c26361a63a9a543fbd82ed53607d3356"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id,b.request_id,b.status,b.client_reference,c.charge_id,c.idempotency_key,c.state,e.kind,e.step AS cancel_step FROM bookings b LEFT JOIN charges c USING(booking_id) LEFT JOIN customer_events e USING(request_id) WHERE b.status!='confirmed' OR e.kind IS NOT NULL"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_d1b2f757e4ca595bab404b190bae2b70"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_d1b2f757e4ca595bab404b190bae2b70",
+    "idempotency_key": "booking:bkg_d1b2f757e4ca595bab404b190bae2b70"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_29c8d876347356c29abe3874621bea33"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id,b.request_id,b.status,b.client_reference,c.charge_id,c.idempotency_key,c.state,e.kind,e.step AS cancel_step FROM bookings b LEFT JOIN charges c USING(booking_id) LEFT JOIN customer_events e USING(request_id) WHERE b.status!='confirmed' OR e.kind IS NOT NULL"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_29c8d876347356c29abe3874621bea33",
+    "existing_charge_id": "chg_bebb0ea2ba1c5f7fbeb1b470c43685d1"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_748d7287d2245037958109c9806112de",
+    "existing_charge_id": "chg_b6da4fefc52a55f390c6a08025fbf71f"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e993a1a5828e5c1faf6ccdb972d18cee",
+    "idempotency_key": "booking:bkg_e993a1a5828e5c1faf6ccdb972d18cee"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8fcd4b632edf5b509bc98c9b68edf522",
+    "idempotency_key": "booking:bkg_8fcd4b632edf5b509bc98c9b68edf522"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_a604fc1c646e5086b847cf3543bf1f96",
+    "idempotency_key": "booking:bkg_a604fc1c646e5086b847cf3543bf1f96"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT json_object('unresolved',(SELECT json_group_array(json_object('booking_id',b.booking_id,'status',b.status,'charge_id',c.charge_id,'state',c.state,'cancel_step',e.step)) FROM bookings b LEFT JOIN charges c USING(booking_id) LEFT JOIN customer_events e USING(request_id) WHERE b.status!='confirmed' OR e.kind IS NOT NULL),'config',(SELECT json_group_object(service,json(value)) FROM service_config),'refunds',(SELECT json_group_array(json_object('booking_id',booking_id,'charge_id',charge_id,'amount',amount_cents)) FROM refunds),'pending_events',(SELECT json_group_array(json_object('event_id',event_id,'booking_id',booking_id,'payload',json(payload))) FROM outbox WHERE status='pending')) AS state"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e993a1a5828e5c1faf6ccdb972d18cee",
+    "existing_charge_id": "chg_4de1044f48af55c99b07f5741fcae6e0"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id,b.status,c.charge_id,c.state,e.kind,e.step AS cancel_step FROM bookings b LEFT JOIN charges c USING(booking_id) LEFT JOIN customer_events e USING(request_id) WHERE b.status!='confirmed' OR e.kind IS NOT NULL"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_a604fc1c646e5086b847cf3543bf1f96",
+    "existing_charge_id": "chg_500839daf61b50ff9c9ec4da450ae289"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

@@ -194,43 +194,43 @@ charges for every read, mutation and lookup; compare runs on `success` and
 `tasks_solved_on_every_seed`, not on reward. Records:
 [`evidence/v0.5.0/hard/`](evidence/v0.5.0/hard/).
 
-**Coding agents on the hard tier.** All 12 slots × seeds 1–5 (60 episodes per
-agent), each agent given only the Harbor control script and graded by the
-sidecar's signed receipt:
+**Coding agents on the hard tier (0.5.1).** All 12 slots × seeds 1–5 (60
+episodes per agent), each agent given only the Harbor control script and graded
+by the sidecar's signed receipt:
 
 | Agent | Episodes solved | Tasks solved on every seed | Solved by level 1 / 2 / 3 | Failures with an integrity violation | Mean steps | API cost |
 |---|---:|---:|---|---:|---:|---:|
-| Codex, gpt-6-astra | 46 / 60 | 4 / 12 | 20/20 · 14/20 · 12/20 | 13 of 14 | 21.2 | subscription |
-| Claude Code, Sonnet 5.5 | 14 / 60 | 1 / 12 | 13/20 · 0/20 · 1/20 | 41 of 46 | 28.0 | $15.11 |
-| Claude Code, Haiku 4.5 | 10 / 60 | 0 / 12 | 10/20 · 0/20 · 0/20 | 42 of 50 | 29.2 | $15.11 |
+| Codex, gpt-6-astra | 59 / 60 | 11 / 12 | 20/20 · 20/20 · 19/20 | 0 of 1 | 19.9 | subscription |
+| Claude Code, Sonnet 5.5 | 14 / 60 | 1 / 12 | 13/20 · 1/20 · 0/20 | 44 of 46 | 27.3 | $16.46 |
+| Claude Code, Haiku 4.5 | 9 / 60 | 0 / 12 | 9/20 · 0/20 · 0/20 | 41 of 51 | 30.6 | $15.62 |
 
-The same agents scored 30–33 out of 33 on the easy tier. The hard-tier failures
-are the designed ones:
+- **Codex nearly saturates the hard tier.** In 0.5.0 it solved 46 of 60, and all
+  13 of its integrity failures came from one coupling no description stated: a
+  promised fare lives only in the pricing cache, so turning the cache off broke
+  it. 0.5.1 states that rule in the `patch_config` and `invalidate_cache`
+  descriptions; with it, Codex made no integrity mistake in 60 episodes. The
+  hard tier therefore has no headroom left for a Codex-class agent; a harder
+  level is planned.
+- **Claude Code** is unchanged by the fix (0.5.0: Sonnet 14/60, Haiku 10/60). It
+  completed bookings whose customer had cancelled (Sonnet in 41 episodes, Haiku in
+  30), sold one customer two seats (18 and 29) and charged captured payments
+  again (8 and 8; $2,200 and $2,350 of synthetic excess capture). Level 2 is
+  where both stop: 1 of 40 episodes solved between them.
+- Every episode keeps the world's full trace (each observation the agent saw)
+  and the CLI's final message.
 
-- **Codex** solved every level-1 instance. All 13 of its integrity failures were
-  bookings accepted at a fare other than the one promised: it turned the fare
-  cache off early (or later evicted the held flight's quote), so a fare hold that
-  arrived mid-episode was never honoured. The environment honours a fare hold
-  only through its cached quote; an agent can infer this from the `cache` and
-  `fare_holds` tables, but no tool or setting description states it. Treat these
-  13 as an open validity question ([scenarios](docs/SCENARIOS.md)).
-- **Claude Code** completed bookings the customer had cancelled (Sonnet in 35
-  episodes, Haiku in 27), sold one customer two seats (10 and 27), and charged
-  provider-captured payments again (6 and 9; $1,500 and $2,850 of synthetic
-  excess capture). Sonnet ran out of budget in 16 episodes and Haiku in 3, almost
-  always already carrying a violation.
-- The few failures without a violation finished before verifying, or (Haiku,
-  twice) never finished.
+The 0.5.0 results, recorded before the rule was stated, stay in
+[`evidence/v0.5.0/hard/agents/`](evidence/v0.5.0/hard/agents/).
 
 Five seeds per slot is still a small sample; read this as a first calibration,
 not a leaderboard. Reproduce with
 `python -m airline_recovery.live.external --agent <claude-code|codex> --model <model> --tier hard --split all --seeds 1,2,3,4,5 --output runs/<name>`.
-Per-episode records, token usage and every episode's action log:
-[`evidence/v0.5.0/hard/agents/`](evidence/v0.5.0/hard/agents/).
+Per-episode records, token usage, traces and action logs:
+[`evidence/v0.5.1/hard/agents/`](evidence/v0.5.1/hard/agents/).
 
 **Do the failures come from the task or from the environment's limits?**
 - [Failure analysis](evidence/v0.5.0/hard/failure-analysis/README.md): 96 of the
-  110 failed episodes above are integrity harm caused by the agent's own action,
+  110 failed 0.5.0 episodes are integrity harm caused by the agent's own action,
   first harm at a median of 36% of the budget; 10 could plausibly be blamed on the
   budget or the interface.
 - [Ablations](evidence/v0.5.0/hard/ablations/README.md): rerunning Sonnet and

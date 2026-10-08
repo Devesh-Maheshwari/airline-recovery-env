@@ -1,0 +1,41 @@
+{
+ "num_turns": 31,
+ "result": "The episode is finished and the sidecar issued a signed receipt, but I never got the two healthy probes, so I lost the verification credit. The cost penalty hit its 0.25 cap. I did not capture the final reward figure, and the episode is closed, so I can't re-read it.\n\n**What I fixed**\n- **Unresolved payments:** I resolved the 8 bookings stuck as pending against the provider.\n  - 5 had captured payments, and I confirmed them with `reconcile_booking`.\n  - 3 were declined, and I cancelled them with `void_booking`.\n- **Outbox backlog:**\n  - Event 6 was blocked because the consumer only accepted schema 1, so I set `accepted_schema` to 2.\n  - Events 4, 5 and 7 were corrupt (truncated, wrong booking id, missing passenger_id), so I quarantined them.\n  - I then replayed everything else.\n- **Final state:** The last query showed 75 confirmed bookings, each with a check-in and a delivered event, and 3 cancelled bookings. The finish receipt shows no abandoned requests and the horizon complete.\n\n**What went wrong**\n- **Probes:** All three probes I ran came back unhealthy. I didn't find out why. I spent the last few actions on a guess, raising booking `payment_timeout_ms` to 2000, and it didn't help. I only had 3 actions left when I realised the probes were failing, so I couldn't investigate.\n- **Cost:** I used all 4 provider lookups and made many mutating calls, which pushed the penalty to the cap.\n- **Quarantined events:** I judged events 4, 5 and 7 corrupt from their payloads. If any of them counts as a valid event, that would be an integrity violation. The receipt doesn't suggest one, but I didn't see an explicit integrity result.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.35210279999999994,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 29039,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 29039,
+  "cache_read_input_tokens": 820214,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 62,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 155,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 155,
+    "cache_read_input_tokens": 34827,
+    "input_tokens": 2,
+    "output_tokens": 608,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 7178,
+  "output_tokens_details": {
+   "thinking_tokens": 1819
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

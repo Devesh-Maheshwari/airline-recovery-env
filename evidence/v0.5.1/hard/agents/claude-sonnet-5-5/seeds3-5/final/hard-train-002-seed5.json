@@ -1,0 +1,41 @@
+{
+ "num_turns": 26,
+ "result": "I used all 36 actions, but the episode almost certainly scored very low because it never reached the two healthy verification probes. The last reward I saw was 0.019, and I couldn't call `finish` because the budget had already ended the episode. I didn't open `episode.json`, so I haven't confirmed the receipt or the final score.\n\n**What I fixed:**\n- **Root cause:** the booking `payment_timeout_ms` was 142, below the provider latency of 644 ms, so payment captures kept timing out. I raised it to 3000.\n- **Check-in events:**\n  - I quarantined three malformed events: the one with a mismatched booking ID, the one missing a passenger, and the truncated one.\n  - Event `evt_00000008` is valid but uses schema version 2, so I set checkin `accepted_schema` to 2 instead of quarantining it. All remaining events then delivered.\n- **Stuck bookings:**\n  - I reconciled the bookings that were stuck behind lost charges using the original idempotency keys. That avoids duplicate charges.\n  - I reconciled the bookings with captured charges against their existing charge IDs.\n  - By the end, none were left pending.\n- **Voids:** I voided `bkg_4f84\u2026`, which duplicated an already confirmed sale with the same client reference, and `bkg_a75a\u2026`, whose charge was declined.\n- **Payment restart:** I restarted the payment worker as the alert recommended, but it did not resolve the pending captures.\n\n**What went wrong:** the budget ran out before verification. The one probe I ran came back unhealthy, most likely because one booking was still pending at that point. That left no actions for the two healthy probes. Because I ran the first probe only a few actions before the end, the final reconcile reset it anyway.\n\nI spent several early actions on exploratory reads and a first round of reconciles that failed while the provider was pending. A tighter sequence of timeout patch, event fix, reconciles, then probes would have left room for verification.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.32740040000000004,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 31623,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 31623,
+  "cache_read_input_tokens": 599712,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 48,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 135,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 135,
+    "cache_read_input_tokens": 35127,
+    "input_tokens": 2,
+    "output_tokens": 650,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 8087,
+  "output_tokens_details": {
+   "thinking_tokens": 2022
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

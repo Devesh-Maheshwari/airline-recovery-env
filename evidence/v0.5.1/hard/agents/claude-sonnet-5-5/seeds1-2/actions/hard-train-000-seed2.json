@@ -1,0 +1,96 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.*, (select group_concat(charge_id||\":\"||idempotency_key) from charges c where c.booking_id=b.booking_id) ch from bookings b"
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_fd3b37ebea62513e945ff3ce5e3ad538",
+    "idempotency_key": "booking:bkg_fd3b37ebea62513e945ff3ce5e3ad538"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8de6d5bc74105f628963964e40569d98",
+    "idempotency_key": "booking:bkg_8de6d5bc74105f628963964e40569d98"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_c7065a3bb48d51919be46f8d860e5626"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ff27b12d81e15adeaed1ac0b4f6bc3fa"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select (select count(*) from bookings where status=\"pending\") p, (select count(*) from bookings where status=\"confirmed\") c, (select count(*) from checkins) k, (select group_concat(status) from outbox where status!=\"delivered\") o, (select count(*) from holds) h"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select path,status,duration_ms,message from request_logs where status>=500 order by rowid desc limit 10"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select count(*) from checkins k where k.booking_id=b.booking_id) k,(select count(*) from charges c where c.booking_id=b.booking_id) c from bookings b where h=0 or k=0 or c!=1 union all select event_id,status,attempts,0,0,0 from outbox where status!=\"delivered\" union all select * from (select event_id, type, 0,0,0,0 from customer_events order by rowid desc limit 3)"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select count(*) from checkins k where k.booking_id=b.booking_id) k,(select count(*) from charges c where c.booking_id=b.booking_id) c from bookings b where h=0 or k=0 or c!=1"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from charges where booking_id in (\"bkg_8de6d5bc74105f628963964e40569d98\",\"bkg_c7065a3bb48d51919be46f8d860e5626\")"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select status,message,count(*) n from request_logs where service=\"booking\" and rowid>(select max(rowid)-60 from request_logs) group by 1,2"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

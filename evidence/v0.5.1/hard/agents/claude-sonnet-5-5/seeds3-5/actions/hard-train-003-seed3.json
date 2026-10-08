@@ -1,0 +1,202 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select booking_id,status,flight_id,passenger_id,amount_cents,client_reference,request_id from bookings"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select sql from sqlite_master where type=\"table\" and name in (\"charges\",\"outbox\",\"holds\",\"fare_holds\",\"checkins\",\"customer_events\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id||\"|\"||b.status||\"|\"||b.flight_id||\"|\"||ifnull(b.client_reference,\"\")||\"|\"||ifnull((select group_concat(c.state||\":\"||c.idempotency_key||\":\"||c.amount_cents) from charges c where c.booking_id=b.booking_id),\"\")||\"|hold\"||(select count(*) from holds h where h.booking_id=b.booking_id)||\"|\"||ifnull((select group_concat(status||o.attempts) from outbox o where o.booking_id=b.booking_id),\"\") as r from bookings b"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id||\"|\"||booking_id||\"|\"||payload||\"|\"||status as r from outbox"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select \"cache\" t, key||\"=\"||value as r from cache union all select \"flight\", flight_id||\" \"||capacity||\" \"||price_cents||\" \"||ifnull(version,\"\") from flights union all select \"fh\",hold_id||flight_id||price_cents||\" until \"||until_step from fare_holds"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000004_bkg_e7b785a631d85d34938cf1cb078ceb72"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_87fc83ab75745d0c85b29fa35f76cd64"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_f6e9af34bf3c53a2a62d1b3c892c510a"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select charge_id||\" \"||booking_id||\" \"||state as r from charges where idempotency_key like \"booking-v2%\" or state=\"lost\""
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ecb6044b05125da1a2eaf6bbb384adb2",
+    "existing_charge_id": "chg_6ba71d4dbfac5848aaa65fbc282db310"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_73d6fc7a6c08505b9eab574f1d743c18",
+    "existing_charge_id": "chg_647e1cdf5387580f995a9283e246957b"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_715b84df3a6d5196b4c1301344f22972"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_87407d7035925a6f9af3136df9061b21"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_87407d7035925a6f9af3136df9061b21"
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing",
+    "flight_id": "F100"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 2000
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.status||\"|\"||ifnull(b.client_reference,\"\")||\"|\"||(select count(*) from charges c where c.booking_id=b.booking_id and state=\"captured\")||\"|h\"||(select count(*) from holds h where h.booking_id=b.booking_id)||\"|ck\"||(select count(*) from checkins k where k.booking_id=b.booking_id)||\"|\"||ifnull((select group_concat(status) from outbox o where o.booking_id=b.booking_id),\"\") as r from bookings b where b.status<>\"confirmed\" or not exists(select 1 from checkins k where k.booking_id=b.booking_id)"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id||\"|\"||b.status||\"|\"||b.flight_id||\"|\"||(select count(*) from charges c where c.booking_id=b.booking_id and state=\"captured\")||\"|h\"||(select count(*) from holds h where h.booking_id=b.booking_id)||\"|ck\"||(select count(*) from checkins k where k.booking_id=b.booking_id)||\"|\"||ifnull((select group_concat(status) from outbox o where o.booking_id=b.booking_id),\"\") as r from bookings b where b.rowid>14 or b.status<>\"confirmed\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select rowid||\"|\"||status||\"|\"||message as r from request_logs where service=\"booking\" and status<>200 order by rowid desc limit 6"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select key||\"=\"||value as r from cache"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select \"ev\" t,request_id||\" \"||kind as r from customer_events union all select \"rf\",* from refunds union all select \"b\",booking_id||\" \"||request_id||\" \"||status from bookings where status=\"cancelled\""
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

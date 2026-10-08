@@ -9,7 +9,14 @@ dates are build dates. 0.4.0 was the last internal build; 0.5.0 is the first ver
 The reasons behind the 0.2.1, 0.3.0, 0.4.0 and 0.5.0 changes are summarised in
 [docs/LIMITATIONS.md](docs/LIMITATIONS.md#review-history).
 
-## [Unreleased]
+## [0.5.1] - 2026-10-08
+
+### Changed
+
+- The hard-tier `patch_config` and `invalidate_cache` descriptions state that a
+  promised fare is served only from its cached quote, so evicting that row or
+  turning the pricing cache off breaks the hold. Agent-facing text changed, so
+  hard-tier results from 0.5.0 are not comparable.
 
 ### Added
 
@@ -31,6 +38,10 @@ The reasons behind the 0.2.1, 0.3.0, 0.4.0 and 0.5.0 changes are summarised in
 
 ### Measured
 
+- Coding agents on the hard tier, seeds 1–5, with full traces: Codex gpt-6-astra
+  59/60 with no integrity violation (0.5.0: 46/60, all 13 integrity failures from
+  the unstated fare-hold rule); Sonnet 5.5 14/60; Haiku 4.5 9/60
+  ([evidence](evidence/v0.5.1/hard/agents/)).
 - Ablations (Sonnet 5.5 and Haiku 4.5, 24 instances each): neither clearer
   instructions nor twice the budget changes the outcome by more than two
   episodes; level 2 stays unsolved

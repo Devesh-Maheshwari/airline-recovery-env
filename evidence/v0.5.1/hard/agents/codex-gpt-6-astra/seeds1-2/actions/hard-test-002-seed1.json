@@ -1,0 +1,106 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type = 'table'"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'pending_booking' AS kind, json_object('booking_id',b.booking_id,'request_id',b.request_id,'flight_id',b.flight_id,'passenger_id',b.passenger_id,'amount_cents',b.amount_cents,'status',b.status,'client_reference',b.client_reference,'charges',(SELECT json_group_array(json_object('charge_id',c.charge_id,'key',c.idempotency_key,'amount',c.amount_cents,'state',c.state,'created_step',c.created_step)) FROM charges c WHERE c.booking_id=b.booking_id),'customer_events',(SELECT json_group_array(json_object('event_id',e.event_id,'kind',e.kind,'step',e.step)) FROM customer_events e WHERE e.request_id=b.request_id),'same_client',(SELECT json_group_array(json_object('booking_id',x.booking_id,'status',x.status,'request_id',x.request_id)) FROM bookings x WHERE x.client_reference=b.client_reference AND x.booking_id<>b.booking_id)) AS data FROM bookings b WHERE b.status='pending' UNION ALL SELECT 'outbox',json_object('event_id',event_id,'booking_id',booking_id,'payload',payload,'attempts',attempts) FROM outbox WHERE status='pending' UNION ALL SELECT 'flight',json_object('flight_id',flight_id,'capacity',capacity,'price_cents',price_cents,'version',version) FROM flights UNION ALL SELECT 'cache',json_object('key',key,'value',value) FROM cache UNION ALL SELECT 'fare_hold',json_object('hold_id',hold_id,'flight_id',flight_id,'price_cents',price_cents,'until_step',until_step) FROM fare_holds"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000350_bkg_79d160be8283589d92a030370ca53662"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "batch_size": 50,
+     "accepted_schema": 2,
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_40edda15237c558cbac097b1427a26ba"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_f3fd15756eae55f5984191b955e173ad"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_23cc9f7e32045223a8094b3580e23934"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_6d4902ef2c665f75b53abdbb07d82a8c"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking-v2:bkg_b48fd58932b752c783a1f665298b77bd"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'booking' kind,json_object('booking_id',b.booking_id,'request_id',b.request_id,'status',b.status,'client_reference',b.client_reference,'customer_events',(SELECT json_group_array(json_object('kind',e.kind,'step',e.step)) FROM customer_events e WHERE e.request_id=b.request_id),'charges',(SELECT json_group_array(json_object('charge_id',c.charge_id,'key',c.idempotency_key,'state',c.state,'amount',c.amount_cents)) FROM charges c WHERE c.booking_id=b.booking_id)) data FROM bookings b WHERE b.status='pending' UNION ALL SELECT 'customer_event',json_object('event_id',event_id,'request_id',request_id,'kind',kind,'step',step) FROM customer_events UNION ALL SELECT 'config',json_object('service',service,'value',value) FROM service_config UNION ALL SELECT 'refund',json_object('booking_id',booking_id,'charge_id',charge_id,'amount_cents',amount_cents) FROM refunds"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_23cc9f7e32045223a8094b3580e23934",
+    "existing_charge_id": "chg_3fea65d19abb58bcb65b2a3f506ccc5b"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_6d4902ef2c665f75b53abdbb07d82a8c",
+    "existing_charge_id": "chg_679e7754e417587db269b875f2244c62"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_b48fd58932b752c783a1f665298b77bd"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

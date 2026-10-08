@@ -1,0 +1,41 @@
+{
+ "num_turns": 38,
+ "result": "The episode ended with a reward of 0. I ran out of the 34-action budget before I could verify or call `finish`. The score shows `integrity: false` and `verified: false`.\n\n**What I did**\n- **Payment timeouts:** the booking service's `payment_timeout_ms` was 111, but the payment provider's latency was about 492 ms. That left bookings pending. I raised it to 5000.\n- **Pending bookings:** I reconciled all 10 pending bookings and they are confirmed.\n- **Check-in backlog:** I quarantined three invalid outbox events. One had a truncated payload, one had a booking ID that didn't match, and one had no `passenger_id`. I raised the check-in `batch_size` to 50, and the rest of the backlog replayed.\n- **Cache:** I cleared the pricing quote cache.\n\n**What went wrong**\n- **Stale-quote failures:** the booking logs kept showing 409 \"stale pricing quote\" errors after the cache clear, so every probe came back unhealthy. I never got a single counted healthy probe.\n- **Likely cause:** `F200` has version 2 in `flights` while `F100` and `F900` have version 1. I suspect the quotes were out of step with that version, but I never confirmed it. The cache table was already empty when I looked.\n- **Wasted actions:** I used many actions on single-booking reconciles and on diagnostic reads and queries. That left too few actions to find the stale-quote cause.\n- **Integrity violation:** the score flags one, but the response was cut off before it named which rule. I don't know the cause. My best guess is the quarantined events, since the booking with the truncated event and the booking whose event had a mismatched ID may not count as having a valid event delivered. That is a guess.\n- **Partial credit:** the score shows `incident_recovery` at about 0.62 and a cost penalty of 0.224. None of that counts, because the terminal reward is 0 after an integrity violation.\n\nThe world can't be reset, so nothing more can be done in this episode.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.34755879999999995,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 34054,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 34054,
+  "cache_read_input_tokens": 699474,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 54,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 446,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 446,
+    "cache_read_input_tokens": 37247,
+    "input_tokens": 2,
+    "output_tokens": 696,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 7134,
+  "output_tokens_details": {
+   "thinking_tokens": 1619
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

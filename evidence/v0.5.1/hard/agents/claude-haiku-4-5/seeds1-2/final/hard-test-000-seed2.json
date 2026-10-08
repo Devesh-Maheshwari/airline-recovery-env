@@ -1,0 +1,41 @@
+{
+ "num_turns": 14,
+ "result": "Perfect! The airline recovery system has been successfully restored. Here's what was accomplished:\n\n## Recovery Summary\n\n**Final Score: 0.924 / 1.0** \u2713\n\n### Key Actions (11 of 32 budget used):\n1. **Identified the problem** - Checkin service had undelivered events with invalid payloads\n2. **Quarantined bad event** - One outbox event had a missing `passenger_id` field causing repeated validation failures\n3. **Enabled consumer** - Re-enabled the disabled checkin consumer, which automatically delivered queued events\n4. **Replayed remaining events** - Successfully delivered all 6 remaining valid outbox events\n5. **Verified recovery** - Ran 2 healthy probes confirming system stability\n\n### Final State:\n- \u2705 29 confirmed bookings with 29 complete check-ins\n- \u2705 0 pending outbox events (100% event delivery)\n- \u2705 2 verified healthy probes\n- \u2705 0 integrity violations\n- \u2705 100% recovery rate for incident-affected requests\n- \u2705 100% revenue retained (zero abandoned requests)\n- \u2705 Signed receipt stored in `episode.json`\n\n### Score Composition:\n- **Availability**: 1.0 (all traffic succeeded)\n- **Recovery**: 1.0 (all incident requests resolved)\n- **Verification**: 0.15 (2 healthy probes)\n- **Revenue Retained**: 0.10\n- **Success**: 0.10\n- **Cost penalty**: -0.076 (3 mutations)\n\nThe system is now fully operational with all customers' bookings properly confirmed, charged, and checked in.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.09502460000000001,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 19196,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 19196,
+  "cache_read_input_tokens": 320346,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 113,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 275,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 275,
+    "cache_read_input_tokens": 30127,
+    "input_tokens": 8,
+    "output_tokens": 766,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 4897,
+  "output_tokens_details": {
+   "thinking_tokens": 2287
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

@@ -1,0 +1,109 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type = 'table' ORDER BY name"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'booking' AS kind, json_object('booking_id',b.booking_id,'request_id',b.request_id,'flight_id',b.flight_id,'passenger_id',b.passenger_id,'amount_cents',b.amount_cents,'status',b.status,'client_reference',b.client_reference,'hold',h.booking_id,'charges',json((SELECT json_group_array(json_object('charge_id',c.charge_id,'key',c.idempotency_key,'amount',c.amount_cents,'state',c.state,'step',c.created_step)) FROM charges c WHERE c.booking_id=b.booking_id))) AS data FROM bookings b LEFT JOIN holds h USING(booking_id) WHERE b.status <> 'confirmed' UNION ALL SELECT 'customer_event',json_object('event_id',event_id,'request_id',request_id,'kind',kind,'step',step) FROM customer_events UNION ALL SELECT 'outbox',json_object('event_id',event_id,'booking_id',booking_id,'payload',payload,'status',status,'attempts',attempts) FROM outbox WHERE status <> 'delivered' UNION ALL SELECT 'fare_hold',json_object('flight_id',flight_id,'price',price_cents,'until',until_step) FROM fare_holds UNION ALL SELECT 'cache',json_object('key',key,'value',value) FROM cache UNION ALL SELECT 'flight',json_object('flight_id',flight_id,'price',price_cents,'capacity',capacity,'holds',(SELECT count(*) FROM holds h WHERE h.flight_id=f.flight_id)) FROM flights f UNION ALL SELECT 'config',json_object('service',service,'value',value) FROM service_config"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'booking' AS kind,json_object('booking_id',booking_id,'request_id',request_id,'client_reference',client_reference,'status',status) AS data FROM bookings WHERE client_reference IS NOT NULL UNION ALL SELECT 'cancel',json_object('request_id',request_id,'step',step) FROM customer_events UNION ALL SELECT 'log',json_object('service',service,'status',status,'trace_id',trace_id,'message',message) FROM (SELECT * FROM request_logs WHERE service IN ('payment','booking') ORDER BY id DESC LIMIT 40)"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_90eed11d585155349d0956bf2648241e"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_5b17eed39c465020a09ec80aa009c4e3"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id,b.request_id,b.status,b.client_reference,c.charge_id,c.idempotency_key,c.amount_cents,c.state,e.kind AS customer_event,e.step AS event_step FROM bookings b LEFT JOIN charges c USING(booking_id) LEFT JOIN customer_events e USING(request_id) WHERE b.status <> 'confirmed' OR e.event_id IS NOT NULL"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_5b17eed39c465020a09ec80aa009c4e3",
+    "existing_charge_id": "chg_c89302fa540f5bc5886a1d560296765f"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_4362191e0a74580796ffc4f6873a8705"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_4362191e0a74580796ffc4f6873a8705",
+    "existing_charge_id": "chg_99d8683ca46e5b6bb3869461cb1c4863"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_0ebb35b767ae5e8190951e66505d1469"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_0ebb35b767ae5e8190951e66505d1469",
+    "idempotency_key": "booking-v2:bkg_0ebb35b767ae5e8190951e66505d1469"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'pending' AS kind,json_object('booking_id',b.booking_id,'request_id',b.request_id,'charge_id',c.charge_id,'key',c.idempotency_key,'state',c.state,'amount',c.amount_cents) AS data FROM bookings b LEFT JOIN charges c USING(booking_id) WHERE b.status='pending' UNION ALL SELECT 'customer_event',json_object('request_id',request_id,'kind',kind,'step',step) FROM customer_events UNION ALL SELECT 'config',json_object('service',service,'value',value) FROM service_config"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_59cf4781fd775fc99f1f3eb6c7a1d18e",
+    "idempotency_key": "booking:bkg_59cf4781fd775fc99f1f3eb6c7a1d18e"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_015a0a1a20ac59fdafd6a436d8ba107e",
+    "idempotency_key": "booking-v2:bkg_015a0a1a20ac59fdafd6a436d8ba107e"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

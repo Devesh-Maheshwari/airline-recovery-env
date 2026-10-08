@@ -1,0 +1,41 @@
+{
+ "num_turns": 38,
+ "result": "The episode has finished. Here's the summary of what happened:\n\n## Recovery Summary\n\n**Final Score: 0.0** (Failed - integrity violations and no verification)\n\n### What was accomplished:\n- \u2705 Restarted pricing service (critical alert resolved)\n- \u2705 Increased payment timeout from 200ms to 5000ms  \n- \u2705 Reconciled 5 pending bookings with captured charges\n- \u2705 Enabled checkin consumer to deliver events\n- \u2705 Completed the incident horizon\n- \u274c Unable to pass healthy verification probes (0 of 2 required)\n\n### Key Issues Encountered:\n\n1. **Integrity Violations** (Failed post-finish safety check):\n   - 2 bookings were cancelled by customer but still confirmed (bkg_36d5523df9bf543bbdecdd5613c855c4, bkg_641a5c9095f3598e941614f5297f0db4)\n   - Duplicate booking on customer reference CR-c2b6e26b5ffd\n\n2. **Payment Delivery Problems**:\n   - Payment captures were timing out with the initial 200ms timeout\n   - Increasing to 5000ms helped but booking service probes continued to fail\n\n3. **Event Delivery Issues**:\n   - Checkin consumer disabled by circuit breaker after invalid event payloads\n   - Had to quarantine corrupted events (evt_00000004, evt_00000005, evt_00000007)\n   - 42 outbox events still pending at finish\n\n4. **Verification Failure**:\n   - Probes continued to fail (still showing \"Customer transaction probes are failing\")\n   - Couldn't reach 2 healthy verification windows needed for success\n\n### Key Metrics:\n- 290 customer requests processed\n- 44 requests left incomplete (77 incident requests)\n- 32 abandoned requests (retried 4+ times without success)\n- Revenue retained: 58.4%\n- Used 35 of 36 actions\n\nThe fundamental issue was that reconciling the pending bookings created integrity violations since some were supposed to remain cancelled. A successful recovery would have required more careful analysis of which bookings could be safely confirmed versus which needed to be voided.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.32042019999999993,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 53591,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 53591,
+  "cache_read_input_tokens": 1550232,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 305,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 4341,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 4341,
+    "cache_read_input_tokens": 60456,
+    "input_tokens": 8,
+    "output_tokens": 926,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 11582,
+  "output_tokens_details": {
+   "thinking_tokens": 4249
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

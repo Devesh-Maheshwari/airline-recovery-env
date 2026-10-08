@@ -1,0 +1,41 @@
+{
+ "num_turns": 17,
+ "result": "I finished the episode at step 29 of 36 with a reward of 0.75. The episode terminated, but I haven't confirmed that `episode.json` holds the signed receipt.\n\nI didn't see a score breakdown, so I can't say what cost the other 0.25. Part of it is the cost penalty from about 20 mutations. My guess is the rest is availability or incident recovery, but that is unconfirmed.\n\nWhat I changed:\n- **Payment timeouts:** I raised `booking.payment_timeout_ms` from 200 to 2000, because payment calls were returning 504s.\n- **Check-in consumer:** I re-enabled it, set `auto_pause_after_attempts` to 0 so it can't pause itself again, and raised `batch_size` to 50.\n- **Bad events:** I quarantined four outbox events that were invalid:\n  - `evt_00000004` had a truncated payload.\n  - `evt_00000006` had no `passenger_id`.\n  - `evt_00000007` and `evt_00000019` named a booking that doesn't exist.\n- **Stuck bookings:**\n  - I adopted the existing captured charges for `bkg_11316a\u2026` and `bkg_462dd1\u2026`, which confirmed both.\n  - I voided `bkg_a720bd\u2026`, a duplicate sale sharing a client reference with a confirmed booking, and refunded its 20,000 cents.\n  - I voided `bkg_b01fb2\u2026` and `bkg_eb27d6\u2026`, which the customers had cancelled.\n- **Result:** at the last replay there were 60 confirmed bookings, 60 check-ins and 3 cancelled. No bookings were pending and no outbox events were pending.\n- **Verification:** two healthy probes in a row, then finish.\n\nI never queried the charge or refund rows after the voids, so I'm relying on the void responses for the refund amounts. I also didn't touch `payment_key_version`, which is still 1.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.2659572,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 30091,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 30091,
+  "cache_read_input_tokens": 417626,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 34,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 161,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 161,
+    "cache_read_input_tokens": 33569,
+    "input_tokens": 2,
+    "output_tokens": 640,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 6200,
+  "output_tokens_details": {
+   "thinking_tokens": 1848
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

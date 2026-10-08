@@ -1,0 +1,204 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select name,sql from sqlite_master where type=\"table\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.flight_id,b.amount_cents,(select group_concat(c.charge_id||\"|\"||c.idempotency_key||\"|\"||c.state) from charges c where c.booking_id=b.booking_id) ch,(select group_concat(p.idempotency_key||\"|\"||p.state||\"|\"||coalesce(p.final_state,\"\")||\"|\"||coalesce(p.settles_at_step,\"\")) from provider_ledger p where p.booking_id=b.booking_id) pl from bookings b where status=\"pending\""
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 2000
+    }
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.flight_id,b.amount_cents,c.charge_id,c.idempotency_key,c.state,c.amount_cents ca from bookings b left join charges c on c.booking_id=b.booking_id where b.status=\"pending\""
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_4fcd22294cf65e989b8c230686d6ceed"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_a19c8ede86d2543dab446a3fa5f8c811"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_87d2b8432c7d5ffeaf025f33a23a6a00"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_2413e1830ec0582da1f24c9397802b41"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_56bd53de0fc4529f88c086ac0a6d3947"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_99ec24e5505b5fb99ca3057cd7a9348c"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_0e1521314f0f5a60b79c08a28c3a55c2"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_a9e72d12076151e4b228dbf635eb0b5a"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ec6b6a6e6a7c5b19ab5d99cfdffcec24"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_fd54c072961b5ca0be46d8fdba4ccee7"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_6bb4c85e07b753e8a7232fc8dae74027"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_89ff22845f7855c9ad1686d99454ec05"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_3491c63f00e553fcaa4475a376e95579"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_b7b4078492c450708df8e75172b9cfcb"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,c.state,c.idempotency_key from bookings b left join charges c on c.booking_id=b.booking_id where b.status!=\"confirmed\""
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_fae3e74e156258d8bb63593493a8f620"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_83a608bcba2851abae32b5d907fc8620"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select \"f\" k,flight_id a,price_cents b,version c from flights union all select \"h\",flight_id,price_cents,until_step from fare_holds union all select \"c\",key,value,0 from cache"
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing",
+    "flight_id": "F100"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,path,status,message,count(*) n from (select * from request_logs order by id desc limit 60) group by 1,2,3,4"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select id,service,path,status,message from request_logs where status>=400 order by id desc limit 6"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select id,service,path,status,substr(message,1,50) m from request_logs where service in (\"pricing\",\"booking\") order by id desc limit 24"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select \"outbox\" k,status a,count(*) n from outbox group by 2 union all select \"conf_bad\",b.status,count(*) from bookings b where b.status=\"confirmed\" and ((select count(*) from charges c where c.booking_id=b.booking_id and c.state=\"captured\")!=1 or not exists(select 1 from holds h where h.booking_id=b.booking_id) or not exists(select 1 from checkins k where k.booking_id=b.booking_id)) union all select \"charge_state\",state,count(*) from charges group by 2 union all select \"refunds\",\"\",count(*) from refunds union all select \"cancel_ev\",\"\",count(*) from customer_events union all select \"summary\",\"rem\",0"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.flight_id,(select count(*) from charges c where c.booking_id=b.booking_id and c.state=\"captured\") nc,(select count(*) from holds h where h.booking_id=b.booking_id) nh,(select count(*) from checkins k where k.booking_id=b.booking_id) nk from bookings b where b.status=\"confirmed\" and ((select count(*) from charges c where c.booking_id=b.booking_id and c.state=\"captured\")!=1 or not exists(select 1 from holds h where h.booking_id=b.booking_id) or not exists(select 1 from checkins k where k.booking_id=b.booking_id))"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select charge_id,idempotency_key,amount_cents,state,created_step from charges where booking_id=\"bkg_83a608bcba2851abae32b5d907fc8620\""
+   }
+  }
+ ]
+}

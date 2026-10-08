@@ -1,0 +1,41 @@
+{
+ "num_turns": 25,
+ "result": "The episode ended with a reward of 0.0, so the recovery did not succeed. Every probe from step 6 onward came back unhealthy, with `backlog_complete` false. No verification window ever counted, and I don't know why the probes failed. I ran out of actions before I could find out.\n\nWhat I changed:\n- **Check-in:** I enabled the consumer and set `auto_pause_after_attempts` to 0. I quarantined `evt_00000004`, a duplicate event for `bkg_e7b785\u2026` whose payload had no `passenger_id`. Afterward every outbox event was delivered and no outbox events were left pending.\n- **Pending bookings:** I reconciled four of them to confirmed. One used the default key, one had no charge yet, and two used the `booking-v2` charges via `existing_charge_id`.\n- **Voids:**\n  - **`bkg_715b84\u2026`:** I voided it because it duplicated a confirmed booking's `client_reference` and had a captured charge.\n  - **`bkg_87407d\u2026`:** I voided it after the provider lookup showed the charge as declined.\n- **Pricing and payment:** I invalidated the stale F100 pricing cache (the F200 cache was left alone because it backs the live fare hold). I raised `payment_timeout_ms` from 200 to 2000.\n- **State checks:** My final table check showed only the two voided bookings not confirmed, and every confirmed booking had one captured charge, a hold, a check-in and a delivered event. The pending and outbox counts were 0.\n\nWhat I didn't check, and my guess at the cause: the SQL check for refunds and customer cancel events returned nothing, probably because my query was malformed. I never confirmed that the cancelled bookings had matching refund or cancel-event rows. That, or a setting I left deployed, may be what kept the backlog incomplete.\n\nI used up the budget mostly on exploratory reads and chained calls before acting, which left no room to diagnose the unhealthy probes.",
+ "stop_reason": "end_turn",
+ "terminal_reason": "completed",
+ "total_cost_usd": 0.30633540000000004,
+ "usage": {
+  "cache_creation": {
+   "ephemeral_1h_input_tokens": 28020,
+   "ephemeral_5m_input_tokens": 0
+  },
+  "cache_creation_input_tokens": 28020,
+  "cache_read_input_tokens": 585947,
+  "fallback_credit": null,
+  "inference_geo": "not_available",
+  "input_tokens": 48,
+  "iterations": [
+   {
+    "cache_creation": {
+     "ephemeral_1h_input_tokens": 179,
+     "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 179,
+    "cache_read_input_tokens": 33784,
+    "input_tokens": 2,
+    "output_tokens": 651,
+    "type": "message"
+   }
+  ],
+  "output_tokens": 7697,
+  "output_tokens_details": {
+   "thinking_tokens": 1960
+  },
+  "server_tool_use": {
+   "web_fetch_requests": 0,
+   "web_search_requests": 0
+  },
+  "service_tier": "standard",
+  "speed": "standard"
+ }
+}

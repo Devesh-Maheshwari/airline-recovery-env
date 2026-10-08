@@ -1,0 +1,167 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, status, passenger_id, flight_id, amount_cents, hold_id, refund_id FROM bookings ORDER BY booking_id"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name=\"bookings\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id, status, passenger_id, flight_id, amount_cents FROM bookings WHERE status=\"pending\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT booking_id FROM holds WHERE booking_id IN (SELECT booking_id FROM bookings WHERE status=\"pending\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT charge_id, booking_id, amount_cents, status FROM charges WHERE booking_id IN (SELECT booking_id FROM bookings WHERE status=\"pending\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name=\"charges\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT charge_id, booking_id, idempotency_key, amount_cents, state FROM charges WHERE booking_id IN (SELECT booking_id FROM bookings WHERE status=\"pending\")"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_ff719b85a7e75a60955b69ae963fabd3"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_27c8b0a4783c5c798d576a4887e20bf0"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_9ddc22ca6565510e850bc6f621194b36",
+    "existing_charge_id": "chg_141a74a3bf7955dab40b5844b8ab3f34"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_ff719b85a7e75a60955b69ae963fabd3",
+    "idempotency_key": "booking:bkg_ff719b85a7e75a60955b69ae963fabd3"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_27c8b0a4783c5c798d576a4887e20bf0",
+    "idempotency_key": "booking:bkg_27c8b0a4783c5c798d576a4887e20bf0"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT COUNT(*) as total_events FROM customer_events WHERE event_type=\"accepted\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name=\"customer_events\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT sql FROM sqlite_master WHERE type=\"table\" AND name=\"outbox\""
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id, b.status, COUNT(h.booking_id) as holds, COUNT(c.booking_id) as charges FROM bookings b LEFT JOIN holds h ON b.booking_id = h.booking_id LEFT JOIN charges c ON b.booking_id = c.booking_id WHERE b.status=\"confirmed\" GROUP BY b.booking_id HAVING holds = 0 OR charges = 0"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT b.booking_id FROM bookings b WHERE b.status=\"confirmed\" AND NOT EXISTS (SELECT 1 FROM checkins c WHERE c.booking_id = b.booking_id)"
+   }
+  },
+  {
+   "tool": "restart_service",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

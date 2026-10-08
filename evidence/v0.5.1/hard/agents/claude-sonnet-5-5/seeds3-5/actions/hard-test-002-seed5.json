@@ -1,0 +1,183 @@
+{
+ "actions": [
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.*, c.charge_id, c.state, c.idempotency_key from bookings b left join charges c on c.booking_id=b.booking_id where b.status!=\"confirmed\""
+   }
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from outbox where status!=\"delivered\""
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 2000
+    }
+   }
+  },
+  {
+   "tool": "invalidate_cache",
+   "arguments": {
+    "service": "pricing"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000340_bkg_a9429573c3a253eab4b7c2983183c82c"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "batch_size": 50,
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_999408f6e91d5151ba5d1644871c2fdd"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_13e4ca4c4af25430a1da86f0c5edb1ef"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_344b4962a362547b966513afe164659a"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_492a98c9c4055498bee55f83c0044a6c"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_9af1d2a3cf8e5b1094c72cad06ec2264"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_a765471a7fa75b31b8a199d80999cb9a",
+    "idempotency_key": "booking-v2:bkg_a765471a7fa75b31b8a199d80999cb9a"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,payload,status,attempts from outbox where status!=\"delivered\" and (payload not like \"{%\" or payload like \"%schema_version\\\": 2%\" or event_id like \"%a9429573%\") limit 30"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,substr(payload,1,120) p,status,attempts from outbox where status=\"pending\" order by event_id limit 8"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,booking_id,replace(replace(payload,char(10),\" \"),\"  \",\"\") p from outbox where status=\"pending\" and attempts<=10 and event_id<\"evt_00000349\" order by event_id"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000345_bkg_a9429573c3a253eab4b7c2983183c82c"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000347_bkg_ae222c2509e95dde99c2f77ff219233a"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000348_bkg_a9429573c3a253eab4b7c2983183c82c"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,status,message,count(*) n from (select * from request_logs order by id desc limit 120) group by 1,2,3"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select \"nohold\" k,count(*) from bookings b where status=\"confirmed\" and not exists(select 1 from holds h where h.booking_id=b.booking_id) union all select \"nocheckin\",count(*) from bookings b where status=\"confirmed\" and not exists(select 1 from checkins c where c.booking_id=b.booking_id) union all select \"badcharge\",count(*) from bookings b where status=\"confirmed\" and (select count(*) from charges c where c.booking_id=b.booking_id and c.state=\"captured\")!=1 union all select \"orphan\",count(*) from charges c where not exists(select 1 from bookings b where b.booking_id=c.booking_id) union all select \"dupref\",count(*) from (select client_reference from bookings where status=\"confirmed\" and client_reference is not null group by 1 having count(*)>1) union all select \"nonconf_charge\",count(*) from charges c join bookings b using(booking_id) where b.status!=\"confirmed\" and c.state!=\"captured\" union all select \"quar\",count(*) from outbox where status=\"quarantined\" union all select \"refunds\",count(*) from refunds"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select id,service,path,status,message from request_logs where status>=400 and id>(select max(id)-160 from request_logs) order by id desc limit 25"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from customer_events"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

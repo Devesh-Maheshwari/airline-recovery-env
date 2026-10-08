@@ -1,0 +1,193 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,b.request_id,c.charge_id,c.idempotency_key,c.status cs from bookings b left join charges c on c.booking_id=b.booking_id where b.status<>\"confirmed\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from outbox where status<>\"delivered\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.*, (select group_concat(charge_id||\"|\"||idempotency_key) from charges c where c.booking_id=b.booking_id) ch, (select count(*) from outbox o where o.booking_id=b.booking_id) ob from bookings b where b.status<>\"confirmed\" or b.booking_id in (\"bkg_6736cce9b28159079c49f266ab314ae8\",\"bkg_b4e8baaa69825c71a1a99db526dc206e\")"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from charges where booking_id in (select booking_id from bookings where status=\"pending\")"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_f8f9d58039065b8f825166e240827b25"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000376_bkg_b4e8baaa69825c71a1a99db526dc206e"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_f8f9d58039065b8f825166e240827b25"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_3cb55973832b58978e6049875eea588a"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_2367240295e453ab9f2816d1b8059c29",
+    "existing_charge_id": "chg_e9a0be68fbcf51f583e5cdd1a21ebfbb"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_fc62478d42c550ac95aebe5547a6c071",
+    "existing_charge_id": "chg_05d2bb4dbe435e3ca649433a014690eb"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_620bdd20e2f755efa393e3bc9127ac28"
+   }
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "checkin",
+    "values": {
+     "consumer_enabled": true,
+     "batch_size": 50,
+     "auto_pause_after_attempts": 0
+    }
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select o.event_id,o.status,o.attempts,o.payload,b.passenger_id,b.flight_id from outbox o left join bookings b on b.booking_id=o.booking_id where o.status=\"pending\" and (o.payload not like \"%\"||b.booking_id||\"%\" or o.payload not like \"%\"||b.passenger_id||\"%\" or o.payload not like \"%\"||b.flight_id||\"%\" or b.booking_id is null)"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000387_bkg_b4e8baaa69825c71a1a99db526dc206e"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000388_bkg_9d7c957556955a9bada1ac6dbddc2a6b"
+   }
+  },
+  {
+   "tool": "quarantine_event",
+   "arguments": {
+    "event_id": "evt_00000389_bkg_eef517d83984541fb50609a26592bb08"
+   }
+  },
+  {
+   "tool": "replay_events",
+   "arguments": {
+    "limit": 50
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select status,count(*) n from bookings group by status"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "checkin"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select (select count(*) from bookings b where status=\"confirmed\" and not exists(select 1 from checkins c where c.booking_id=b.booking_id)) nocheckin,(select count(*) from outbox where status=\"pending\") pend,(select count(*) from bookings b where status=\"confirmed\" and not exists(select 1 from outbox o where o.booking_id=b.booking_id and o.status=\"delivered\")) nodeliv"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "payment"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,b.flight_id,b.amount_cents,(select count(*) from charges c where c.booking_id=b.booking_id) nc,(select group_concat(state) from charges c where c.booking_id=b.booking_id) st,(select count(*) from holds h where h.booking_id=b.booking_id) nh from bookings b where nc<>1 or nh<>(b.status=\"confirmed\") or st<>\"captured\" order by 1"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select event_id,status,attempts,payload from outbox where status<>\"delivered\" or event_id>\"evt_00000395\" order by event_id desc limit 12"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

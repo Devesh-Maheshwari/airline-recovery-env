@@ -1,0 +1,3 @@
+{
+ "result": "Recovered successfully in 19/32 actions.\n\n- All required requests completed; both cancellations honored.\n- Two healthy probes and final safety check passed.\n- No integrity violations or abandoned requests.\n- Reward: **0.784**.\n- Signed receipt saved in `episode.json`."
+}

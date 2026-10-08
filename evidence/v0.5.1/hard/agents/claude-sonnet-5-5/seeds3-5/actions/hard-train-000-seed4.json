@@ -1,0 +1,142 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from bookings"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select booking_id,status,message,path,duration_ms from request_logs where service=\"booking\" and status>=400 order by rowid desc limit 8"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from charges"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select booking_id,idempotency_key,state from charges where booking_id in (\"bkg_8d1fda601e865e56b0cb391a0e94bc4d\",\"bkg_1d55d18e23cc54dfbbfc050928cef175\")"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_1d55d18e23cc54dfbbfc050928cef175"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_e5a25388e2fd5f74a7caa52f2fa36e2e",
+    "existing_charge_id": "chg_a33b8e97ff7458c992124abb03d394b4"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_34e7800b299650cca307a80e164a6e1f",
+    "existing_charge_id": "chg_9ca822e30aff523ab289ec58c4bd9a8d"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_8d1fda601e865e56b0cb391a0e94bc4d"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.status,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select count(*) from checkins c where c.booking_id=b.booking_id) c from bookings b where status!=\"confirmed\" or booking_id in (select booking_id from outbox)"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_1d55d18e23cc54dfbbfc050928cef175"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_metrics",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select service,path,status,duration_ms,message from request_logs where status>=500 order by rowid desc limit 8"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select rowid,service,path,status,message from request_logs where status>=400 order by rowid desc limit 12"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.flight_id,b.status,b.amount_cents,(select count(*) from charges c where c.booking_id=b.booking_id and state=\"captured\") cc,(select group_concat(amount_cents) from charges c where c.booking_id=b.booking_id) amts,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select count(*) from checkins k where k.booking_id=b.booking_id) k from bookings b where b.status=\"confirmed\" and (cc!=1 or h!=1 or k!=1 or amts!=cast(b.amount_cents as text)) union all select flight_id,\"cap\",capacity,(select count(*) from holds h where h.flight_id=f.flight_id),0,fare_cents,0,0 from flights f"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select b.booking_id,b.flight_id,b.status,b.amount_cents,(select count(*) from charges c where c.booking_id=b.booking_id and state=\"captured\") cc,(select count(*) from holds h where h.booking_id=b.booking_id) h,(select count(*) from checkins k where k.booking_id=b.booking_id) k from bookings b where b.status=\"confirmed\" and (cc!=1 or h!=1 or k!=1)"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from flights"
+   }
+  },
+  {
+   "tool": "get_logs",
+   "arguments": {
+    "service": "booking"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "select * from customer_events"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_e5a25388e2fd5f74a7caa52f2fa36e2e"
+   }
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

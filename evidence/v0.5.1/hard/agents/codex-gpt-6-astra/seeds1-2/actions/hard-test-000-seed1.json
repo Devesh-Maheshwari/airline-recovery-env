@@ -1,0 +1,115 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "patch_config",
+   "arguments": {
+    "service": "booking",
+    "values": {
+     "payment_timeout_ms": 1500
+    }
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type = \"table\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'booking' AS kind, json_object('booking_id',b.booking_id,'request_id',b.request_id,'flight_id',b.flight_id,'passenger_id',b.passenger_id,'amount',b.amount_cents,'status',b.status,'client_reference',b.client_reference,'charges',(SELECT json_group_array(json_object('id',c.charge_id,'key',c.idempotency_key,'amount',c.amount_cents,'state',c.state,'step',c.created_step)) FROM charges c WHERE c.booking_id=b.booking_id),'events',(SELECT json_group_array(json_object('kind',e.kind,'step',e.step)) FROM customer_events e WHERE e.request_id=b.request_id)) AS data FROM bookings b WHERE b.status!='confirmed' UNION ALL SELECT 'config',json_object('service',service,'value',value) FROM service_config UNION ALL SELECT 'cache',json_object('key',key,'value',value) FROM cache UNION ALL SELECT 'flight',json_object('id',flight_id,'capacity',capacity,'price',price_cents,'version',version) FROM flights UNION ALL SELECT 'fare_hold',json_object('id',hold_id,'flight',flight_id,'price',price_cents,'until',until_step) FROM fare_holds UNION ALL SELECT 'outbox',json_object('id',event_id,'booking',booking_id,'payload',payload,'status',status,'attempts',attempts) FROM outbox WHERE status!='delivered'"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_2238f6228abb571ca3cd1887474c936f"
+   }
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_2238f6228abb571ca3cd1887474c936f"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_71f3387a64c95ec29967f3ca98572647",
+    "existing_charge_id": "chg_b2c8790c17c559618eff7bb44e931d1d"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_89eac339c73d58f5b3148359707a7ef9",
+    "existing_charge_id": "chg_87097824327e506bba0281c87c6bd17f"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_5afdb390c632541d994d6b324c4a6b28",
+    "existing_charge_id": "chg_e6a87cb324fd55358d937d7258ba296b"
+   }
+  },
+  {
+   "tool": "reconcile_booking",
+   "arguments": {
+    "booking_id": "bkg_0ff998c899005d3d8f46e2ff91822a75",
+    "existing_charge_id": "chg_2df26460ac0756e293170f128be22ab4"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_2238f6228abb571ca3cd1887474c936f"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_1b05cb1dd6fa582d89750b4954b510af"
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT 'charge' AS kind,json_object('id',c.charge_id,'booking',c.booking_id,'key',c.idempotency_key,'amount',c.amount_cents,'state',c.state,'created_step',c.created_step,'booking_status',b.status) AS data FROM charges c JOIN bookings b ON b.booking_id=c.booking_id WHERE b.status!='confirmed' UNION ALL SELECT 'refund',json_object('id',refund_id,'charge',charge_id,'booking',booking_id,'amount',amount_cents,'step',created_step) FROM refunds UNION ALL SELECT 'log',json_object('service',service,'path',path,'status',status,'message',message) FROM (SELECT * FROM request_logs WHERE service='payment' OR status>=500 ORDER BY id DESC LIMIT 30)"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "provider_lookup",
+   "arguments": {
+    "idempotency_key": "booking:bkg_2238f6228abb571ca3cd1887474c936f"
+   }
+  },
+  {
+   "tool": "void_booking",
+   "arguments": {
+    "booking_id": "bkg_2238f6228abb571ca3cd1887474c936f"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}

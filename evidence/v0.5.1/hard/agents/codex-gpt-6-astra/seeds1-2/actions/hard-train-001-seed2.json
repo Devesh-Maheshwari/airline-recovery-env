@@ -1,0 +1,40 @@
+{
+ "actions": [
+  {
+   "tool": "get_config",
+   "arguments": {}
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT name, sql FROM sqlite_master WHERE type = \"table\""
+   }
+  },
+  {
+   "tool": "query_sql",
+   "arguments": {
+    "query": "SELECT \"outbox\" AS source, json_object(\"event_id\",o.event_id,\"booking_id\",o.booking_id,\"payload\",o.payload,\"status\",o.status,\"attempts\",o.attempts) AS data FROM outbox o WHERE o.status != \"delivered\" UNION ALL SELECT \"booking\", json_object(\"booking_id\",b.booking_id,\"request_id\",b.request_id,\"flight_id\",b.flight_id,\"passenger_id\",b.passenger_id,\"amount_cents\",b.amount_cents,\"status\",b.status,\"client_reference\",b.client_reference) FROM bookings b WHERE b.status != \"confirmed\" UNION ALL SELECT \"customer_event\",json_object(\"event_id\",event_id,\"request_id\",request_id,\"kind\",kind,\"step\",step) FROM customer_events UNION ALL SELECT \"config:\" || service, value FROM service_config UNION ALL SELECT \"cache:\" || key, value FROM cache UNION ALL SELECT \"fare_hold\", json_object(\"flight_id\",flight_id,\"price_cents\",price_cents,\"until_step\",until_step) FROM fare_holds"
+   }
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "probe",
+   "arguments": {}
+  },
+  {
+   "tool": "finish",
+   "arguments": {}
+  }
+ ]
+}
